@@ -240,7 +240,7 @@ show_ica_torg = st.sidebar.checkbox("ICA Supermarket Torgkassen", value=True)
 show_willys = st.sidebar.checkbox("Willys (Björkgatan)", value=True)
 show_hemkop = st.sidebar.checkbox("Hemköp (Svava)", value=True)
 show_coop = st.sidebar.checkbox("Coop (Centralhuset)", value=True)
-show_lidl = st.sidebar.checkbox("Lidl (Mock-data)", value=False)
+show_lidl = st.sidebar.checkbox("Lidl", value=True)
 
 # Search bar
 search_query = st.text_input("🔍 Sök efter varor (t.ex. kaffe, blandfärs, lax)...", "").strip().lower()
