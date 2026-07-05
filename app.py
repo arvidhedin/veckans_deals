@@ -1,6 +1,8 @@
 import streamlit as st
 from scrapers import ica, coop, willys, lidl, hemkop
 import urllib.parse
+import datetime
+import re
 
 # Set page config
 st.set_page_config(
@@ -215,6 +217,26 @@ st.markdown("""
         width: fit-content;
         margin-top: 2px;
     }
+    .deal-restriction-badge {
+        font-size: 0.7rem;
+        font-weight: 700;
+        background: #FEF3C7;
+        color: #D97706;
+        padding: 4px 8px;
+        border-radius: 4px;
+        width: fit-content;
+        margin-top: 6px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        border: 1px solid #FCD34D;
+    }
+    @media (prefers-color-scheme: dark) {
+        .deal-restriction-badge {
+            background: rgba(217, 119, 6, 0.2);
+            color: #FBBF24;
+            border-color: rgba(217, 119, 6, 0.3);
+        }
+    }
     @media (prefers-color-scheme: dark) {
         .deal-discount-badge {
             background: rgba(239, 68, 68, 0.2);
@@ -241,6 +263,14 @@ show_willys = st.sidebar.checkbox("Willys (Björkgatan)", value=True)
 show_hemkop = st.sidebar.checkbox("Hemköp (Svava)", value=True)
 show_coop = st.sidebar.checkbox("Coop (Centralhuset)", value=True)
 show_lidl = st.sidebar.checkbox("Lidl", value=True)
+
+lidl_filter = "Alla Lidl-erbjudanden"
+if show_lidl:
+    lidl_filter = st.sidebar.radio(
+        "Lidl-period:",
+        ["Alla Lidl-erbjudanden", "Endast denna vecka", "Endast nästa vecka"],
+        index=0
+    )
 
 # Search bar
 search_query = st.text_input("🔍 Sök efter varor (t.ex. kaffe, blandfärs, lax)...", "").strip().lower()
@@ -272,7 +302,51 @@ with st.spinner("Hämtar de senaste erbjudandena..."):
 
     # Lidl
     if show_lidl:
-        all_offers.extend(lidl.get_offers())
+        lidl_offers = lidl.get_offers()
+        if lidl_filter != "Alla Lidl-erbjudanden":
+            today = datetime.date.today()
+            # Start of current week (Monday)
+            start_of_this_week = today - datetime.timedelta(days=today.weekday())
+            end_of_this_week = start_of_this_week + datetime.timedelta(days=6)
+            # Start of next week (Monday)
+            start_of_next_week = start_of_this_week + datetime.timedelta(days=7)
+            end_of_next_week = start_of_next_week + datetime.timedelta(days=6)
+            
+            filtered_lidl = []
+            for offer in lidl_offers:
+                restriction = offer.get("restriction", "")
+                dates_found = re.findall(r'(\d{1,2})/(\d{1,2})', restriction)
+                parsed_dates = []
+                for d, m in dates_found:
+                    day = int(d)
+                    month = int(m)
+                    year = today.year
+                    if today.month == 12 and month == 1:
+                        year += 1
+                    elif today.month == 1 and month == 12:
+                        year -= 1
+                    try:
+                        parsed_dates.append(datetime.date(year, month, day))
+                    except ValueError:
+                        pass
+                
+                # Om inga datum hittades, behåll erbjudandet
+                if not parsed_dates:
+                    filtered_lidl.append(offer)
+                    continue
+                    
+                d1 = parsed_dates[0]
+                d2 = parsed_dates[1] if len(parsed_dates) > 1 else d1
+                
+                if lidl_filter == "Endast denna vecka":
+                    if max(d1, start_of_this_week) <= min(d2, end_of_this_week):
+                        filtered_lidl.append(offer)
+                elif lidl_filter == "Endast nästa vecka":
+                    if max(d1, start_of_next_week) <= min(d2, end_of_next_week):
+                        filtered_lidl.append(offer)
+            lidl_offers = filtered_lidl
+            
+        all_offers.extend(lidl_offers)
 
 # Filter by search query if present
 if search_query:
@@ -310,6 +384,11 @@ else:
                 desc_tag = offer.get('description', '') if offer.get('description', '') else "&nbsp;"
                 discount_tag = offer.get('discount', '') if offer.get('discount', '') else ""
                 
+                # Check for "tor" or "sön" (case-insensitive) in restriction
+                restriction_text = offer.get('restriction', '')
+                is_tor_son = any(x in restriction_text.lower() for x in ['tor', 'sön'])
+                restriction_badge = '<div class="deal-restriction-badge">Endast Tor-Sön</div>' if is_tor_son else ''
+                
                 # Säkra upp övriga variabler i kortet också
                 product_name = offer.get('product', 'Okänd produkt')
                 price_str = offer.get('price', 'Se pris i butik')
@@ -332,6 +411,7 @@ else:
                             <div class="deal-price">{price_str}</div>
                             {f'<div class="deal-discount-badge">{discount_tag}</div>' if discount_tag else ''}
                         </div>
+                        {restriction_badge}
                     </div>
                 </div>
                 """)
