@@ -97,6 +97,9 @@ st.markdown("""
         .product-desc {
             color: #71717A !important;
         }
+        .original-price {
+            color: #71717A !important;
+        }
     }
     
     .deal-card:hover {
@@ -127,6 +130,22 @@ st.markdown("""
     .store-hemköp { background: #D31115; }
     .store-coop { background: #007A33; }
     .store-lidl { background: #00509E; }
+    
+    /* Discount percentage badge */
+    .discount-percent-badge {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        background: #EF4444;
+        color: white;
+        padding: 6px 12px;
+        border-radius: 30px;
+        font-size: 0.75rem;
+        font-weight: 800;
+        z-index: 10;
+        box-shadow: 0 4px 8px rgba(239, 68, 68, 0.2);
+        letter-spacing: 0.5px;
+    }
     
     /* Card Image styling */
     .card-img-container {
@@ -199,6 +218,13 @@ st.markdown("""
         display: flex;
         flex-direction: column;
         margin-top: 0.75rem;
+    }
+    .original-price {
+        text-decoration: line-through;
+        color: #A0A0AB;
+        font-size: 0.85rem;
+        font-weight: 500;
+        margin-bottom: 2px;
     }
     .deal-price {
         font-size: 1.5rem;
@@ -355,6 +381,18 @@ if search_query:
         if search_query in o.get('product', '').lower() or search_query in o.get('brand', '').lower()
     ]
 
+# Sort offers by discount percentage descending
+def get_discount_pct(offer):
+    pct = offer.get('discount_percentage')
+    if pct is None:
+        return 0.0
+    try:
+        return float(pct)
+    except (ValueError, TypeError):
+        return 0.0
+
+all_offers.sort(key=get_discount_pct, reverse=True)
+
 # Render offers
 if not all_offers:
     st.info("Inga erbjudanden hittades för det valda filtret eller sökningen.")
@@ -374,7 +412,8 @@ else:
                 # Standardize store names for styling class
                 store_name = offer.get('store', 'Okänd butik')
                 store_class = store_name.lower().replace(" ", "-")
-# Image placeholder
+                
+                # Image placeholder
                 img_url = offer.get('image_url', '')
                 if not img_url:
                     img_url = "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=300&q=80"
@@ -389,6 +428,13 @@ else:
                 is_tor_son = any(x in restriction_text.lower() for x in ['tor', 'sön'])
                 restriction_badge = '<div class="deal-restriction-badge">Endast Tor-Sön</div>' if is_tor_son else ''
                 
+                # Säkra upp originalpris och rabattprocent
+                orig_price = offer.get('original_price', '')
+                discount_pct = get_discount_pct(offer)
+                
+                orig_price_html = f'<div class="original-price">{orig_price}</div>' if orig_price else ''
+                pct_badge_html = f'<span class="discount-percent-badge">-{discount_pct:g}%</span>' if discount_pct > 0 else ''
+                
                 # Säkra upp övriga variabler i kortet också
                 product_name = offer.get('product', 'Okänd produkt')
                 price_str = offer.get('price', 'Se pris i butik')
@@ -398,6 +444,7 @@ else:
                 card_html = textwrap.dedent(f"""
                 <div class="deal-card">
                     <span class="store-badge store-{store_class}">{store_name}</span>
+                    {pct_badge_html}
                     <div class="card-img-container">
                         <img class="card-img" src="{img_url}" onerror="this.src='https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=300&q=80';">
                     </div>
@@ -408,6 +455,7 @@ else:
                             <span class="product-desc">{desc_tag}</span>
                         </div>
                         <div class="price-section">
+                            {orig_price_html}
                             <div class="deal-price">{price_str}</div>
                             {f'<div class="deal-discount-badge">{discount_tag}</div>' if discount_tag else ''}
                         </div>
