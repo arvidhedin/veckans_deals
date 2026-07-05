@@ -278,7 +278,7 @@ with st.spinner("Hämtar de senaste erbjudandena..."):
 if search_query:
     all_offers = [
         o for o in all_offers
-        if search_query in o['product'].lower() or search_query in o['brand'].lower()
+        if search_query in o.get('product', '').lower() or search_query in o.get('brand', '').lower()
     ]
 
 # Render offers
