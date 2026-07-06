@@ -1,4 +1,7 @@
 import requests
+from bs4 import BeautifulSoup
+import urllib.parse
+import json
 
 
 # Willys butik att hämta erbjudanden för
@@ -129,3 +132,114 @@ def get_offers() -> list[dict]:
         print(f"Fel vid hämtning av Willys-erbjudanden: {e}")
 
     return all_offers
+
+
+def search_regular_assortment(query: str) -> list[dict]:
+    """Sök i Willys ordinarie sortiment via HTML-sidan och extrahera __NEXT_DATA__."""
+    try:
+        url = f"https://www.willys.se/sok?q={urllib.parse.quote(query)}"
+        response = requests.get(url, headers=HEADERS, timeout=15)
+        response.raise_for_status()
+
+        soup = BeautifulSoup(response.text, "html.parser")
+        script_tag = soup.find("script", id="__NEXT_DATA__", type="application/json")
+
+        if not script_tag or not script_tag.string:
+            print("Willys sök: Kunde inte hitta __NEXT_DATA__-taggen.")
+            return []
+
+        next_data = json.loads(script_tag.string)
+
+        # Navigera in i JSON-trädet – Axfood/Next.js-strukturen kan variera
+        props = next_data.get("props", {})
+        page_props = props.get("pageProps", {})
+
+        # Försök flera möjliga vägar till sökresultaten
+        products = []
+
+        # Väg 1: initialState -> search -> results
+        initial_state = page_props.get("initialState", {})
+        search_data = initial_state.get("search", {})
+        products = search_data.get("results", [])
+
+        # Väg 2: searchResult -> results
+        if not products:
+            search_result = page_props.get("searchResult", {})
+            products = search_result.get("results", [])
+
+        # Väg 3: products direkt under pageProps
+        if not products:
+            products = page_props.get("products", [])
+
+        # Väg 4: Sök rekursivt efter en lista med "name"-fält
+        if not products:
+            products = _find_product_list(next_data)
+
+        if not products:
+            print("Willys sök: Hittade inga produkter i __NEXT_DATA__.")
+            return []
+
+        # Ta max 3 första produkterna
+        results = []
+        for item in products[:3]:
+            # Bild-URL
+            image_url = ""
+            img = item.get("image")
+            if isinstance(img, dict):
+                img_url = img.get("url", "")
+                if img_url:
+                    if img_url.startswith("http"):
+                        image_url = img_url
+                    else:
+                        image_url = IMAGE_BASE + img_url.lstrip("/")
+            elif isinstance(img, str) and img:
+                if img.startswith("http"):
+                    image_url = img
+                else:
+                    image_url = IMAGE_BASE + img.lstrip("/")
+
+            # Pris med enhet
+            price_val = item.get("price", "")
+            price_unit = item.get("priceUnit", item.get("comparePriceUnit", ""))
+            price_str = f"{price_val} kr" if price_val else ""
+            if price_unit and price_str:
+                price_str += f" ({price_unit})"
+
+            results.append({
+                "store": "Willys Ord.pris",
+                "product": item.get("name", "Okänd produkt"),
+                "brand": item.get("manufacturer", ""),
+                "price": price_str,
+                "discount": "",
+                "description": item.get("displayVolume", ""),
+                "image_url": image_url,
+                "original_price": "",
+                "discount_percentage": 0,
+            })
+
+        return results
+
+    except requests.RequestException as e:
+        print(f"Willys sök: Nätverksfel – {e}")
+        return []
+    except (json.JSONDecodeError, KeyError, TypeError) as e:
+        print(f"Willys sök: Fel vid parsning av data – {e}")
+        return []
+    except Exception as e:
+        print(f"Willys sök: Oväntat fel – {e}")
+        return []
+
+
+def _find_product_list(data, depth=0) -> list:
+    """Rekursivt sök igenom JSON-trädet efter en lista som ser ut som produkter."""
+    if depth > 10:
+        return []
+    if isinstance(data, list) and len(data) > 0:
+        if isinstance(data[0], dict) and "name" in data[0]:
+            return data
+    if isinstance(data, dict):
+        for key, value in data.items():
+            result = _find_product_list(value, depth + 1)
+            if result:
+                return result
+    return []

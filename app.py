@@ -269,6 +269,71 @@ st.markdown("""
             color: #F87171;
         }
     }
+    
+    /* Willys Reference Price Box */
+    .ref-price-box {
+        background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 100%);
+        border: 1px solid #a5d6a7;
+        border-radius: 14px;
+        padding: 1.25rem 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 2px 8px rgba(0, 147, 69, 0.08);
+    }
+    @media (prefers-color-scheme: dark) {
+        .ref-price-box {
+            background: linear-gradient(135deg, #1b3a1f 0%, #1a2e1b 100%);
+            border-color: rgba(76, 175, 80, 0.25);
+        }
+        .ref-price-box h4 {
+            color: #81C784 !important;
+        }
+        .ref-item {
+            color: #C8E6C9 !important;
+        }
+        .ref-item .ref-price {
+            color: #A5D6A7 !important;
+        }
+    }
+    .ref-price-box h4 {
+        margin: 0 0 0.75rem 0;
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: #2E7D32;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+    }
+    .ref-items {
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+    }
+    .ref-item {
+        font-size: 0.9rem;
+        color: #37474F;
+        display: flex;
+        align-items: baseline;
+        gap: 0.5rem;
+        line-height: 1.5;
+    }
+    .ref-item .ref-name {
+        font-weight: 600;
+    }
+    .ref-item .ref-brand {
+        font-weight: 400;
+        opacity: 0.7;
+        font-size: 0.8rem;
+    }
+    .ref-item .ref-price {
+        font-weight: 800;
+        color: #2E7D32;
+        margin-left: auto;
+        white-space: nowrap;
+    }
+    .ref-item .ref-desc {
+        font-size: 0.78rem;
+        opacity: 0.6;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -375,11 +440,17 @@ with st.spinner("Hämtar de senaste erbjudandena..."):
         all_offers.extend(lidl_offers)
 
 # Filter by search query if present
+willys_reference_offers = []
 if search_query:
     all_offers = [
         o for o in all_offers
         if search_query in str(o.get('product') or '').lower() or search_query in str(o.get('brand') or '').lower()
     ]
+    # Hämta referenspris från Willys ordinarie sortiment
+    try:
+        willys_reference_offers = willys.search_regular_assortment(search_query)
+    except Exception as e:
+        print(f"Kunde inte hämta Willys referenspriser: {e}")
 
 # Sort offers by discount percentage descending
 def get_discount_pct(offer):
@@ -392,6 +463,28 @@ def get_discount_pct(offer):
         return 0.0
 
 all_offers.sort(key=get_discount_pct, reverse=True)
+
+# Visa Willys referenspris-sektion om vi har sökresultat
+if willys_reference_offers:
+    ref_items_html = ""
+    for ref in willys_reference_offers:
+        name = ref.get('product', '')
+        brand = ref.get('brand', '')
+        price = ref.get('price', '')
+        desc = ref.get('description', '')
+        brand_html = f' <span class="ref-brand">({brand})</span>' if brand else ''
+        desc_html = f' <span class="ref-desc">· {desc}</span>' if desc else ''
+        ref_items_html += f'<div class="ref-item"><span><span class="ref-name">{name}</span>{brand_html}{desc_html}</span><span class="ref-price">{price}</span></div>'
+    
+    ref_html = f"""
+    <div class="ref-price-box">
+        <h4>🏷️ Referenspris på Willys (ordinarie sortiment)</h4>
+        <div class="ref-items">
+            {ref_items_html}
+        </div>
+    </div>
+    """
+    st.markdown(ref_html, unsafe_allow_html=True)
 
 # Render offers
 if not all_offers:
