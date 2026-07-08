@@ -231,17 +231,32 @@ def search_regular_assortment(query: str) -> list[dict]:
 
 
 def _find_product_list(data, depth=0) -> list:
-    """Rekursivt sök igenom JSON-trädet efter en lista som ser ut som riktiga produkter."""
-    if depth > 15:
+    """Söker igenom JSON-trädet och plockar ut alla riktiga produkter."""
+    if depth > 20:
         return []
-    if isinstance(data, list) and len(data) > 0:
-        item = data[0]
-        # Säkerställ att det är en produkt genom att kräva både namn och pris
-        if isinstance(item, dict) and "name" in item and "price" in item:
-            return data
-    if isinstance(data, dict):
+
+    if isinstance(data, list):
+        # 1. Kolla om just den här listan innehåller matvaror (kräver både namn och pris)
+        products_in_list = [
+            item for item in data
+            if isinstance(item, dict) and "name" in item and "price" in item
+        ]
+        
+        # Hittade vi riktiga varor i listan? Returnera bara dem!
+        if products_in_list:
+            return products_in_list 
+
+        # 2. Om listan inte hade några matvaror, gräv djupare inuti den
+        for element in data:
+            result = _find_product_list(element, depth + 1)
+            if result:
+                return result
+
+    elif isinstance(data, dict):
+        # Gräv djupare i dictionaryns värden
         for key, value in data.items():
             result = _find_product_list(value, depth + 1)
             if result:
                 return result
+
     return []
