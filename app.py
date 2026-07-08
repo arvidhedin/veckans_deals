@@ -1,4 +1,3 @@
-from streamlit.proto import TextArea_pb2
 import streamlit as st
 from scrapers import ica, coop, willys, lidl, hemkop
 import urllib.parse

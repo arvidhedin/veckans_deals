@@ -138,7 +138,9 @@ def search_regular_assortment(query: str) -> list[dict]:
     """Sök i Willys ordinarie sortiment via HTML-sidan och extrahera __NEXT_DATA__."""
     try:
         url = f"https://www.willys.se/sok?q={urllib.parse.quote(query)}"
-        response = requests.get(url, headers=HEADERS, timeout=15)
+        html_headers = HEADERS.copy()
+        html_headers["Accept"] = "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8"
+        response = requests.get(url, headers=html_headers, timeout=15)
         response.raise_for_status()
 
         soup = BeautifulSoup(response.text, "html.parser")
@@ -231,32 +233,15 @@ def search_regular_assortment(query: str) -> list[dict]:
 
 
 def _find_product_list(data, depth=0) -> list:
-    """Söker igenom JSON-trädet och plockar ut alla riktiga produkter."""
-    if depth > 20:
-        return []
-
+    if depth > 20: return []
     if isinstance(data, list):
-        # 1. Kolla om just den här listan innehåller matvaror (kräver både namn och pris)
-        products_in_list = [
-            item for item in data
-            if isinstance(item, dict) and "name" in item and "price" in item
-        ]
-        
-        # Hittade vi riktiga varor i listan? Returnera bara dem!
-        if products_in_list:
-            return products_in_list 
-
-        # 2. Om listan inte hade några matvaror, gräv djupare inuti den
+        products = [i for i in data if isinstance(i, dict) and "name" in i and "price" in i]
+        if products: return products
         for element in data:
-            result = _find_product_list(element, depth + 1)
-            if result:
-                return result
-
+            res = _find_product_list(element, depth + 1)
+            if res: return res
     elif isinstance(data, dict):
-        # Gräv djupare i dictionaryns värden
-        for key, value in data.items():
-            result = _find_product_list(value, depth + 1)
-            if result:
-                return result
-
+        for key, val in data.items():
+            res = _find_product_list(val, depth + 1)
+            if res: return res
     return []
