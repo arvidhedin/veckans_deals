@@ -137,16 +137,28 @@ def search_regular_assortment(query: str) -> list[dict]:
                 else:
                     image_url = IMAGE_BASE + img.lstrip("/")
 
-            # Pris med enhet
+            # Styckpris – bara siffror + "kr"
             price_val = str(item.get("price", ""))
-            price_unit = item.get("priceUnit", item.get("comparePriceUnit", ""))
-            # API:et returnerar ibland priset med "kr" redan, t.ex. "68,90 kr"
-            if price_val and "kr" not in price_val.lower():
-                price_str = f"{price_val} kr"
-            else:
-                price_str = price_val
-            if price_unit and price_str:
-                price_str += f" ({price_unit})"
+            # Rensa bort eventuell befintlig "kr" och trimma
+            price_clean = price_val.replace("kr", "").strip()
+            price_str = f"{price_clean} kr" if price_clean else ""
+
+            # Jämförpris (kr/kg, kr/l etc.)
+            compare_price_raw = str(item.get("comparePrice", ""))
+            compare_unit = item.get("comparePriceUnit", "")
+            # Rensa "kr" från jämförpriset och normalisera decimaltecken
+            compare_price_clean = compare_price_raw.replace("kr", "").replace(".", ",").strip()
+
+            # Bygg description: "500g | Jmf: 153,11 kr/kg"
+            display_volume = item.get("displayVolume", "")
+            desc_parts = []
+            if display_volume:
+                desc_parts.append(display_volume)
+            if compare_price_clean and compare_unit:
+                desc_parts.append(f"Jmf: {compare_price_clean} kr/{compare_unit}")
+            elif compare_price_clean:
+                desc_parts.append(f"Jmf: {compare_price_clean} kr")
+            description = " | ".join(desc_parts)
 
             results.append({
                 "store": "Willys Ord.pris",
@@ -154,7 +166,7 @@ def search_regular_assortment(query: str) -> list[dict]:
                 "brand": item.get("manufacturer", ""),
                 "price": price_str,
                 "discount": "",
-                "description": item.get("displayVolume", ""),
+                "description": description,
                 "image_url": image_url,
                 "original_price": "",
                 "discount_percentage": 0,
