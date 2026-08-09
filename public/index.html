@@ -16,7 +16,6 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
-      darkMode: 'class',
       theme: {
         extend: {
           fontFamily: {
@@ -24,8 +23,7 @@
           },
           colors: {
             brand: {
-              deal: '#E11D48', // Refined Rose-600
-              dealDark: '#FB7185',
+              deal: '#E11D48',
             },
             store: {
               ica: '#E21936',
@@ -77,10 +75,6 @@
       background: #F0FDF4;
       border: 1px solid #BBF7D0;
     }
-    .dark .ref-price-box {
-      background: rgba(6, 78, 59, 0.2);
-      border-color: rgba(16, 185, 129, 0.25);
-    }
 
     /* Line clamp helper */
     .line-clamp-2 {
@@ -104,32 +98,23 @@
   </style>
 </head>
 
-<body class="bg-zinc-50/60 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 min-h-full transition-colors duration-150">
+<body class="bg-zinc-50/60 text-zinc-900 min-h-full">
   
   <!-- App Container -->
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-8">
 
     <!-- Top Navigation Header -->
-    <header class="flex justify-between items-center pb-5 border-b border-zinc-200/80 dark:border-zinc-800/80 mb-5 sm:mb-8">
+    <header class="flex justify-between items-center pb-5 border-b border-zinc-200/80 mb-5 sm:mb-8">
       <div>
-        <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight text-zinc-900 dark:text-white">
+        <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight text-zinc-900">
           Veckans Deals
         </h1>
       </div>
 
-      <div class="flex items-center gap-3">
-        <!-- Live Status Text -->
-        <div class="hidden md:flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400">
-          <span class="inline-block w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
-          <span id="status-update-text">Laddar erbjudanden...</span>
-        </div>
-
-        <!-- Theme Switcher Button -->
-        <button id="theme-toggle" type="button" aria-label="Växla färgtema"
-          class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm hover:bg-zinc-50 dark:hover:bg-zinc-800/80 transition active:scale-95 text-zinc-700 dark:text-zinc-300">
-          <span id="theme-icon">🌙</span>
-          <span id="theme-label" class="hidden sm:inline">Mörkt</span>
-        </button>
+      <!-- Live Status Text -->
+      <div class="flex items-center gap-2 text-xs text-zinc-500">
+        <span class="inline-block w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
+        <span id="status-update-text">Laddar erbjudanden...</span>
       </div>
     </header>
 
@@ -140,30 +125,30 @@
       <div id="filter-backdrop" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden hidden transition-opacity duration-300 opacity-0"></div>
 
       <!-- Sidebar / Mobile Slide-over Drawer -->
-      <aside id="filter-sidebar" class="fixed inset-y-0 right-0 z-50 w-full max-w-xs sm:max-w-sm bg-white dark:bg-zinc-900 shadow-2xl transition-transform duration-300 ease-out translate-x-full lg:translate-x-0 lg:static lg:w-auto lg:z-auto lg:shadow-none lg:bg-transparent lg:dark:bg-transparent lg:col-span-1">
+      <aside id="filter-sidebar" class="fixed inset-y-0 right-0 z-50 w-full max-w-xs sm:max-w-sm bg-white shadow-2xl transition-transform duration-300 ease-out translate-x-full lg:translate-x-0 lg:static lg:w-auto lg:z-auto lg:shadow-none lg:bg-transparent lg:col-span-1">
         
-        <div class="bg-white dark:bg-zinc-900 lg:p-5 lg:rounded-2xl lg:border lg:border-zinc-200/80 lg:dark:border-zinc-800/80 lg:sticky lg:top-6 flex flex-col h-full lg:h-auto max-h-screen lg:max-h-[calc(100vh-3rem)]">
+        <div class="bg-white lg:p-5 lg:rounded-2xl lg:border lg:border-zinc-200/80 lg:sticky lg:top-6 flex flex-col h-full lg:h-auto max-h-screen lg:max-h-[calc(100vh-3rem)]">
           
           <!-- Sidebar / Drawer Header -->
-          <div class="flex items-center justify-between p-4 lg:p-0 pb-3 border-b border-zinc-100 dark:border-zinc-800">
+          <div class="flex items-center justify-between p-4 lg:p-0 pb-3 border-b border-zinc-100">
             <div class="flex items-center gap-2">
-              <h2 class="text-sm sm:text-base font-bold text-zinc-900 dark:text-zinc-100">
+              <h2 class="text-sm sm:text-base font-bold text-zinc-900">
                 Välj Butiker
               </h2>
-              <span id="mobile-filter-count" class="lg:hidden text-xs font-semibold px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400">
+              <span id="mobile-filter-count" class="lg:hidden text-xs font-semibold px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-600">
                 0
               </span>
             </div>
 
             <div class="flex items-center gap-3">
               <div class="flex gap-2 text-xs">
-                <button id="btn-select-all" class="font-semibold text-rose-600 dark:text-rose-400 hover:underline">Alla</button>
-                <span class="text-zinc-300 dark:text-zinc-700">|</span>
+                <button id="btn-select-all" class="font-semibold text-rose-600 hover:underline">Alla</button>
+                <span class="text-zinc-300">|</span>
                 <button id="btn-deselect-all" class="text-zinc-500 hover:underline">Inga</button>
               </div>
 
               <!-- Close button for mobile drawer -->
-              <button id="btn-close-filter-drawer" class="lg:hidden p-1.5 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800" aria-label="Stäng filter">
+              <button id="btn-close-filter-drawer" class="lg:hidden p-1.5 text-zinc-400 hover:text-zinc-600 rounded-lg hover:bg-zinc-100" aria-label="Stäng filter">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                 </svg>
@@ -176,150 +161,150 @@
             
             <!-- ICA Stores Group -->
             <div>
-              <span class="text-[11px] font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400 block mb-1.5">ICA</span>
+              <span class="text-[11px] font-bold uppercase tracking-wider text-rose-600 block mb-1.5">ICA</span>
               <div class="space-y-2">
                 <label class="flex items-center justify-between text-xs sm:text-sm cursor-pointer hover:opacity-80 transition select-none">
                   <div class="flex items-center gap-2.5">
-                    <input type="checkbox" id="filter-ica-raby" class="store-filter w-4 h-4 rounded text-rose-600 focus:ring-rose-500 border-zinc-300 dark:border-zinc-700 dark:bg-zinc-800" checked data-store="ICA Nära Råbyvägen">
+                    <input type="checkbox" id="filter-ica-raby" class="store-filter w-4 h-4 rounded text-rose-600 focus:ring-rose-500 border-zinc-300" checked data-store="ICA Nära Råbyvägen">
                     <span class="font-medium">ICA Nära Råbyvägen</span>
                   </div>
-                  <span id="count-ica-raby" class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300">0</span>
+                  <span id="count-ica-raby" class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-rose-50 text-rose-700">0</span>
                 </label>
 
                 <label class="flex items-center justify-between text-xs sm:text-sm cursor-pointer hover:opacity-80 transition select-none">
                   <div class="flex items-center gap-2.5">
-                    <input type="checkbox" id="filter-ica-torg" class="store-filter w-4 h-4 rounded text-rose-600 focus:ring-rose-500 border-zinc-300 dark:border-zinc-700 dark:bg-zinc-800" checked data-store="ICA Supermarket Torgkassen">
+                    <input type="checkbox" id="filter-ica-torg" class="store-filter w-4 h-4 rounded text-rose-600 focus:ring-rose-500 border-zinc-300" checked data-store="ICA Supermarket Torgkassen">
                     <span class="font-medium">ICA Torgkassen</span>
                   </div>
-                  <span id="count-ica-torg" class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300">0</span>
+                  <span id="count-ica-torg" class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-rose-50 text-rose-700">0</span>
                 </label>
 
                 <label class="flex items-center justify-between text-xs sm:text-sm cursor-pointer hover:opacity-80 transition select-none">
                   <div class="flex items-center gap-2.5">
-                    <input type="checkbox" id="filter-ica-rosendal" class="store-filter w-4 h-4 rounded text-rose-600 focus:ring-rose-500 border-zinc-300 dark:border-zinc-700 dark:bg-zinc-800" checked data-store="ICA Nära Rosendal">
+                    <input type="checkbox" id="filter-ica-rosendal" class="store-filter w-4 h-4 rounded text-rose-600 focus:ring-rose-500 border-zinc-300" checked data-store="ICA Nära Rosendal">
                     <span class="font-medium">ICA Nära Rosendal</span>
                   </div>
-                  <span id="count-ica-rosendal" class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300">0</span>
+                  <span id="count-ica-rosendal" class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-rose-50 text-rose-700">0</span>
                 </label>
 
                 <label class="flex items-center justify-between text-xs sm:text-sm cursor-pointer hover:opacity-80 transition select-none">
                   <div class="flex items-center gap-2.5">
-                    <input type="checkbox" id="filter-ica-vast" class="store-filter w-4 h-4 rounded text-rose-600 focus:ring-rose-500 border-zinc-300 dark:border-zinc-700 dark:bg-zinc-800" checked data-store="ICA Supermarket Väst">
+                    <input type="checkbox" id="filter-ica-vast" class="store-filter w-4 h-4 rounded text-rose-600 focus:ring-rose-500 border-zinc-300" checked data-store="ICA Supermarket Väst">
                     <span class="font-medium">ICA Supermarket Väst</span>
                   </div>
-                  <span id="count-ica-vast" class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300">0</span>
+                  <span id="count-ica-vast" class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-rose-50 text-rose-700">0</span>
                 </label>
 
                 <label class="flex items-center justify-between text-xs sm:text-sm cursor-pointer hover:opacity-80 transition select-none">
                   <div class="flex items-center gap-2.5">
-                    <input type="checkbox" id="filter-ica-vretgrand" class="store-filter w-4 h-4 rounded text-rose-600 focus:ring-rose-500 border-zinc-300 dark:border-zinc-700 dark:bg-zinc-800" checked data-store="ICA Vretgränd">
+                    <input type="checkbox" id="filter-ica-vretgrand" class="store-filter w-4 h-4 rounded text-rose-600 focus:ring-rose-500 border-zinc-300" checked data-store="ICA Vretgränd">
                     <span class="font-medium">ICA Vretgränd</span>
                   </div>
-                  <span id="count-ica-vretgrand" class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300">0</span>
+                  <span id="count-ica-vretgrand" class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-rose-50 text-rose-700">0</span>
                 </label>
 
                 <label class="flex items-center justify-between text-xs sm:text-sm cursor-pointer hover:opacity-80 transition select-none">
                   <div class="flex items-center gap-2.5">
-                    <input type="checkbox" id="filter-ica-city" class="store-filter w-4 h-4 rounded text-rose-600 focus:ring-rose-500 border-zinc-300 dark:border-zinc-700 dark:bg-zinc-800" checked data-store="ICA Supermarket City">
+                    <input type="checkbox" id="filter-ica-city" class="store-filter w-4 h-4 rounded text-rose-600 focus:ring-rose-500 border-zinc-300" checked data-store="ICA Supermarket City">
                     <span class="font-medium">ICA Supermarket City</span>
                   </div>
-                  <span id="count-ica-city" class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300">0</span>
+                  <span id="count-ica-city" class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-rose-50 text-rose-700">0</span>
                 </label>
 
                 <label class="flex items-center justify-between text-xs sm:text-sm cursor-pointer hover:opacity-80 transition select-none">
                   <div class="flex items-center gap-2.5">
-                    <input type="checkbox" id="filter-ica-luthagen" class="store-filter w-4 h-4 rounded text-rose-600 focus:ring-rose-500 border-zinc-300 dark:border-zinc-700 dark:bg-zinc-800" checked data-store="ICA Supermarket Luthagens Livs">
+                    <input type="checkbox" id="filter-ica-luthagen" class="store-filter w-4 h-4 rounded text-rose-600 focus:ring-rose-500 border-zinc-300" checked data-store="ICA Supermarket Luthagens Livs">
                     <span class="font-medium">ICA Luthagens Livs</span>
                   </div>
-                  <span id="count-ica-luthagen" class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300">0</span>
+                  <span id="count-ica-luthagen" class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-rose-50 text-rose-700">0</span>
                 </label>
 
                 <label class="flex items-center justify-between text-xs sm:text-sm cursor-pointer hover:opacity-80 transition select-none">
                   <div class="flex items-center gap-2.5">
-                    <input type="checkbox" id="filter-ica-folkes" class="store-filter w-4 h-4 rounded text-rose-600 focus:ring-rose-500 border-zinc-300 dark:border-zinc-700 dark:bg-zinc-800" checked data-store="ICA Folkes Livs">
+                    <input type="checkbox" id="filter-ica-folkes" class="store-filter w-4 h-4 rounded text-rose-600 focus:ring-rose-500 border-zinc-300" checked data-store="ICA Folkes Livs">
                     <span class="font-medium">ICA Folkes Livs</span>
                   </div>
-                  <span id="count-ica-folkes" class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300">0</span>
+                  <span id="count-ica-folkes" class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-rose-50 text-rose-700">0</span>
                 </label>
 
                 <label class="flex items-center justify-between text-xs sm:text-sm cursor-pointer hover:opacity-80 transition select-none">
                   <div class="flex items-center gap-2.5">
-                    <input type="checkbox" id="filter-ica-hornan" class="store-filter w-4 h-4 rounded text-rose-600 focus:ring-rose-500 border-zinc-300 dark:border-zinc-700 dark:bg-zinc-800" checked data-store="ICA Nära Hörnan">
+                    <input type="checkbox" id="filter-ica-hornan" class="store-filter w-4 h-4 rounded text-rose-600 focus:ring-rose-500 border-zinc-300" checked data-store="ICA Nära Hörnan">
                     <span class="font-medium">ICA Nära Hörnan</span>
                   </div>
-                  <span id="count-ica-hornan" class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300">0</span>
+                  <span id="count-ica-hornan" class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-rose-50 text-rose-700">0</span>
                 </label>
               </div>
             </div>
 
             <!-- Willys Store Group -->
-            <div class="pt-2 border-t border-zinc-100 dark:border-zinc-800/60">
-              <span class="text-[11px] font-bold uppercase tracking-wider text-green-600 dark:text-green-400 block mb-1.5">Willys</span>
+            <div class="pt-2 border-t border-zinc-100">
+              <span class="text-[11px] font-bold uppercase tracking-wider text-green-600 block mb-1.5">Willys</span>
               <div class="space-y-2">
                 <label class="flex items-center justify-between text-xs sm:text-sm cursor-pointer hover:opacity-80 transition select-none">
                   <div class="flex items-center gap-2.5">
-                    <input type="checkbox" id="filter-willys" class="store-filter w-4 h-4 rounded text-green-600 focus:ring-green-500 border-zinc-300 dark:border-zinc-700 dark:bg-zinc-800" checked data-store="Willys">
+                    <input type="checkbox" id="filter-willys" class="store-filter w-4 h-4 rounded text-green-600 focus:ring-green-500 border-zinc-300" checked data-store="Willys">
                     <span class="font-medium">Willys</span>
                   </div>
-                  <span id="count-willys" class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-green-50 text-green-700 dark:bg-green-950/60 dark:text-green-300">0</span>
+                  <span id="count-willys" class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-green-50 text-green-700">0</span>
                 </label>
               </div>
             </div>
 
             <!-- Hemköp Stores Group -->
-            <div class="pt-2 border-t border-zinc-100 dark:border-zinc-800/60">
-              <span class="text-[11px] font-bold uppercase tracking-wider text-red-700 dark:text-red-400 block mb-1.5">Hemköp</span>
+            <div class="pt-2 border-t border-zinc-100">
+              <span class="text-[11px] font-bold uppercase tracking-wider text-red-700 block mb-1.5">Hemköp</span>
               <div class="space-y-2">
                 <label class="flex items-center justify-between text-xs sm:text-sm cursor-pointer hover:opacity-80 transition select-none">
                   <div class="flex items-center gap-2.5">
-                    <input type="checkbox" id="filter-hemkop-svava" class="store-filter w-4 h-4 rounded text-red-600 focus:ring-red-500 border-zinc-300 dark:border-zinc-700 dark:bg-zinc-800" checked data-store="Hemköp (Svava)">
+                    <input type="checkbox" id="filter-hemkop-svava" class="store-filter w-4 h-4 rounded text-red-600 focus:ring-red-500 border-zinc-300" checked data-store="Hemköp (Svava)">
                     <span class="font-medium">Hemköp (Svava)</span>
                   </div>
-                  <span id="count-hemkop-svava" class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-red-50 text-red-700 dark:bg-red-950/60 dark:text-red-300">0</span>
+                  <span id="count-hemkop-svava" class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-red-50 text-red-700">0</span>
                 </label>
 
                 <label class="flex items-center justify-between text-xs sm:text-sm cursor-pointer hover:opacity-80 transition select-none">
                   <div class="flex items-center gap-2.5">
-                    <input type="checkbox" id="filter-hemkop-rosendal" class="store-filter w-4 h-4 rounded text-red-600 focus:ring-red-500 border-zinc-300 dark:border-zinc-700 dark:bg-zinc-800" checked data-store="Hemköp (Rosendal)">
+                    <input type="checkbox" id="filter-hemkop-rosendal" class="store-filter w-4 h-4 rounded text-red-600 focus:ring-red-500 border-zinc-300" checked data-store="Hemköp (Rosendal)">
                     <span class="font-medium">Hemköp (Rosendal)</span>
                   </div>
-                  <span id="count-hemkop-rosendal" class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-red-50 text-red-700 dark:bg-red-950/60 dark:text-red-300">0</span>
+                  <span id="count-hemkop-rosendal" class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-red-50 text-red-700">0</span>
                 </label>
               </div>
             </div>
 
             <!-- Coop Stores Group -->
-            <div class="pt-2 border-t border-zinc-100 dark:border-zinc-800/60">
-              <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400 block mb-1.5">Coop</span>
+            <div class="pt-2 border-t border-zinc-100">
+              <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-700 block mb-1.5">Coop</span>
               <div class="space-y-2">
                 <label class="flex items-center justify-between text-xs sm:text-sm cursor-pointer hover:opacity-80 transition select-none">
                   <div class="flex items-center gap-2.5">
-                    <input type="checkbox" id="filter-coop-centralhuset" class="store-filter w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 border-zinc-300 dark:border-zinc-700 dark:bg-zinc-800" checked data-store="Coop (Centralhuset)">
+                    <input type="checkbox" id="filter-coop-centralhuset" class="store-filter w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 border-zinc-300" checked data-store="Coop (Centralhuset)">
                     <span class="font-medium">Coop (Centralhuset)</span>
                   </div>
-                  <span id="count-coop-centralhuset" class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300">0</span>
+                  <span id="count-coop-centralhuset" class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700">0</span>
                 </label>
 
                 <label class="flex items-center justify-between text-xs sm:text-sm cursor-pointer hover:opacity-80 transition select-none">
                   <div class="flex items-center gap-2.5">
-                    <input type="checkbox" id="filter-coop-liljegatan" class="store-filter w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 border-zinc-300 dark:border-zinc-700 dark:bg-zinc-800" checked data-store="Coop (Liljegatan)">
+                    <input type="checkbox" id="filter-coop-liljegatan" class="store-filter w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 border-zinc-300" checked data-store="Coop (Liljegatan)">
                     <span class="font-medium">Coop (Liljegatan)</span>
                   </div>
-                  <span id="count-coop-liljegatan" class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300">0</span>
+                  <span id="count-coop-liljegatan" class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700">0</span>
                 </label>
               </div>
             </div>
 
             <!-- Lidl Store Group -->
-            <div class="pt-2 border-t border-zinc-100 dark:border-zinc-800/60">
-              <span class="text-[11px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 block mb-1.5">Lidl</span>
+            <div class="pt-2 border-t border-zinc-100">
+              <span class="text-[11px] font-bold uppercase tracking-wider text-blue-600 block mb-1.5">Lidl</span>
               <div class="space-y-2">
                 <label class="flex items-center justify-between text-xs sm:text-sm cursor-pointer hover:opacity-80 transition select-none">
                   <div class="flex items-center gap-2.5">
-                    <input type="checkbox" id="filter-lidl" class="store-filter w-4 h-4 rounded text-blue-600 focus:ring-blue-500 border-zinc-300 dark:border-zinc-700 dark:bg-zinc-800" checked data-store="Lidl">
+                    <input type="checkbox" id="filter-lidl" class="store-filter w-4 h-4 rounded text-blue-600 focus:ring-blue-500 border-zinc-300" checked data-store="Lidl">
                     <span class="font-medium">Lidl</span>
                   </div>
-                  <span id="count-lidl" class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300">0</span>
+                  <span id="count-lidl" class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700">0</span>
                 </label>
               </div>
             </div>
@@ -327,29 +312,29 @@
           </div>
 
           <!-- Lidl Date Period Filter Sub-menu (active when Lidl is selected) -->
-          <div id="lidl-filter-section" class="p-4 lg:p-0 mt-3 pt-3 border-t border-zinc-100 dark:border-zinc-800 transition-all">
-            <h3 class="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2">
+          <div id="lidl-filter-section" class="p-4 lg:p-0 mt-3 pt-3 border-t border-zinc-100 transition-all">
+            <h3 class="text-[11px] font-bold uppercase tracking-wider text-zinc-500 mb-2">
               Lidl-period
             </h3>
             <div class="space-y-1.5 text-xs sm:text-sm">
               <label class="flex items-center gap-2 cursor-pointer">
-                <input type="radio" name="lidl-period" value="all" class="text-blue-600 focus:ring-blue-500 dark:bg-zinc-800" checked>
+                <input type="radio" name="lidl-period" value="all" class="text-blue-600 focus:ring-blue-500" checked>
                 <span>Alla Lidl-erbjudanden</span>
               </label>
               <label class="flex items-center gap-2 cursor-pointer">
-                <input type="radio" name="lidl-period" value="this-week" class="text-blue-600 focus:ring-blue-500 dark:bg-zinc-800">
+                <input type="radio" name="lidl-period" value="this-week" class="text-blue-600 focus:ring-blue-500">
                 <span>Endast denna vecka</span>
               </label>
               <label class="flex items-center gap-2 cursor-pointer">
-                <input type="radio" name="lidl-period" value="next-week" class="text-blue-600 focus:ring-blue-500 dark:bg-zinc-800">
+                <input type="radio" name="lidl-period" value="next-week" class="text-blue-600 focus:ring-blue-500">
                 <span>Endast nästa vecka</span>
               </label>
             </div>
           </div>
 
           <!-- Mobile Drawer Done Button -->
-          <div class="p-4 border-t border-zinc-100 dark:border-zinc-800 lg:hidden mt-auto bg-zinc-50 dark:bg-zinc-900/90">
-            <button id="btn-apply-filter-mobile" class="w-full py-2.5 px-4 bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 text-sm font-semibold rounded-xl shadow-sm active:scale-98 transition">
+          <div class="p-4 border-t border-zinc-100 lg:hidden mt-auto bg-zinc-50">
+            <button id="btn-apply-filter-mobile" class="w-full py-2.5 px-4 bg-zinc-900 text-white text-sm font-semibold rounded-xl shadow-sm active:scale-98 transition">
               Visa resultat
             </button>
           </div>
@@ -361,7 +346,7 @@
       <main class="lg:col-span-3 space-y-5">
         
         <!-- Search, Filter & Sort Controls Bar -->
-        <div class="bg-white dark:bg-zinc-900 p-3 sm:p-4 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-sm flex flex-col sm:flex-row gap-2.5 sm:gap-3 items-stretch sm:items-center justify-between">
+        <div class="bg-white p-3 sm:p-4 rounded-2xl border border-zinc-200/80 shadow-sm flex flex-col sm:flex-row gap-2.5 sm:gap-3 items-stretch sm:items-center justify-between">
           
           <!-- Search Input -->
           <div class="relative flex-1">
@@ -374,9 +359,9 @@
               type="text" 
               id="search-input" 
               placeholder="Sök varor (t.ex. kaffe, smör, lax)..."
-              class="w-full pl-9 pr-9 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent transition placeholder:text-zinc-400 text-zinc-900 dark:text-zinc-100"
+              class="w-full pl-9 pr-9 py-2 bg-zinc-50 border border-zinc-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent transition placeholder:text-zinc-400 text-zinc-900"
             >
-            <button id="btn-clear-search" class="hidden absolute inset-y-0 right-0 pr-3 flex items-center text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200">
+            <button id="btn-clear-search" class="hidden absolute inset-y-0 right-0 pr-3 flex items-center text-zinc-400 hover:text-zinc-600">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
               </svg>
@@ -387,7 +372,7 @@
           <div class="flex items-center gap-2">
             
             <!-- Mobile Filter Trigger Button (< lg) -->
-            <button id="btn-open-filter-drawer" type="button" class="lg:hidden flex-1 sm:flex-initial flex items-center justify-center gap-2 px-3.5 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs sm:text-sm font-semibold text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition active:scale-95">
+            <button id="btn-open-filter-drawer" type="button" class="lg:hidden flex-1 sm:flex-initial flex items-center justify-center gap-2 px-3.5 py-2 bg-zinc-50 border border-zinc-200 rounded-xl text-xs sm:text-sm font-semibold text-zinc-700 hover:bg-zinc-100 transition active:scale-95">
               <svg class="w-4 h-4 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
               </svg>
@@ -397,10 +382,10 @@
 
             <!-- Sort Select -->
             <div class="flex items-center gap-1.5 flex-1 sm:flex-initial">
-              <label for="sort-select" class="text-xs font-semibold text-zinc-500 dark:text-zinc-400 whitespace-nowrap hidden sm:inline">Sortera:</label>
+              <label for="sort-select" class="text-xs font-semibold text-zinc-500 whitespace-nowrap hidden sm:inline">Sortera:</label>
               <select 
                 id="sort-select" 
-                class="w-full sm:w-auto bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl px-3 py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent font-medium text-zinc-800 dark:text-zinc-200"
+                class="w-full sm:w-auto bg-zinc-50 border border-zinc-200 rounded-xl px-3 py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent font-medium text-zinc-800"
               >
                 <option value="discount-desc">Högsta rabatt (%)</option>
                 <option value="price-asc">Lägst pris</option>
@@ -414,7 +399,7 @@
         </div>
 
         <!-- Live Offers Count -->
-        <div class="flex items-center justify-between px-1 text-xs sm:text-sm text-zinc-500 dark:text-zinc-400">
+        <div class="flex items-center justify-between px-1 text-xs sm:text-sm text-zinc-500">
           <div id="results-count" class="font-medium">
             Hämtar erbjudanden...
           </div>
@@ -422,7 +407,7 @@
 
         <!-- Willys Reference Price Section (Shown dynamically when searching) -->
         <div id="willys-reference-box" class="hidden ref-price-box rounded-xl p-4 sm:p-5 transition-all duration-200">
-          <h4 class="text-xs sm:text-sm font-bold text-emerald-800 dark:text-emerald-400 flex items-center gap-2 mb-2.5">
+          <h4 class="text-xs sm:text-sm font-bold text-emerald-800 flex items-center gap-2 mb-2.5">
             <span>🏷️</span> Referenspris på Willys (ordinarie sortiment / matchningar)
           </h4>
           <div id="willys-reference-items" class="space-y-2">
@@ -433,19 +418,19 @@
         <!-- Deals Grid Container (3 columns on all viewports) -->
         <div id="deals-grid" class="grid grid-cols-3 gap-2 sm:gap-4 lg:gap-5">
           <!-- Loading skeleton cards -->
-          <div class="deal-skeleton bg-white dark:bg-zinc-900 rounded-xl sm:rounded-2xl p-2.5 sm:p-4 h-[280px] sm:h-[360px] md:h-[400px] animate-pulse border border-zinc-200/80 dark:border-zinc-800/80"></div>
-          <div class="deal-skeleton bg-white dark:bg-zinc-900 rounded-xl sm:rounded-2xl p-2.5 sm:p-4 h-[280px] sm:h-[360px] md:h-[400px] animate-pulse border border-zinc-200/80 dark:border-zinc-800/80"></div>
-          <div class="deal-skeleton bg-white dark:bg-zinc-900 rounded-xl sm:rounded-2xl p-2.5 sm:p-4 h-[280px] sm:h-[360px] md:h-[400px] animate-pulse border border-zinc-200/80 dark:border-zinc-800/80"></div>
+          <div class="deal-skeleton bg-white rounded-xl sm:rounded-2xl p-2.5 sm:p-4 h-[280px] sm:h-[360px] md:h-[400px] animate-pulse border border-zinc-200/80"></div>
+          <div class="deal-skeleton bg-white rounded-xl sm:rounded-2xl p-2.5 sm:p-4 h-[280px] sm:h-[360px] md:h-[400px] animate-pulse border border-zinc-200/80"></div>
+          <div class="deal-skeleton bg-white rounded-xl sm:rounded-2xl p-2.5 sm:p-4 h-[280px] sm:h-[360px] md:h-[400px] animate-pulse border border-zinc-200/80"></div>
         </div>
 
         <!-- Empty State (Hidden by default) -->
-        <div id="empty-state" class="hidden bg-white dark:bg-zinc-900 rounded-2xl p-8 sm:p-12 text-center border border-zinc-200/80 dark:border-zinc-800/80 my-6">
+        <div id="empty-state" class="hidden bg-white rounded-2xl p-8 sm:p-12 text-center border border-zinc-200/80 my-6">
           <div class="text-4xl sm:text-5xl mb-3">🔍</div>
-          <h3 class="text-base sm:text-lg font-bold text-zinc-900 dark:text-zinc-100 mb-1">Inga erbjudanden hittades</h3>
-          <p class="text-zinc-500 dark:text-zinc-400 text-xs sm:text-sm max-w-sm mx-auto mb-5">
+          <h3 class="text-base sm:text-lg font-bold text-zinc-900 mb-1">Inga erbjudanden hittades</h3>
+          <p class="text-zinc-500 text-xs sm:text-sm max-w-sm mx-auto mb-5">
             Det fanns inga erbjudanden som matchade din sökning eller dina valda butiksfilter.
           </p>
-          <button id="btn-reset-filters" class="px-4 py-2 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-xl font-semibold text-xs sm:text-sm hover:opacity-90 transition active:scale-95">
+          <button id="btn-reset-filters" class="px-4 py-2 bg-zinc-900 text-white rounded-xl font-semibold text-xs sm:text-sm hover:opacity-90 transition active:scale-95">
             Återställ filter och sökning
           </button>
         </div>
@@ -454,7 +439,7 @@
     </div>
 
     <!-- Footer -->
-    <footer class="mt-16 pt-6 border-t border-zinc-200/80 dark:border-zinc-800/80 text-center text-xs text-zinc-400 dark:text-zinc-600 pb-12">
+    <footer class="mt-16 pt-6 border-t border-zinc-200/80 text-center text-xs text-zinc-400 pb-12">
       <p>Veckans Deals • Automatisk matprisbevakning för Uppsala & Sverige • Uppdateras dagligen</p>
     </footer>
   </div>

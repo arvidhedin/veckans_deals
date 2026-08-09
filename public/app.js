@@ -3,6 +3,12 @@
  * Clean, modern Scandinavian UI with responsive mobile drawer and live filtering.
  */
 
+// Clean up any previously cached dark theme
+if (document.documentElement.classList.contains('dark')) {
+  document.documentElement.classList.remove('dark');
+}
+localStorage.removeItem('theme');
+
 // Global State
 const state = {
   allOffers: [],
@@ -70,33 +76,6 @@ const STORE_COLORS = {
 };
 
 const DEFAULT_IMG = "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=300&q=80";
-
-// --- Theme Management ---
-function initTheme() {
-  const savedTheme = localStorage.getItem('theme');
-  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-  
-  if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
-    document.documentElement.classList.add('dark');
-  } else {
-    document.documentElement.classList.remove('dark');
-  }
-  updateThemeButton();
-}
-
-function toggleTheme() {
-  const isDark = document.documentElement.classList.toggle('dark');
-  localStorage.setItem('theme', isDark ? 'dark' : 'light');
-  updateThemeButton();
-}
-
-function updateThemeButton() {
-  const isDark = document.documentElement.classList.contains('dark');
-  const icon = document.getElementById('theme-icon');
-  const label = document.getElementById('theme-label');
-  if (icon) icon.textContent = isDark ? '☀️' : '🌙';
-  if (label) label.textContent = isDark ? 'Ljust' : 'Mörkt';
-}
 
 // --- Data Fetching ---
 async function fetchDealsData() {
@@ -378,13 +357,13 @@ function renderReferenceBox(matches, query) {
     const price = escapeHtml(ref.price || ref.original_price || '');
 
     html += `
-      <div class="flex items-baseline justify-between gap-4 text-xs sm:text-sm py-1.5 border-b border-emerald-200/50 dark:border-emerald-800/30 last:border-0 text-emerald-950 dark:text-emerald-100">
+      <div class="flex items-baseline justify-between gap-4 text-xs sm:text-sm py-1.5 border-b border-emerald-200/50 last:border-0 text-emerald-950">
         <div class="truncate">
           <span class="font-bold">${name}</span>
           ${brand}
           ${desc}
         </div>
-        <span class="font-bold text-emerald-700 dark:text-emerald-400 whitespace-nowrap">${price}</span>
+        <span class="font-bold text-emerald-700 whitespace-nowrap">${price}</span>
       </div>
     `;
   }
@@ -410,22 +389,22 @@ function createDealCardHtml(offer) {
   const priceStr = escapeHtml(offer.price || 'Se pris i butik');
   
   const origPriceHtml = offer.original_price 
-    ? `<div class="text-[9px] sm:text-xs line-through text-zinc-400 dark:text-zinc-500 font-medium leading-none">${escapeHtml(offer.original_price)}</div>` 
+    ? `<div class="text-[9px] sm:text-xs line-through text-zinc-400 font-medium leading-none">${escapeHtml(offer.original_price)}</div>` 
     : '';
 
   const discountTagHtml = offer.discount 
-    ? `<div class="text-[8px] sm:text-[10px] md:text-[11px] font-semibold bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 border border-rose-200/60 dark:border-rose-900/30 px-1 sm:px-2 py-0.5 rounded w-fit mt-1 truncate max-w-full">${escapeHtml(offer.discount)}</div>` 
+    ? `<div class="text-[8px] sm:text-[10px] md:text-[11px] font-semibold bg-rose-50 text-rose-600 border border-rose-200/60 px-1 sm:px-2 py-0.5 rounded w-fit mt-1 truncate max-w-full">${escapeHtml(offer.discount)}</div>` 
     : '';
 
   // Restriction badge (e.g. Endast Tor-Sön)
   const restriction = (offer.restriction || '').toLowerCase();
   const isTorSon = restriction.includes('tor') || restriction.includes('sön') || restriction.includes('son');
   const restrictionBadgeHtml = isTorSon 
-    ? `<div class="text-[8px] sm:text-[10px] md:text-[11px] font-bold uppercase tracking-wider bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800/40 px-1 sm:px-2 py-0.5 rounded w-fit mt-1 truncate max-w-full">Endast Tor-Sön</div>`
-    : (offer.restriction ? `<div class="text-[8px] sm:text-[10px] md:text-[11px] font-medium text-amber-600 dark:text-amber-400 mt-1 truncate">${escapeHtml(offer.restriction)}</div>` : '');
+    ? `<div class="text-[8px] sm:text-[10px] md:text-[11px] font-bold uppercase tracking-wider bg-amber-50 text-amber-700 border border-amber-200 px-1 sm:px-2 py-0.5 rounded w-fit mt-1 truncate max-w-full">Endast Tor-Sön</div>`
+    : (offer.restriction ? `<div class="text-[8px] sm:text-[10px] md:text-[11px] font-medium text-amber-600 mt-1 truncate">${escapeHtml(offer.restriction)}</div>` : '');
 
   return `
-    <div class="deal-card group bg-white dark:bg-zinc-900 rounded-xl sm:rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-200 flex flex-col h-[280px] sm:h-[350px] md:h-[390px] relative overflow-hidden">
+    <div class="deal-card group bg-white rounded-xl sm:rounded-2xl border border-zinc-200/80 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-200 flex flex-col h-[280px] sm:h-[350px] md:h-[390px] relative overflow-hidden">
       <!-- Store Badge Overlay -->
       <span class="absolute top-1.5 left-1.5 sm:top-2.5 sm:left-2.5 px-1.5 py-0.5 sm:px-2.5 sm:py-0.75 rounded text-[8px] sm:text-[10px] md:text-[11px] font-bold tracking-wide uppercase text-white shadow-sm z-10 max-w-[65px] sm:max-w-none truncate" style="background-color: ${storeBadgeColor};">
         ${escapeHtml(store)}
@@ -435,7 +414,7 @@ function createDealCardHtml(offer) {
       ${pctBadgeHtml}
 
       <!-- Image Container -->
-      <div class="h-24 sm:h-36 md:h-44 bg-zinc-50/70 dark:bg-zinc-950/40 flex items-center justify-center p-2 sm:p-3 relative overflow-hidden border-b border-zinc-100 dark:border-zinc-800/60">
+      <div class="h-24 sm:h-36 md:h-44 bg-zinc-50/70 flex items-center justify-center p-2 sm:p-3 relative overflow-hidden border-b border-zinc-100">
         <img 
           src="${imgUrl}" 
           alt="${productName}"
@@ -448,20 +427,20 @@ function createDealCardHtml(offer) {
       <!-- Card Body -->
       <div class="p-2 sm:p-3 md:p-4 flex flex-col flex-grow justify-between">
         <div>
-          <span class="text-[9px] sm:text-[10px] md:text-[11px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 block truncate">
+          <span class="text-[9px] sm:text-[10px] md:text-[11px] font-bold uppercase tracking-wider text-zinc-400 block truncate">
             ${brandTag}
           </span>
-          <h3 class="text-xs sm:text-sm md:text-base font-bold text-zinc-900 dark:text-zinc-100 line-clamp-2 leading-tight mt-0.5" title="${productName}">
+          <h3 class="text-xs sm:text-sm md:text-base font-bold text-zinc-900 line-clamp-2 leading-tight mt-0.5" title="${productName}">
             ${productName}
           </h3>
-          <p class="text-[9px] sm:text-xs text-zinc-500 dark:text-zinc-400 mt-0.5 truncate hidden sm:block">
+          <p class="text-[9px] sm:text-xs text-zinc-500 mt-0.5 truncate hidden sm:block">
             ${descTag}
           </p>
         </div>
 
         <div class="pt-1 sm:pt-2">
           ${origPriceHtml}
-          <div class="text-xs sm:text-base md:text-xl font-black text-rose-600 dark:text-rose-400 tracking-tight leading-none mt-0.5">
+          <div class="text-xs sm:text-base md:text-xl font-black text-rose-600 tracking-tight leading-none mt-0.5">
             ${priceStr}
           </div>
           ${discountTagHtml}
@@ -491,7 +470,7 @@ function renderDeals() {
 function renderResultsCount() {
   const countEl = document.getElementById('results-count');
   if (countEl) {
-    countEl.innerHTML = `Visar <strong class="text-zinc-900 dark:text-white font-bold">${state.filteredOffers.length}</strong> aktuella erbjudanden`;
+    countEl.innerHTML = `Visar <strong class="text-zinc-900 font-bold">${state.filteredOffers.length}</strong> aktuella erbjudanden`;
   }
 }
 
@@ -499,7 +478,7 @@ function renderErrorState(message) {
   const grid = document.getElementById('deals-grid');
   if (grid) {
     grid.innerHTML = `
-      <div class="col-span-full bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-2xl p-8 text-center text-red-700 dark:text-red-300">
+      <div class="col-span-full bg-red-50 border border-red-200 rounded-2xl p-8 text-center text-red-700">
         <div class="text-3xl mb-2">⚠️</div>
         <h3 class="font-bold text-base mb-1">Kunde inte ladda erbjudanden</h3>
         <p class="text-sm opacity-80 mb-4">${escapeHtml(message)}</p>
@@ -556,10 +535,6 @@ function escapeHtml(str) {
 
 // --- Event Listeners Setup ---
 function setupEventListeners() {
-  // Theme Toggle Button
-  const themeBtn = document.getElementById('theme-toggle');
-  if (themeBtn) themeBtn.addEventListener('click', toggleTheme);
-
   // Mobile Drawer Toggle Buttons
   const btnOpenDrawer = document.getElementById('btn-open-filter-drawer');
   const btnCloseDrawer = document.getElementById('btn-close-filter-drawer');
@@ -712,7 +687,6 @@ function setupEventListeners() {
 
 // --- Initialization on DOM Load ---
 document.addEventListener('DOMContentLoaded', () => {
-  initTheme();
   setupEventListeners();
   fetchDealsData();
 });
