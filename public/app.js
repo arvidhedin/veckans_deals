@@ -1,6 +1,6 @@
 /**
  * Veckans Deals - Frontend Application Logic
- * Replicates Streamlit UI & functionality in client-side JavaScript.
+ * Clean, modern Scandinavian UI with responsive mobile drawer and live filtering.
  */
 
 // Global State
@@ -41,32 +41,32 @@ const state = {
 // Store color configuration
 const STORE_COLORS = {
   // ICA Stores (#E21936)
-  'ICA Nära Råbyvägen': { bg: '#E21936', text: '#FFFFFF', pillClass: 'bg-red-600' },
-  'ICA Supermarket Torgkassen': { bg: '#E21936', text: '#FFFFFF', pillClass: 'bg-red-600' },
-  'ICA Nära Rosendal': { bg: '#E21936', text: '#FFFFFF', pillClass: 'bg-red-600' },
-  'ICA Supermarket Väst': { bg: '#E21936', text: '#FFFFFF', pillClass: 'bg-red-600' },
-  'ICA Vretgränd': { bg: '#E21936', text: '#FFFFFF', pillClass: 'bg-red-600' },
-  'ICA Supermarket City': { bg: '#E21936', text: '#FFFFFF', pillClass: 'bg-red-600' },
-  'ICA Supermarket Luthagens Livs': { bg: '#E21936', text: '#FFFFFF', pillClass: 'bg-red-600' },
-  'ICA Folkes Livs': { bg: '#E21936', text: '#FFFFFF', pillClass: 'bg-red-600' },
-  'ICA Nära Hörnan': { bg: '#E21936', text: '#FFFFFF', pillClass: 'bg-red-600' },
+  'ICA Nära Råbyvägen': { bg: '#E21936', text: '#FFFFFF' },
+  'ICA Supermarket Torgkassen': { bg: '#E21936', text: '#FFFFFF' },
+  'ICA Nära Rosendal': { bg: '#E21936', text: '#FFFFFF' },
+  'ICA Supermarket Väst': { bg: '#E21936', text: '#FFFFFF' },
+  'ICA Vretgränd': { bg: '#E21936', text: '#FFFFFF' },
+  'ICA Supermarket City': { bg: '#E21936', text: '#FFFFFF' },
+  'ICA Supermarket Luthagens Livs': { bg: '#E21936', text: '#FFFFFF' },
+  'ICA Folkes Livs': { bg: '#E21936', text: '#FFFFFF' },
+  'ICA Nära Hörnan': { bg: '#E21936', text: '#FFFFFF' },
 
   // Willys (#009345)
-  'Willys': { bg: '#009345', text: '#FFFFFF', pillClass: 'bg-green-600' },
-  'Willys (Björkgatan)': { bg: '#009345', text: '#FFFFFF', pillClass: 'bg-green-600' },
+  'Willys': { bg: '#009345', text: '#FFFFFF' },
+  'Willys (Björkgatan)': { bg: '#009345', text: '#FFFFFF' },
 
   // Hemköp (#D31115)
-  'Hemköp': { bg: '#D31115', text: '#FFFFFF', pillClass: 'bg-red-700' },
-  'Hemköp (Svava)': { bg: '#D31115', text: '#FFFFFF', pillClass: 'bg-red-700' },
-  'Hemköp (Rosendal)': { bg: '#D31115', text: '#FFFFFF', pillClass: 'bg-red-700' },
+  'Hemköp': { bg: '#D31115', text: '#FFFFFF' },
+  'Hemköp (Svava)': { bg: '#D31115', text: '#FFFFFF' },
+  'Hemköp (Rosendal)': { bg: '#D31115', text: '#FFFFFF' },
 
   // Coop (#007A33)
-  'Coop': { bg: '#007A33', text: '#FFFFFF', pillClass: 'bg-emerald-700' },
-  'Coop (Centralhuset)': { bg: '#007A33', text: '#FFFFFF', pillClass: 'bg-emerald-700' },
-  'Coop (Liljegatan)': { bg: '#007A33', text: '#FFFFFF', pillClass: 'bg-emerald-700' },
+  'Coop': { bg: '#007A33', text: '#FFFFFF' },
+  'Coop (Centralhuset)': { bg: '#007A33', text: '#FFFFFF' },
+  'Coop (Liljegatan)': { bg: '#007A33', text: '#FFFFFF' },
 
   // Lidl (#00509E)
-  'Lidl': { bg: '#00509E', text: '#FFFFFF', pillClass: 'bg-blue-600' }
+  'Lidl': { bg: '#00509E', text: '#FFFFFF' }
 };
 
 const DEFAULT_IMG = "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=300&q=80";
@@ -95,7 +95,7 @@ function updateThemeButton() {
   const icon = document.getElementById('theme-icon');
   const label = document.getElementById('theme-label');
   if (icon) icon.textContent = isDark ? '☀️' : '🌙';
-  if (label) label.textContent = isDark ? 'Ljust läge' : 'Mörkt läge';
+  if (label) label.textContent = isDark ? 'Ljust' : 'Mörkt';
 }
 
 // --- Data Fetching ---
@@ -109,15 +109,14 @@ async function fetchDealsData() {
 
     const data = await response.json();
     
-    // Support both raw list and envelope with metadata
     if (Array.isArray(data)) {
       state.allOffers = data;
     } else {
       state.allOffers = data.offers || [];
       if (data.updated_at_readable && statusEl) {
-        statusEl.textContent = `Senast uppdaterad: ${data.updated_at_readable}`;
+        statusEl.textContent = `Uppdaterad: ${data.updated_at_readable}`;
       } else if (statusEl) {
-        statusEl.textContent = `Uppdaterad (${state.allOffers.length} erbjudanden)`;
+        statusEl.textContent = `${state.allOffers.length} erbjudanden laddade`;
       }
     }
 
@@ -132,7 +131,7 @@ async function fetchDealsData() {
   }
 }
 
-// --- Statistics & Counts ---
+// --- Statistics & Store Counts ---
 function computeStoreCounts() {
   state.storeCounts = {};
   for (const offer of state.allOffers) {
@@ -155,7 +154,6 @@ function computeStoreCounts() {
     return 0;
   };
 
-  // Update counts in sidebar
   // ICA
   updateCountElement('count-ica-raby', getCount('ICA Nära Råbyvägen'));
   updateCountElement('count-ica-torg', getCount('ICA Supermarket Torgkassen'));
@@ -180,11 +178,22 @@ function computeStoreCounts() {
 
   // Lidl
   updateCountElement('count-lidl', getCount('Lidl'));
+
+  updateMobileFilterBadge();
 }
 
 function updateCountElement(id, count) {
   const el = document.getElementById(id);
   if (el) el.textContent = count;
+}
+
+function updateMobileFilterBadge() {
+  const badge = document.getElementById('mobile-filter-badge');
+  const mobileCount = document.getElementById('mobile-filter-count');
+  const checkboxes = document.querySelectorAll('.store-filter:checked');
+  const count = checkboxes.length;
+  if (badge) badge.textContent = count;
+  if (mobileCount) mobileCount.textContent = `${count} valda`;
 }
 
 // --- Lidl Date Filtering Logic ---
@@ -199,7 +208,6 @@ function parseLidlDates(restrictionStr, today) {
     const month = parseInt(match[2], 10) - 1; // 0-indexed month
     let year = today.getFullYear();
 
-    // Adjust for year rollover (e.g. current month Dec and deal in Jan)
     if (today.getMonth() === 11 && month === 0) {
       year += 1;
     } else if (today.getMonth() === 0 && month === 11) {
@@ -222,7 +230,6 @@ function filterLidlOffers(lidlOffers, period) {
   const now = new Date();
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   
-  // Calculate Monday of current week
   const dayOfWeek = (today.getDay() + 6) % 7; // Monday is 0, Sunday is 6
   const startOfThisWeek = new Date(today);
   startOfThisWeek.setDate(today.getDate() - dayOfWeek);
@@ -242,7 +249,6 @@ function filterLidlOffers(lidlOffers, period) {
     const restriction = offer.restriction || '';
     const parsedDates = parseLidlDates(restriction, today);
 
-    // If no dates found in restriction, keep the offer
     if (parsedDates.length === 0) {
       filtered.push(offer);
       continue;
@@ -252,12 +258,10 @@ function filterLidlOffers(lidlOffers, period) {
     const d2 = parsedDates.length > 1 ? parsedDates[1] : d1;
 
     if (period === 'this-week') {
-      // Overlap check with this week
       if (Math.max(d1.getTime(), startOfThisWeek.getTime()) <= Math.min(d2.getTime(), endOfThisWeek.getTime())) {
         filtered.push(offer);
       }
     } else if (period === 'next-week') {
-      // Overlap check with next week
       if (Math.max(d1.getTime(), startOfNextWeek.getTime()) <= Math.min(d2.getTime(), endOfNextWeek.getTime())) {
         filtered.push(offer);
       }
@@ -273,9 +277,8 @@ function applyFilters() {
 
   // 1. Filter by selected store
   for (const offer of state.allOffers) {
-    const store = offer.store || '';
+    const store = (offer.store || '').trim();
     if (store === 'Lidl') {
-      // Handle Lidl separately for date filtering
       continue;
     }
 
@@ -322,11 +325,11 @@ function applyFilters() {
   renderReferenceBox(willysReferenceMatches, q);
   renderDeals();
   renderResultsCount();
+  updateMobileFilterBadge();
 }
 
 function parsePriceNumeric(priceStr) {
   if (!priceStr) return 0;
-  // Extract first number/float found in price string
   const clean = String(priceStr).replace(/\s+/g, '').replace(',', '.');
   const match = clean.match(/(\d+(\.\d+)?)/);
   return match ? parseFloat(match[1]) : 0;
@@ -375,13 +378,13 @@ function renderReferenceBox(matches, query) {
     const price = escapeHtml(ref.price || ref.original_price || '');
 
     html += `
-      <div class="flex items-baseline justify-between gap-4 text-xs sm:text-sm py-1 border-b border-emerald-200/50 dark:border-emerald-800/30 last:border-0 text-emerald-950 dark:text-emerald-100">
+      <div class="flex items-baseline justify-between gap-4 text-xs sm:text-sm py-1.5 border-b border-emerald-200/50 dark:border-emerald-800/30 last:border-0 text-emerald-950 dark:text-emerald-100">
         <div class="truncate">
           <span class="font-bold">${name}</span>
           ${brand}
           ${desc}
         </div>
-        <span class="font-extrabold text-emerald-700 dark:text-emerald-400 whitespace-nowrap">${price}</span>
+        <span class="font-bold text-emerald-700 dark:text-emerald-400 whitespace-nowrap">${price}</span>
       </div>
     `;
   }
@@ -392,12 +395,12 @@ function renderReferenceBox(matches, query) {
 
 // --- Deal Card Template Generator ---
 function createDealCardHtml(offer) {
-  const store = offer.store || 'Okänd butik';
+  const store = (offer.store || 'Okänd butik').trim();
   const storeBadgeColor = STORE_COLORS[store]?.bg || (store.toLowerCase().includes('hemköp') ? '#D31115' : '#4B5563');
   
   const discountPct = parseFloat(offer.discount_percentage) || 0;
   const pctBadgeHtml = discountPct > 0 
-    ? `<span class="absolute top-3 right-3 bg-red-500 text-white font-extrabold text-xs px-2.5 py-1 rounded-full shadow-md z-10 tracking-wider">-${Math.round(discountPct)}%</span>` 
+    ? `<span class="absolute top-3 right-3 bg-rose-600 text-white font-extrabold text-[11px] px-2 py-0.5 rounded-md shadow-sm z-10 tracking-wider">-${Math.round(discountPct)}%</span>` 
     : '';
 
   const imgUrl = offer.image_url || DEFAULT_IMG;
@@ -407,24 +410,24 @@ function createDealCardHtml(offer) {
   const priceStr = escapeHtml(offer.price || 'Se pris i butik');
   
   const origPriceHtml = offer.original_price 
-    ? `<div class="text-xs line-through text-gray-400 dark:text-gray-500 font-medium mb-0.5">${escapeHtml(offer.original_price)}</div>` 
+    ? `<div class="text-xs line-through text-zinc-400 dark:text-zinc-500 font-medium mb-0.5">${escapeHtml(offer.original_price)}</div>` 
     : '';
 
   const discountTagHtml = offer.discount 
-    ? `<div class="text-xs font-semibold bg-red-100 dark:bg-red-950/60 text-red-600 dark:text-red-400 px-2 py-0.5 rounded w-fit mt-1">${escapeHtml(offer.discount)}</div>` 
+    ? `<div class="text-[11px] font-semibold bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 border border-rose-200/60 dark:border-rose-900/30 px-2 py-0.5 rounded w-fit mt-1">${escapeHtml(offer.discount)}</div>` 
     : '';
 
   // Restriction badge (e.g. Endast Tor-Sön)
   const restriction = (offer.restriction || '').toLowerCase();
   const isTorSon = restriction.includes('tor') || restriction.includes('sön') || restriction.includes('son');
   const restrictionBadgeHtml = isTorSon 
-    ? `<div class="text-[11px] font-bold uppercase tracking-wider bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-700/50 px-2 py-0.5 rounded w-fit mt-2">Endast Tor-Sön</div>`
+    ? `<div class="text-[11px] font-bold uppercase tracking-wider bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800/40 px-2 py-0.5 rounded w-fit mt-1.5">Endast Tor-Sön</div>`
     : (offer.restriction ? `<div class="text-[11px] font-medium text-amber-600 dark:text-amber-400 mt-1">${escapeHtml(offer.restriction)}</div>` : '');
 
   return `
-    <div class="deal-card group bg-white dark:bg-darkcard rounded-2xl border border-gray-200/80 dark:border-gray-800 shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col h-[420px] relative overflow-hidden">
+    <div class="deal-card group bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-200 flex flex-col h-[400px] relative overflow-hidden">
       <!-- Store Badge Overlay -->
-      <span class="absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider text-white shadow-md z-10" style="background-color: ${storeBadgeColor};">
+      <span class="absolute top-3 left-3 px-2.5 py-0.75 rounded-md text-[11px] font-bold tracking-wide uppercase text-white shadow-sm z-10" style="background-color: ${storeBadgeColor};">
         ${escapeHtml(store)}
       </span>
 
@@ -432,33 +435,33 @@ function createDealCardHtml(offer) {
       ${pctBadgeHtml}
 
       <!-- Image Container -->
-      <div class="h-44 bg-gray-50 dark:bg-darkimg flex items-center justify-center p-4 relative overflow-hidden border-b border-gray-100 dark:border-gray-800/80">
+      <div class="h-44 bg-zinc-50/70 dark:bg-zinc-950/40 flex items-center justify-center p-3.5 relative overflow-hidden border-b border-zinc-100 dark:border-zinc-800/60">
         <img 
           src="${imgUrl}" 
           alt="${productName}"
           loading="lazy"
           onerror="this.onerror=null; this.src='${DEFAULT_IMG}';"
-          class="max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-105"
+          class="max-h-full max-w-full object-contain transition-transform duration-200 group-hover:scale-105"
         />
       </div>
 
       <!-- Card Body -->
       <div class="p-4 flex flex-col flex-grow justify-between">
         <div>
-          <span class="text-[11px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500 block truncate">
+          <span class="text-[11px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 block truncate">
             ${brandTag}
           </span>
-          <h3 class="text-sm sm:text-base font-bold text-gray-900 dark:text-white line-clamp-2 leading-snug mt-0.5" title="${productName}">
+          <h3 class="text-sm sm:text-base font-bold text-zinc-900 dark:text-zinc-100 line-clamp-2 leading-snug mt-0.5" title="${productName}">
             ${productName}
           </h3>
-          <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 truncate">
+          <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-1 truncate">
             ${descTag}
           </p>
         </div>
 
         <div class="pt-2">
           ${origPriceHtml}
-          <div class="text-xl font-extrabold text-brand-deal tracking-tight">
+          <div class="text-xl sm:text-2xl font-black text-rose-600 dark:text-rose-400 tracking-tight">
             ${priceStr}
           </div>
           ${discountTagHtml}
@@ -488,7 +491,7 @@ function renderDeals() {
 function renderResultsCount() {
   const countEl = document.getElementById('results-count');
   if (countEl) {
-    countEl.innerHTML = `Visar <strong class="text-gray-900 dark:text-white font-bold">${state.filteredOffers.length}</strong> aktuella erbjudanden`;
+    countEl.innerHTML = `Visar <strong class="text-zinc-900 dark:text-white font-bold">${state.filteredOffers.length}</strong> aktuella erbjudanden`;
   }
 }
 
@@ -496,7 +499,7 @@ function renderErrorState(message) {
   const grid = document.getElementById('deals-grid');
   if (grid) {
     grid.innerHTML = `
-      <div class="col-span-full bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 rounded-2xl p-8 text-center text-red-700 dark:text-red-300">
+      <div class="col-span-full bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-2xl p-8 text-center text-red-700 dark:text-red-300">
         <div class="text-3xl mb-2">⚠️</div>
         <h3 class="font-bold text-base mb-1">Kunde inte ladda erbjudanden</h3>
         <p class="text-sm opacity-80 mb-4">${escapeHtml(message)}</p>
@@ -505,6 +508,38 @@ function renderErrorState(message) {
         </button>
       </div>
     `;
+  }
+}
+
+// --- Mobile Filter Drawer Handlers ---
+function openMobileFilterDrawer() {
+  const sidebar = document.getElementById('filter-sidebar');
+  const backdrop = document.getElementById('filter-backdrop');
+  if (sidebar && backdrop) {
+    backdrop.classList.remove('hidden');
+    void backdrop.offsetWidth;
+    backdrop.classList.remove('opacity-0');
+    backdrop.classList.add('opacity-100');
+    
+    sidebar.classList.remove('translate-x-full');
+    sidebar.classList.add('translate-x-0');
+    document.body.classList.add('overflow-hidden', 'lg:overflow-auto');
+  }
+}
+
+function closeMobileFilterDrawer() {
+  const sidebar = document.getElementById('filter-sidebar');
+  const backdrop = document.getElementById('filter-backdrop');
+  if (sidebar && backdrop) {
+    sidebar.classList.remove('translate-x-0');
+    sidebar.classList.add('translate-x-full');
+    
+    backdrop.classList.remove('opacity-100');
+    backdrop.classList.add('opacity-0');
+    setTimeout(() => {
+      backdrop.classList.add('hidden');
+    }, 300);
+    document.body.classList.remove('overflow-hidden', 'lg:overflow-auto');
   }
 }
 
@@ -524,6 +559,21 @@ function setupEventListeners() {
   // Theme Toggle Button
   const themeBtn = document.getElementById('theme-toggle');
   if (themeBtn) themeBtn.addEventListener('click', toggleTheme);
+
+  // Mobile Drawer Toggle Buttons
+  const btnOpenDrawer = document.getElementById('btn-open-filter-drawer');
+  const btnCloseDrawer = document.getElementById('btn-close-filter-drawer');
+  const btnApplyMobile = document.getElementById('btn-apply-filter-mobile');
+  const backdrop = document.getElementById('filter-backdrop');
+
+  if (btnOpenDrawer) btnOpenDrawer.addEventListener('click', openMobileFilterDrawer);
+  if (btnCloseDrawer) btnCloseDrawer.addEventListener('click', closeMobileFilterDrawer);
+  if (btnApplyMobile) btnApplyMobile.addEventListener('click', closeMobileFilterDrawer);
+  if (backdrop) backdrop.addEventListener('click', closeMobileFilterDrawer);
+
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeMobileFilterDrawer();
+  });
 
   // Store filter checkboxes
   const checkboxes = document.querySelectorAll('.store-filter');
