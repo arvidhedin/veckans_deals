@@ -110,19 +110,11 @@
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-8">
 
     <!-- Top Navigation Header -->
-    <header class="flex justify-between items-center pb-6 border-b border-zinc-200/80 dark:border-zinc-800/80 mb-6 sm:mb-8">
+    <header class="flex justify-between items-center pb-5 border-b border-zinc-200/80 dark:border-zinc-800/80 mb-5 sm:mb-8">
       <div>
-        <div class="flex items-center gap-2">
-          <span class="text-xl sm:text-2xl font-extrabold tracking-tight text-zinc-900 dark:text-white">
-            Veckans Deals
-          </span>
-          <span class="hidden sm:inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300">
-            Uppsala
-          </span>
-        </div>
-        <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5 hidden sm:block">
-          Aktuella erbjudanden och extrapriser från dina lokala matbutiker.
-        </p>
+        <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight text-zinc-900 dark:text-white">
+          Veckans Deals
+        </h1>
       </div>
 
       <div class="flex items-center gap-3">
@@ -438,12 +430,12 @@
           </div>
         </div>
 
-        <!-- Deals Grid Container -->
-        <div id="deals-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+        <!-- Deals Grid Container (3 columns on all viewports) -->
+        <div id="deals-grid" class="grid grid-cols-3 gap-2 sm:gap-4 lg:gap-5">
           <!-- Loading skeleton cards -->
-          <div class="deal-skeleton bg-white dark:bg-zinc-900 rounded-2xl p-4 h-96 animate-pulse border border-zinc-200/80 dark:border-zinc-800/80"></div>
-          <div class="deal-skeleton bg-white dark:bg-zinc-900 rounded-2xl p-4 h-96 animate-pulse border border-zinc-200/80 dark:border-zinc-800/80"></div>
-          <div class="deal-skeleton bg-white dark:bg-zinc-900 rounded-2xl p-4 h-96 animate-pulse border border-zinc-200/80 dark:border-zinc-800/80"></div>
+          <div class="deal-skeleton bg-white dark:bg-zinc-900 rounded-xl sm:rounded-2xl p-2.5 sm:p-4 h-[280px] sm:h-[360px] md:h-[400px] animate-pulse border border-zinc-200/80 dark:border-zinc-800/80"></div>
+          <div class="deal-skeleton bg-white dark:bg-zinc-900 rounded-xl sm:rounded-2xl p-2.5 sm:p-4 h-[280px] sm:h-[360px] md:h-[400px] animate-pulse border border-zinc-200/80 dark:border-zinc-800/80"></div>
+          <div class="deal-skeleton bg-white dark:bg-zinc-900 rounded-xl sm:rounded-2xl p-2.5 sm:p-4 h-[280px] sm:h-[360px] md:h-[400px] animate-pulse border border-zinc-200/80 dark:border-zinc-800/80"></div>
         </div>
 
         <!-- Empty State (Hidden by default) -->

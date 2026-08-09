@@ -400,7 +400,7 @@ function createDealCardHtml(offer) {
   
   const discountPct = parseFloat(offer.discount_percentage) || 0;
   const pctBadgeHtml = discountPct > 0 
-    ? `<span class="absolute top-3 right-3 bg-rose-600 text-white font-extrabold text-[11px] px-2 py-0.5 rounded-md shadow-sm z-10 tracking-wider">-${Math.round(discountPct)}%</span>` 
+    ? `<span class="absolute top-1.5 right-1.5 sm:top-2.5 sm:right-2.5 bg-rose-600 text-white font-extrabold text-[8px] sm:text-[10px] md:text-[11px] px-1 sm:px-2 py-0.5 rounded shadow-sm z-10 tracking-wider">-${Math.round(discountPct)}%</span>` 
     : '';
 
   const imgUrl = offer.image_url || DEFAULT_IMG;
@@ -410,24 +410,24 @@ function createDealCardHtml(offer) {
   const priceStr = escapeHtml(offer.price || 'Se pris i butik');
   
   const origPriceHtml = offer.original_price 
-    ? `<div class="text-xs line-through text-zinc-400 dark:text-zinc-500 font-medium mb-0.5">${escapeHtml(offer.original_price)}</div>` 
+    ? `<div class="text-[9px] sm:text-xs line-through text-zinc-400 dark:text-zinc-500 font-medium leading-none">${escapeHtml(offer.original_price)}</div>` 
     : '';
 
   const discountTagHtml = offer.discount 
-    ? `<div class="text-[11px] font-semibold bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 border border-rose-200/60 dark:border-rose-900/30 px-2 py-0.5 rounded w-fit mt-1">${escapeHtml(offer.discount)}</div>` 
+    ? `<div class="text-[8px] sm:text-[10px] md:text-[11px] font-semibold bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 border border-rose-200/60 dark:border-rose-900/30 px-1 sm:px-2 py-0.5 rounded w-fit mt-1 truncate max-w-full">${escapeHtml(offer.discount)}</div>` 
     : '';
 
   // Restriction badge (e.g. Endast Tor-Sön)
   const restriction = (offer.restriction || '').toLowerCase();
   const isTorSon = restriction.includes('tor') || restriction.includes('sön') || restriction.includes('son');
   const restrictionBadgeHtml = isTorSon 
-    ? `<div class="text-[11px] font-bold uppercase tracking-wider bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800/40 px-2 py-0.5 rounded w-fit mt-1.5">Endast Tor-Sön</div>`
-    : (offer.restriction ? `<div class="text-[11px] font-medium text-amber-600 dark:text-amber-400 mt-1">${escapeHtml(offer.restriction)}</div>` : '');
+    ? `<div class="text-[8px] sm:text-[10px] md:text-[11px] font-bold uppercase tracking-wider bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800/40 px-1 sm:px-2 py-0.5 rounded w-fit mt-1 truncate max-w-full">Endast Tor-Sön</div>`
+    : (offer.restriction ? `<div class="text-[8px] sm:text-[10px] md:text-[11px] font-medium text-amber-600 dark:text-amber-400 mt-1 truncate">${escapeHtml(offer.restriction)}</div>` : '');
 
   return `
-    <div class="deal-card group bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-200 flex flex-col h-[400px] relative overflow-hidden">
+    <div class="deal-card group bg-white dark:bg-zinc-900 rounded-xl sm:rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-200 flex flex-col h-[280px] sm:h-[350px] md:h-[390px] relative overflow-hidden">
       <!-- Store Badge Overlay -->
-      <span class="absolute top-3 left-3 px-2.5 py-0.75 rounded-md text-[11px] font-bold tracking-wide uppercase text-white shadow-sm z-10" style="background-color: ${storeBadgeColor};">
+      <span class="absolute top-1.5 left-1.5 sm:top-2.5 sm:left-2.5 px-1.5 py-0.5 sm:px-2.5 sm:py-0.75 rounded text-[8px] sm:text-[10px] md:text-[11px] font-bold tracking-wide uppercase text-white shadow-sm z-10 max-w-[65px] sm:max-w-none truncate" style="background-color: ${storeBadgeColor};">
         ${escapeHtml(store)}
       </span>
 
@@ -435,7 +435,7 @@ function createDealCardHtml(offer) {
       ${pctBadgeHtml}
 
       <!-- Image Container -->
-      <div class="h-44 bg-zinc-50/70 dark:bg-zinc-950/40 flex items-center justify-center p-3.5 relative overflow-hidden border-b border-zinc-100 dark:border-zinc-800/60">
+      <div class="h-24 sm:h-36 md:h-44 bg-zinc-50/70 dark:bg-zinc-950/40 flex items-center justify-center p-2 sm:p-3 relative overflow-hidden border-b border-zinc-100 dark:border-zinc-800/60">
         <img 
           src="${imgUrl}" 
           alt="${productName}"
@@ -446,22 +446,22 @@ function createDealCardHtml(offer) {
       </div>
 
       <!-- Card Body -->
-      <div class="p-4 flex flex-col flex-grow justify-between">
+      <div class="p-2 sm:p-3 md:p-4 flex flex-col flex-grow justify-between">
         <div>
-          <span class="text-[11px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 block truncate">
+          <span class="text-[9px] sm:text-[10px] md:text-[11px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 block truncate">
             ${brandTag}
           </span>
-          <h3 class="text-sm sm:text-base font-bold text-zinc-900 dark:text-zinc-100 line-clamp-2 leading-snug mt-0.5" title="${productName}">
+          <h3 class="text-xs sm:text-sm md:text-base font-bold text-zinc-900 dark:text-zinc-100 line-clamp-2 leading-tight mt-0.5" title="${productName}">
             ${productName}
           </h3>
-          <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-1 truncate">
+          <p class="text-[9px] sm:text-xs text-zinc-500 dark:text-zinc-400 mt-0.5 truncate hidden sm:block">
             ${descTag}
           </p>
         </div>
 
-        <div class="pt-2">
+        <div class="pt-1 sm:pt-2">
           ${origPriceHtml}
-          <div class="text-xl sm:text-2xl font-black text-rose-600 dark:text-rose-400 tracking-tight">
+          <div class="text-xs sm:text-base md:text-xl font-black text-rose-600 dark:text-rose-400 tracking-tight leading-none mt-0.5">
             ${priceStr}
           </div>
           ${discountTagHtml}
