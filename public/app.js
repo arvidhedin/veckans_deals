@@ -136,35 +136,50 @@ async function fetchDealsData() {
 function computeStoreCounts() {
   state.storeCounts = {};
   for (const offer of state.allOffers) {
-    const store = offer.store || 'Okänd';
-    state.storeCounts[store] = (state.storeCounts[store] || 0) + 1;
+    const store = (offer.store || '').trim();
+    if (store) {
+      state.storeCounts[store] = (state.storeCounts[store] || 0) + 1;
+    }
   }
+
+  // Helper to find count by exact name, aliases, or case-insensitive match
+  const getCount = (name, aliases = []) => {
+    if (state.storeCounts[name] !== undefined) return state.storeCounts[name];
+    for (const alias of aliases) {
+      if (state.storeCounts[alias] !== undefined) return state.storeCounts[alias];
+    }
+    const lowerName = name.toLowerCase();
+    for (const [key, count] of Object.entries(state.storeCounts)) {
+      if (key.toLowerCase() === lowerName) return count;
+    }
+    return 0;
+  };
 
   // Update counts in sidebar
   // ICA
-  updateCountElement('count-ica-raby', state.storeCounts['ICA Nära Råbyvägen'] || 0);
-  updateCountElement('count-ica-torg', state.storeCounts['ICA Supermarket Torgkassen'] || 0);
-  updateCountElement('count-ica-rosendal', state.storeCounts['ICA Nära Rosendal'] || 0);
-  updateCountElement('count-ica-vast', state.storeCounts['ICA Supermarket Väst'] || 0);
-  updateCountElement('count-ica-vretgrand', state.storeCounts['ICA Vretgränd'] || 0);
-  updateCountElement('count-ica-city', state.storeCounts['ICA Supermarket City'] || 0);
-  updateCountElement('count-ica-luthagen', state.storeCounts['ICA Supermarket Luthagens Livs'] || 0);
-  updateCountElement('count-ica-folkes', state.storeCounts['ICA Folkes Livs'] || 0);
-  updateCountElement('count-ica-hornan', state.storeCounts['ICA Nära Hörnan'] || 0);
+  updateCountElement('count-ica-raby', getCount('ICA Nära Råbyvägen'));
+  updateCountElement('count-ica-torg', getCount('ICA Supermarket Torgkassen'));
+  updateCountElement('count-ica-rosendal', getCount('ICA Nära Rosendal'));
+  updateCountElement('count-ica-vast', getCount('ICA Supermarket Väst'));
+  updateCountElement('count-ica-vretgrand', getCount('ICA Vretgränd'));
+  updateCountElement('count-ica-city', getCount('ICA Supermarket City'));
+  updateCountElement('count-ica-luthagen', getCount('ICA Supermarket Luthagens Livs'));
+  updateCountElement('count-ica-folkes', getCount('ICA Folkes Livs'));
+  updateCountElement('count-ica-hornan', getCount('ICA Nära Hörnan'));
 
   // Willys
-  updateCountElement('count-willys', state.storeCounts['Willys'] || state.storeCounts['Willys (Björkgatan)'] || 0);
+  updateCountElement('count-willys', getCount('Willys', ['Willys (Björkgatan)']));
 
   // Hemköp
-  updateCountElement('count-hemkop-svava', state.storeCounts['Hemköp (Svava)'] || state.storeCounts['Hemköp'] || 0);
-  updateCountElement('count-hemkop-rosendal', state.storeCounts['Hemköp (Rosendal)'] || 0);
+  updateCountElement('count-hemkop-svava', getCount('Hemköp (Svava)', ['Hemköp']));
+  updateCountElement('count-hemkop-rosendal', getCount('Hemköp (Rosendal)'));
 
   // Coop
-  updateCountElement('count-coop-centralhuset', state.storeCounts['Coop (Centralhuset)'] || state.storeCounts['Coop'] || 0);
-  updateCountElement('count-coop-liljegatan', state.storeCounts['Coop (Liljegatan)'] || 0);
+  updateCountElement('count-coop-centralhuset', getCount('Coop (Centralhuset)', ['Coop']));
+  updateCountElement('count-coop-liljegatan', getCount('Coop (Liljegatan)'));
 
   // Lidl
-  updateCountElement('count-lidl', state.storeCounts['Lidl'] || 0);
+  updateCountElement('count-lidl', getCount('Lidl'));
 }
 
 function updateCountElement(id, count) {
