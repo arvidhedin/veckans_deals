@@ -5,9 +5,17 @@ import json
 
 
 # ICA butiker att hämta erbjudanden för
+# ICA butiker att hämta erbjudanden för
 STORES = {
     "ICA Nära Råbyvägen": "https://www.ica.se/erbjudanden/ica-nara-rabyvagen-1003963/",
     "ICA Supermarket Torgkassen": "https://www.ica.se/erbjudanden/ica-supermarket-torgkassen-1003821/",
+    "ICA Nära Rosendal": "https://www.ica.se/erbjudanden/ica-nara-rosendal-1004328/",
+    "ICA Supermarket Väst": "https://www.ica.se/erbjudanden/ica-supermarket-vast-1003761/",
+    "ICA Vretgränd": "https://www.ica.se/erbjudanden/ica-vretgrand-1003558/",
+    "ICA Supermarket City": "https://www.ica.se/erbjudanden/ica-supermarket-city-uppsala-1003381/",
+    "ICA Supermarket Luthagens Livs": "https://www.ica.se/erbjudanden/ica-supermarket-luthagens-livs-1004458/",
+    "ICA Folkes Livs": "https://www.ica.se/erbjudanden/ica-folkes-livs-1004181/",
+    "ICA Nära Hörnan": "https://www.ica.se/erbjudanden/ica-nara-hornan-1003672/",
 }
 
 HEADERS = {

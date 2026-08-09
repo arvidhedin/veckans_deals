@@ -3,13 +3,17 @@ from bs4 import BeautifulSoup
 import json
 import re
 
-API_URL = "https://external.api.coop.se/dke/offers/sorting-groups/036910?api-version=v2&clustered=true&grouped=true"
+# Coop butiker att hämta erbjudanden för
+STORES = {
+    "Coop (Centralhuset)": "036910",
+    "Coop (Liljegatan)": "036002"
+}
 
 # Fallback keys if dynamic retrieval fails
 FALLBACK_KEYS = [
     "3becf0ce306f41a1ae94077c16798187",  # extApimSubscriptionKey
     "32895bd5b86e4a5ab6e94fb0bc8ae234",  # dkeKey
-    "990520e65cc44eef89e9045b57f4e9"   # User-provided key (storeApiSubscriptionKey)
+    "990520e65cc44eef89e9045b57f4e9"     # User-provided key (storeApiSubscriptionKey)
 ]
 
 def _get_headers() -> dict:
@@ -21,7 +25,6 @@ def _get_headers() -> dict:
                       "Chrome/120.0.0.0 Safari/537.36"
     }
 
-    # Försök hämta nyckeln dynamiskt från butikssidan för att undvika att nyckeln går ut
     try:
         url = "https://www.coop.se/butiker-erbjudanden/coop/coop-centralhuset/"
         r = requests.get(url, headers={"User-Agent": headers["User-Agent"]}, timeout=5)
@@ -40,17 +43,15 @@ def _get_headers() -> dict:
     except Exception:
         pass
 
-    # Fallback till den första fungerande kända nyckeln
     headers["Ocp-Apim-Subscription-Key"] = FALLBACK_KEYS[0]
     return headers
 
-def _parse_offer(item: dict) -> dict:
+def _parse_offer(item: dict, store_name: str) -> dict:
     """Konvertera ett Coop-erbjudande till vårt standardformat."""
     content = item.get("content", {})
     us = item.get("unifiedSplash", {})
     price_info = item.get("priceInformation", {})
 
-    # Bygg prissträng från unifiedSplash
     prefix = us.get("prefix", "").strip()
     value = us.get("value", "").strip()
     decimal = us.get("decimal", "").strip()
@@ -65,7 +66,6 @@ def _parse_offer(item: dict) -> dict:
             price_str += f"{value},{decimal}"
         else:
             price_str += value
-            # Lägg till :- om värdet bara är siffror och saknar det
             if value.replace(":-", "").replace(",", "").replace(".", "").isdigit() and ":-" not in value:
                 price_str += ":-"
         
@@ -74,7 +74,6 @@ def _parse_offer(item: dict) -> dict:
     else:
         price_str = "Se butik"
 
-    # Bygg beskrivning genom att kombinera parentAmountInformation och description
     parent_amount = (item.get("parentAmountInformation") or content.get("parentAmountInformation") or "").strip()
     desc_text = content.get("description", "").strip()
 
@@ -88,25 +87,15 @@ def _parse_offer(item: dict) -> dict:
     else:
         description = desc_text
 
-    # Fixa protokoll-relativa bild-URL:er
     image_url = content.get("imageUrl", "")
     if image_url.startswith("//"):
         image_url = f"https:{image_url}"
 
-    # Originalpris och rabattprocent
     original_price = ""
     discount_percentage = 0
-    discount_val = price_info.get("discountValue")
-    if discount_val is not None:
-        try:
-            deal_price = float(discount_val)
-            # discountValue i Coop är kampanjpriset, inte rabattbeloppet
-            # Vi kan inte beräkna procent utan originalpris
-        except (ValueError, TypeError):
-            pass
 
     return {
-        "store": "Coop",
+        "store": store_name,
         "product": content.get("title", "Okänd produkt"),
         "brand": content.get("brand", ""),
         "price": price_str.strip(),
@@ -120,40 +109,46 @@ def _parse_offer(item: dict) -> dict:
     }
 
 def get_offers() -> list[dict]:
-    """Hämtar veckans erbjudanden från Coop via DKE-API:et."""
+    """Hämtar veckans erbjudanden från alla konfigurerade Coop-butiker."""
     all_offers = []
-    seen_ids = set()
+    
+    # Vi hämtar API-nyckeln en gång för alla butiker
+    headers = _get_headers()
 
-    try:
-        headers = _get_headers()
+    for store_name, store_id in STORES.items():
+        # Återställ set:et med id:n per butik, annars missar vi produkter 
+        # som finns i båda butikerna
+        seen_ids = set()
         
-        # Prova att hämta med den valda nyckeln
-        response = requests.get(API_URL, headers=headers, timeout=10)
-        
-        # Om den valda nyckeln ger 401, prova fallback-nycklarna
-        if response.status_code == 401:
-            for fallback_key in FALLBACK_KEYS:
-                headers["Ocp-Apim-Subscription-Key"] = fallback_key
-                response = requests.get(API_URL, headers=headers, timeout=10)
-                if response.status_code == 200:
-                    break
+        # Dynamisk URL baserat på butikens ID
+        api_url = f"https://external.api.coop.se/dke/offers/sorting-groups/{store_id}?api-version=v2&clustered=true&grouped=true"
 
-        response.raise_for_status()
-        data = response.json()
+        try:
+            response = requests.get(api_url, headers=headers, timeout=10)
+            
+            if response.status_code == 401:
+                for fallback_key in FALLBACK_KEYS:
+                    headers["Ocp-Apim-Subscription-Key"] = fallback_key
+                    response = requests.get(api_url, headers=headers, timeout=10)
+                    if response.status_code == 200:
+                        break
 
-        sorting_groups = data.get("sortingGroups", [])
-        for group in sorting_groups:
-            for offer in group.get("offers", []):
-                offer_id = offer.get("id")
-                if offer_id:
-                    if offer_id in seen_ids:
-                        continue
-                    seen_ids.add(offer_id)
-                
-                parsed = _parse_offer(offer)
-                all_offers.append(parsed)
+            response.raise_for_status()
+            data = response.json()
 
-    except Exception as e:
-        print(f"Fel vid hämtning av Coop-erbjudanden: {e}")
+            sorting_groups = data.get("sortingGroups", [])
+            for group in sorting_groups:
+                for offer in group.get("offers", []):
+                    offer_id = offer.get("id")
+                    if offer_id:
+                        if offer_id in seen_ids:
+                            continue
+                        seen_ids.add(offer_id)
+                    
+                    parsed = _parse_offer(offer, store_name)
+                    all_offers.append(parsed)
+
+        except Exception as e:
+            print(f"Fel vid hämtning av Coop-erbjudanden för {store_name}: {e}")
 
     return all_offers

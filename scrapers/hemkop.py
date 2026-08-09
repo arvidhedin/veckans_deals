@@ -1,9 +1,11 @@
 import requests
+import re
 
-# Hemköp butik att hämta erbjudanden för
-# Butiks-ID hittas i URL:en när man väljer butik på hemkop.se/veckans-erbjudanden
-STORE_ID = "4256"
-STORE_NAME = "Hemköp"
+# Hemköp butiker att hämta erbjudanden för
+STORES = {
+    "Hemköp (Svava)": "4256",
+    "Hemköp (Rosendal)": "4103"
+}
 
 API_URL = "https://www.hemkop.se/axfood/rest/v1/search/campaigns/offline"
 
@@ -14,7 +16,7 @@ HEADERS = {
     "Accept": "application/json",
 }
 
-def _parse_offer(item: dict) -> dict:
+def _parse_offer(item: dict, store_name: str) -> dict:
     """Konvertera ett Hemköp-erbjudande till vårt standardformat."""
     promos = item.get("potentialPromotions", [])
 
@@ -48,7 +50,6 @@ def _parse_offer(item: dict) -> dict:
                 orig = float(str(price_no_unit).replace(",", "."))
                 deal = float(promo_price)
                 # Hantera "2 för" erbjudanden
-                import re
                 multi_match = re.search(r'(\d+)\s*för', cond_label)
                 if multi_match:
                     qty = int(multi_match.group(1))
@@ -71,7 +72,7 @@ def _parse_offer(item: dict) -> dict:
             image_url = f"https://www.hemkop.se{img_url}"
 
     return {
-        "store": STORE_NAME,
+        "store": store_name,
         "product": item.get("name", "Okänd produkt"),
         "brand": item.get("manufacturer", ""),
         "price": price_str,
@@ -87,40 +88,44 @@ def _parse_offer(item: dict) -> dict:
 def get_offers() -> list[dict]:
     """Hämtar veckans erbjudanden från Hemköp via kampanj-API:et."""
     all_offers = []
-    page = 0
-    page_size = 100
 
-    try:
-        while True:
-            params = {
-                "q": STORE_ID,
-                "type": "PERSONAL_GENERAL",
-                "page": page,
-                "size": page_size,
-            }
+    # Loopa igenom alla våra inlagda butiker
+    for store_name, store_id in STORES.items():
+        page = 0
+        page_size = 100
 
-            response = requests.get(API_URL, params=params, headers=HEADERS, timeout=10)
-            response.raise_for_status()
+        try:
+            while True:
+                params = {
+                    "q": store_id,
+                    "type": "PERSONAL_GENERAL",
+                    "page": page,
+                    "size": page_size,
+                }
 
-            data = response.json()
-            results = data.get("results", [])
+                response = requests.get(API_URL, params=params, headers=HEADERS, timeout=10)
+                response.raise_for_status()
 
-            if not results:
-                break
+                data = response.json()
+                results = data.get("results", [])
 
-            for item in results:
-                parsed = _parse_offer(item)
-                all_offers.append(parsed)
+                if not results:
+                    break
 
-            # Kolla om det finns fler sidor
-            pagination = data.get("pagination", {})
-            total_pages = pagination.get("numberOfPages", 1)
+                for item in results:
+                    # Vi skickar nu med store_name så att rätt butik hamnar på rätt erbjudande
+                    parsed = _parse_offer(item, store_name)
+                    all_offers.append(parsed)
 
-            page += 1
-            if page >= total_pages:
-                break
+                # Kolla om det finns fler sidor
+                pagination = data.get("pagination", {})
+                total_pages = pagination.get("numberOfPages", 1)
 
-    except Exception as e:
-        print(f"Fel vid hämtning av Hemköp-erbjudanden: {e}")
+                page += 1
+                if page >= total_pages:
+                    break
+
+        except Exception as e:
+            print(f"Fel vid hämtning av Hemköp-erbjudanden för {store_name}: {e}")
 
     return all_offers
