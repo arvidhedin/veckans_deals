@@ -273,26 +273,65 @@ function applyFilters() {
     result.push(...filteredLidl);
   }
 
-  // 3. Search Query Filter
-  const q = state.searchQuery.trim().toLowerCase();
+  // 3. Search Query Filter & Willys Reference Matches
+  const rawQ = state.searchQuery.trim();
+  const q = rawQ.toLowerCase();
   let willysReferenceMatches = [];
 
   if (q) {
+    const queryTokens = q.split(/\s+/).filter(Boolean);
+
     result = result.filter(offer => {
       const product = (offer.product || '').toLowerCase();
       const brand = (offer.brand || '').toLowerCase();
       const desc = (offer.description || '').toLowerCase();
-      return product.includes(q) || brand.includes(q) || desc.includes(q);
+      const combined = `${product} ${brand} ${desc}`;
+      
+      if (combined.includes(q)) return true;
+      return queryTokens.every(token => combined.includes(token));
     });
 
-    // Extract Willys reference items from all Willys offers matching query
-    willysReferenceMatches = state.allOffers.filter(o => {
-      const isWillys = (o.store || '').toLowerCase().includes('willys');
-      if (!isWillys) return false;
-      const product = (o.product || '').toLowerCase();
-      const brand = (o.brand || '').toLowerCase();
-      return product.includes(q) || brand.includes(q);
-    }).slice(0, 4);
+    // Extract Willys reference items from all Willys offers in dataset
+    const willysOffers = state.allOffers.filter(o => {
+      const store = (o.store || '').toLowerCase();
+      return store.includes('willys');
+    });
+
+    const scoredMatches = [];
+    const seenKeys = new Set();
+
+    for (const item of willysOffers) {
+      const prod = (item.product || '').toLowerCase();
+      const brand = (item.brand || '').toLowerCase();
+      const desc = (item.description || '').toLowerCase();
+      const fullText = `${prod} ${brand} ${desc}`;
+
+      let score = 0;
+      if (prod === q) {
+        score = 10;
+      } else if (prod.startsWith(q)) {
+        score = 8;
+      } else if (prod.includes(q)) {
+        score = 6;
+      } else if (fullText.includes(q)) {
+        score = 4;
+      } else if (queryTokens.length > 0 && queryTokens.every(t => fullText.includes(t))) {
+        score = 3;
+      } else if (queryTokens.some(t => t.length >= 3 && (prod.includes(t) || fullText.includes(t)))) {
+        score = 1;
+      }
+
+      if (score > 0) {
+        const key = `${(item.product || '').trim()}_${(item.brand || '').trim()}`.toLowerCase();
+        if (!seenKeys.has(key)) {
+          seenKeys.add(key);
+          scoredMatches.push({ item, score });
+        }
+      }
+    }
+
+    scoredMatches.sort((a, b) => b.score - a.score);
+    willysReferenceMatches = scoredMatches.map(m => m.item).slice(0, 5);
   }
 
   // 4. Sorting
@@ -352,18 +391,18 @@ function renderReferenceBox(matches, query) {
   let html = '';
   for (const ref of matches) {
     const name = escapeHtml(ref.product || 'Okänd produkt');
-    const brand = ref.brand ? ` <span class="opacity-70 font-normal text-xs">(${escapeHtml(ref.brand)})</span>` : '';
-    const desc = ref.description ? ` <span class="opacity-60 text-xs">· ${escapeHtml(ref.description)}</span>` : '';
+    const brand = ref.brand ? ` <span class="text-emerald-800 font-semibold text-xs">(${escapeHtml(ref.brand)})</span>` : '';
+    const desc = ref.description ? ` <span class="text-emerald-800/90 text-xs font-normal">· ${escapeHtml(ref.description)}</span>` : '';
     const price = escapeHtml(ref.price || ref.original_price || '');
 
     html += `
-      <div class="flex items-baseline justify-between gap-4 text-xs sm:text-sm py-1.5 border-b border-emerald-200/50 last:border-0 text-emerald-950">
-        <div class="truncate">
-          <span class="font-bold">${name}</span>
+      <div class="flex items-baseline justify-between gap-4 text-xs sm:text-sm py-2 border-b border-emerald-200/80 last:border-0 text-emerald-950">
+        <div class="truncate font-bold text-emerald-950">
+          <span>${name}</span>
           ${brand}
           ${desc}
         </div>
-        <span class="font-bold text-emerald-700 whitespace-nowrap">${price}</span>
+        <span class="font-extrabold text-emerald-900 whitespace-nowrap text-sm sm:text-base ml-2">${price}</span>
       </div>
     `;
   }
