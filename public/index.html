@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="sv" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Veckans Deals | Jämför matpriser</title>
+  <meta name="description" content="Hitta och jämför de bästa mataffärserbjudandena från ICA, Willys, Hemköp, Coop och Lidl i din stad helt utan krångel.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220%22%20width=%22100%22%20height=%22100%22><text y=%22.9em%22 font-size=%2290%22>🛒</text></svg>">
+
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              red: '#FF416C',
+              orange: '#FF4B2B',
+              deal: '#FF4B2B',
+            },
+            store: {
+              ica: '#E21936',
+              willys: '#009345',
+              hemkop: '#D31115',
+              coop: '#007A33',
+              lidl: '#00509E',
+            },
+            darkbg: '#121216',
+            darkcard: '#1E1E24',
+            darkimg: '#141417',
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Custom Styles for Specific Store Badge Colors and Micro-Animations -->
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    /* Gradient header overlay */
+    .title-banner {
+      background: linear-gradient(135deg, #FF416C 0%, #FF4B2B 100%);
+      box-shadow: 0 10px 25px rgba(255, 75, 43, 0.2);
+    }
+    .title-banner::after {
+      content: "";
+      position: absolute;
+      top: 0; right: 0; bottom: 0; left: 0;
+      background: radial-gradient(circle at 80% 20%, rgba(255,255,255,0.18) 0%, transparent 50%);
+      pointer-events: none;
+    }
+
+    /* Store Badges */
+    .store-badge-ica { background-color: #E21936; }
+    .store-badge-willys { background-color: #009345; }
+    .store-badge-hemkop { background-color: #D31115; }
+    .store-badge-coop { background-color: #007A33; }
+    .store-badge-lidl { background-color: #00509E; }
+
+    /* Willys Ref Price Box styling */
+    .ref-price-box {
+      background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 100%);
+      border: 1px solid #a5d6a7;
+    }
+    .dark .ref-price-box {
+      background: linear-gradient(135deg, #1b3a1f 0%, #1a2e1b 100%);
+      border-color: rgba(76, 175, 80, 0.3);
+    }
+
+    /* Line clamp helper */
+    .line-clamp-2 {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+  </style>
+</head>
+
+<body class="bg-gray-50 dark:bg-darkbg text-gray-900 dark:text-gray-100 min-h-full transition-colors duration-200">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+    <!-- Top Navigation / Theme Bar -->
+    <header class="flex justify-between items-center mb-4">
+      <div class="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+        <span class="inline-block w-2.5 h-2.5 bg-emerald-500 rounded-full animate-pulse"></span>
+        <span id="status-update-text">Laddar erbjudanden...</span>
+      </div>
+
+      <!-- Theme Switcher Button -->
+      <button id="theme-toggle" type="button" aria-label="Växla färgtema"
+        class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-white dark:bg-darkcard border border-gray-200 dark:border-gray-700 shadow-sm hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+        <span id="theme-icon">🌙</span>
+        <span id="theme-label" class="hidden sm:inline">Mörkt läge</span>
+      </button>
+    </header>
+
+    <!-- Header Hero Banner -->
+    <div class="title-banner relative rounded-2xl p-6 sm:p-10 text-white mb-8 overflow-hidden">
+      <div class="relative z-10 max-w-3xl">
+        <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight">
+          🛒 Veckans Deals
+        </h1>
+        <p class="mt-2 text-base sm:text-lg text-white/90 font-normal">
+          Hitta och jämför de bästa mataffärserbjudandena i din stad helt utan krångel.
+        </p>
+      </div>
+    </div>
+
+    <!-- Main Content Layout (Sidebar + Results) -->
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+      
+      <!-- Sidebar Filters -->
+      <aside class="lg:col-span-1 space-y-6">
+        <div class="bg-white dark:bg-darkcard p-5 rounded-2xl border border-gray-200/80 dark:border-gray-800 shadow-sm sticky top-6">
+          <div class="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-800">
+            <h2 class="text-base font-bold flex items-center gap-2">
+              <span>🏬</span> Välj Butiker
+            </h2>
+            <div class="flex gap-2">
+              <button id="btn-select-all" class="text-xs text-brand-orange hover:underline font-semibold">Alla</button>
+              <span class="text-gray-300 dark:text-gray-600">|</span>
+              <button id="btn-deselect-all" class="text-xs text-gray-500 hover:underline">Inga</button>
+            </div>
+          </div>
+
+          <!-- Store Checkboxes -->
+          <div class="mt-4 space-y-3" id="store-checkboxes-container">
+            <!-- Checkboxes will be rendered with dynamic counts by JS -->
+            <label class="flex items-center justify-between text-sm cursor-pointer hover:opacity-80 transition select-none">
+              <div class="flex items-center gap-2.5">
+                <input type="checkbox" id="filter-ica-raby" class="store-filter w-4 h-4 rounded text-red-600 focus:ring-red-500 border-gray-300 dark:border-gray-600 dark:bg-gray-800" checked data-store="ICA Nära Råbyvägen">
+                <span class="font-medium">ICA Nära Råbyvägen</span>
+              </div>
+              <span id="count-ica-raby" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300">0</span>
+            </label>
+
+            <label class="flex items-center justify-between text-sm cursor-pointer hover:opacity-80 transition select-none">
+              <div class="flex items-center gap-2.5">
+                <input type="checkbox" id="filter-ica-torg" class="store-filter w-4 h-4 rounded text-red-600 focus:ring-red-500 border-gray-300 dark:border-gray-600 dark:bg-gray-800" checked data-store="ICA Supermarket Torgkassen">
+                <span class="font-medium">ICA Torgkassen</span>
+              </div>
+              <span id="count-ica-torg" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300">0</span>
+            </label>
+
+            <label class="flex items-center justify-between text-sm cursor-pointer hover:opacity-80 transition select-none">
+              <div class="flex items-center gap-2.5">
+                <input type="checkbox" id="filter-willys" class="store-filter w-4 h-4 rounded text-green-600 focus:ring-green-500 border-gray-300 dark:border-gray-600 dark:bg-gray-800" checked data-store="Willys">
+                <span class="font-medium">Willys (Björkgatan)</span>
+              </div>
+              <span id="count-willys" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-300">0</span>
+            </label>
+
+            <label class="flex items-center justify-between text-sm cursor-pointer hover:opacity-80 transition select-none">
+              <div class="flex items-center gap-2.5">
+                <input type="checkbox" id="filter-hemkop" class="store-filter w-4 h-4 rounded text-red-600 focus:ring-red-500 border-gray-300 dark:border-gray-600 dark:bg-gray-800" checked data-store="Hemköp">
+                <span class="font-medium">Hemköp (Svava)</span>
+              </div>
+              <span id="count-hemkop" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300">0</span>
+            </label>
+
+            <label class="flex items-center justify-between text-sm cursor-pointer hover:opacity-80 transition select-none">
+              <div class="flex items-center gap-2.5">
+                <input type="checkbox" id="filter-coop" class="store-filter w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 border-gray-300 dark:border-gray-600 dark:bg-gray-800" checked data-store="Coop">
+                <span class="font-medium">Coop (Centralhuset)</span>
+              </div>
+              <span id="count-coop" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">0</span>
+            </label>
+
+            <label class="flex items-center justify-between text-sm cursor-pointer hover:opacity-80 transition select-none">
+              <div class="flex items-center gap-2.5">
+                <input type="checkbox" id="filter-lidl" class="store-filter w-4 h-4 rounded text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 dark:bg-gray-800" checked data-store="Lidl">
+                <span class="font-medium">Lidl</span>
+              </div>
+              <span id="count-lidl" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300">0</span>
+            </label>
+          </div>
+
+          <!-- Lidl Date Period Filter Sub-menu (active when Lidl is selected) -->
+          <div id="lidl-filter-section" class="mt-5 pt-4 border-t border-gray-100 dark:border-gray-800 transition-all">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2 flex items-center gap-1.5">
+              <span>📅</span> Lidl-period
+            </h3>
+            <div class="space-y-2 text-sm">
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="radio" name="lidl-period" value="all" class="text-blue-600 focus:ring-blue-500 dark:bg-gray-800" checked>
+                <span>Alla Lidl-erbjudanden</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="radio" name="lidl-period" value="this-week" class="text-blue-600 focus:ring-blue-500 dark:bg-gray-800">
+                <span>Endast denna vecka</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="radio" name="lidl-period" value="next-week" class="text-blue-600 focus:ring-blue-500 dark:bg-gray-800">
+                <span>Endast nästa vecka</span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Main Column: Search Bar, Stats, Willys Reference Box, Deals Grid -->
+      <main class="lg:col-span-3 space-y-6">
+        
+        <!-- Search and Sort Controls -->
+        <div class="bg-white dark:bg-darkcard p-4 rounded-2xl border border-gray-200/80 dark:border-gray-800 shadow-sm flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
+          
+          <!-- Search Input -->
+          <div class="relative flex-1">
+            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              </svg>
+            </div>
+            <input 
+              type="text" 
+              id="search-input" 
+              placeholder="🔍 Sök efter varor (t.ex. kaffe, blandfärs, lax)..."
+              class="w-full pl-10 pr-10 py-2.5 bg-gray-50 dark:bg-darkimg border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-orange focus:border-transparent transition"
+            >
+            <button id="btn-clear-search" class="hidden absolute inset-y-0 right-0 pr-3.5 flex items-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Sort Select -->
+          <div class="flex items-center gap-2">
+            <label for="sort-select" class="text-xs font-semibold text-gray-500 dark:text-gray-400 whitespace-nowrap">Sortera:</label>
+            <select 
+              id="sort-select" 
+              class="bg-gray-50 dark:bg-darkimg border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-orange focus:border-transparent font-medium"
+            >
+              <option value="discount-desc">Högsta rabatt (%)</option>
+              <option value="price-asc">Lägst pris</option>
+              <option value="price-desc">Högst pris</option>
+              <option value="name-asc">Produktnamn (A-Ö)</option>
+              <option value="store-asc">Butik (A-Ö)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Live Offers Count & Active Filter Pills -->
+        <div class="flex flex-wrap items-center justify-between gap-2 px-1 text-sm">
+          <div id="results-count" class="font-medium text-gray-600 dark:text-gray-300">
+            Hämtar erbjudanden...
+          </div>
+          <div id="active-filter-tags" class="flex flex-wrap gap-1.5"></div>
+        </div>
+
+        <!-- Willys Reference Price Section (Shown dynamically when searching) -->
+        <div id="willys-reference-box" class="hidden ref-price-box rounded-2xl p-5 shadow-sm transition-all duration-300">
+          <h4 class="text-sm font-bold text-emerald-800 dark:text-emerald-400 flex items-center gap-2 mb-3">
+            <span>🏷️</span> Referenspris på Willys (ordinarie sortiment / matchningar)
+          </h4>
+          <div id="willys-reference-items" class="space-y-2">
+            <!-- Populated via JS -->
+          </div>
+        </div>
+
+        <!-- Deals Grid Container -->
+        <div id="deals-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          <!-- Loading skeleton cards -->
+          <div class="deal-skeleton bg-white dark:bg-darkcard rounded-2xl p-4 h-96 animate-pulse border border-gray-100 dark:border-gray-800"></div>
+          <div class="deal-skeleton bg-white dark:bg-darkcard rounded-2xl p-4 h-96 animate-pulse border border-gray-100 dark:border-gray-800"></div>
+          <div class="deal-skeleton bg-white dark:bg-darkcard rounded-2xl p-4 h-96 animate-pulse border border-gray-100 dark:border-gray-800"></div>
+        </div>
+
+        <!-- Empty State (Hidden by default) -->
+        <div id="empty-state" class="hidden bg-white dark:bg-darkcard rounded-2xl p-12 text-center border border-gray-200 dark:border-gray-800 my-8">
+          <div class="text-5xl mb-4">🛒🔍</div>
+          <h3 class="text-lg font-bold mb-2">Inga erbjudanden hittades</h3>
+          <p class="text-gray-500 dark:text-gray-400 text-sm max-w-md mx-auto mb-6">
+            Det fanns inga erbjudanden som matchade din sökning eller dina valda butiksfilter.
+          </p>
+          <button id="btn-reset-filters" class="px-5 py-2.5 bg-brand-orange text-white rounded-xl font-semibold text-sm hover:opacity-90 transition shadow-md">
+            Återställ filter och sökning
+          </button>
+        </div>
+
+      </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="mt-16 pt-8 border-t border-gray-200 dark:border-gray-800 text-center text-xs text-gray-400 dark:text-gray-500 pb-12">
+      <p>Veckans Deals • Automatisk matprisbevakning för Uppsala & Sverige • Uppdateras dagligen</p>
+    </footer>
+  </div>
+
+  <!-- Application Logic -->
+  <script src="app.js"></script>
+</body>
+</html>

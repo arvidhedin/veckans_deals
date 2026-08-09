@@ -1,0 +1,47 @@
+name: Scrape Offers and Deploy Data
+
+on:
+  schedule:
+    # Run every day at 02:00 UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch: # Allows manual trigger from GitHub Actions tab
+
+permissions:
+  contents: write
+
+jobs:
+  scrape-and-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests beautifulsoup4
+
+      - name: Run scraper and build deals data
+        run: |
+          python build_data.py
+
+      - name: Commit and push updated deals.json
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add public/deals.json
+          
+          # Only commit and push if public/deals.json has changes
+          if git diff --staged --quiet; then
+            echo "No changes in deals.json to commit."
+          else
+            git commit -m "Update deals data [skip ci]"
+            git push
+          fi
