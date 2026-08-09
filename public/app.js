@@ -8,11 +8,28 @@ const state = {
   allOffers: [],
   filteredOffers: [],
   selectedStores: new Set([
+    // ICA
     'ICA Nära Råbyvägen',
     'ICA Supermarket Torgkassen',
+    'ICA Nära Rosendal',
+    'ICA Supermarket Väst',
+    'ICA Vretgränd',
+    'ICA Supermarket City',
+    'ICA Supermarket Luthagens Livs',
+    'ICA Folkes Livs',
+    'ICA Nära Hörnan',
+    // Willys
     'Willys',
+    'Willys (Björkgatan)',
+    // Hemköp
     'Hemköp',
+    'Hemköp (Svava)',
+    'Hemköp (Rosendal)',
+    // Coop
     'Coop',
+    'Coop (Centralhuset)',
+    'Coop (Liljegatan)',
+    // Lidl
     'Lidl'
   ]),
   lidlPeriod: 'all', // 'all' | 'this-week' | 'next-week'
@@ -23,11 +40,32 @@ const state = {
 
 // Store color configuration
 const STORE_COLORS = {
+  // ICA Stores (#E21936)
   'ICA Nära Råbyvägen': { bg: '#E21936', text: '#FFFFFF', pillClass: 'bg-red-600' },
   'ICA Supermarket Torgkassen': { bg: '#E21936', text: '#FFFFFF', pillClass: 'bg-red-600' },
+  'ICA Nära Rosendal': { bg: '#E21936', text: '#FFFFFF', pillClass: 'bg-red-600' },
+  'ICA Supermarket Väst': { bg: '#E21936', text: '#FFFFFF', pillClass: 'bg-red-600' },
+  'ICA Vretgränd': { bg: '#E21936', text: '#FFFFFF', pillClass: 'bg-red-600' },
+  'ICA Supermarket City': { bg: '#E21936', text: '#FFFFFF', pillClass: 'bg-red-600' },
+  'ICA Supermarket Luthagens Livs': { bg: '#E21936', text: '#FFFFFF', pillClass: 'bg-red-600' },
+  'ICA Folkes Livs': { bg: '#E21936', text: '#FFFFFF', pillClass: 'bg-red-600' },
+  'ICA Nära Hörnan': { bg: '#E21936', text: '#FFFFFF', pillClass: 'bg-red-600' },
+
+  // Willys (#009345)
   'Willys': { bg: '#009345', text: '#FFFFFF', pillClass: 'bg-green-600' },
+  'Willys (Björkgatan)': { bg: '#009345', text: '#FFFFFF', pillClass: 'bg-green-600' },
+
+  // Hemköp (#D31115)
   'Hemköp': { bg: '#D31115', text: '#FFFFFF', pillClass: 'bg-red-700' },
+  'Hemköp (Svava)': { bg: '#D31115', text: '#FFFFFF', pillClass: 'bg-red-700' },
+  'Hemköp (Rosendal)': { bg: '#D31115', text: '#FFFFFF', pillClass: 'bg-red-700' },
+
+  // Coop (#007A33)
   'Coop': { bg: '#007A33', text: '#FFFFFF', pillClass: 'bg-emerald-700' },
+  'Coop (Centralhuset)': { bg: '#007A33', text: '#FFFFFF', pillClass: 'bg-emerald-700' },
+  'Coop (Liljegatan)': { bg: '#007A33', text: '#FFFFFF', pillClass: 'bg-emerald-700' },
+
+  // Lidl (#00509E)
   'Lidl': { bg: '#00509E', text: '#FFFFFF', pillClass: 'bg-blue-600' }
 };
 
@@ -103,11 +141,29 @@ function computeStoreCounts() {
   }
 
   // Update counts in sidebar
+  // ICA
   updateCountElement('count-ica-raby', state.storeCounts['ICA Nära Råbyvägen'] || 0);
   updateCountElement('count-ica-torg', state.storeCounts['ICA Supermarket Torgkassen'] || 0);
-  updateCountElement('count-willys', state.storeCounts['Willys'] || 0);
-  updateCountElement('count-hemkop', state.storeCounts['Hemköp'] || 0);
-  updateCountElement('count-coop', state.storeCounts['Coop'] || 0);
+  updateCountElement('count-ica-rosendal', state.storeCounts['ICA Nära Rosendal'] || 0);
+  updateCountElement('count-ica-vast', state.storeCounts['ICA Supermarket Väst'] || 0);
+  updateCountElement('count-ica-vretgrand', state.storeCounts['ICA Vretgränd'] || 0);
+  updateCountElement('count-ica-city', state.storeCounts['ICA Supermarket City'] || 0);
+  updateCountElement('count-ica-luthagen', state.storeCounts['ICA Supermarket Luthagens Livs'] || 0);
+  updateCountElement('count-ica-folkes', state.storeCounts['ICA Folkes Livs'] || 0);
+  updateCountElement('count-ica-hornan', state.storeCounts['ICA Nära Hörnan'] || 0);
+
+  // Willys
+  updateCountElement('count-willys', state.storeCounts['Willys'] || state.storeCounts['Willys (Björkgatan)'] || 0);
+
+  // Hemköp
+  updateCountElement('count-hemkop-svava', state.storeCounts['Hemköp (Svava)'] || state.storeCounts['Hemköp'] || 0);
+  updateCountElement('count-hemkop-rosendal', state.storeCounts['Hemköp (Rosendal)'] || 0);
+
+  // Coop
+  updateCountElement('count-coop-centralhuset', state.storeCounts['Coop (Centralhuset)'] || state.storeCounts['Coop'] || 0);
+  updateCountElement('count-coop-liljegatan', state.storeCounts['Coop (Liljegatan)'] || 0);
+
+  // Lidl
   updateCountElement('count-lidl', state.storeCounts['Lidl'] || 0);
 }
 
@@ -322,7 +378,7 @@ function renderReferenceBox(matches, query) {
 // --- Deal Card Template Generator ---
 function createDealCardHtml(offer) {
   const store = offer.store || 'Okänd butik';
-  const storeBadgeColor = STORE_COLORS[store]?.bg || '#4B5563';
+  const storeBadgeColor = STORE_COLORS[store]?.bg || (store.toLowerCase().includes('hemköp') ? '#D31115' : '#4B5563');
   
   const discountPct = parseFloat(offer.discount_percentage) || 0;
   const pctBadgeHtml = discountPct > 0 
@@ -461,8 +517,14 @@ function setupEventListeners() {
       const storeName = e.target.dataset.store;
       if (e.target.checked) {
         state.selectedStores.add(storeName);
+        if (storeName === 'Hemköp (Svava)') state.selectedStores.add('Hemköp');
+        if (storeName === 'Coop (Centralhuset)') state.selectedStores.add('Coop');
+        if (storeName === 'Willys') state.selectedStores.add('Willys (Björkgatan)');
       } else {
         state.selectedStores.delete(storeName);
+        if (storeName === 'Hemköp (Svava)') state.selectedStores.delete('Hemköp');
+        if (storeName === 'Coop (Centralhuset)') state.selectedStores.delete('Coop');
+        if (storeName === 'Willys') state.selectedStores.delete('Willys (Björkgatan)');
       }
       
       // Toggle Lidl period filter visibility
@@ -498,6 +560,9 @@ function setupEventListeners() {
         cb.checked = true;
         state.selectedStores.add(cb.dataset.store);
       });
+      state.selectedStores.add('Hemköp');
+      state.selectedStores.add('Coop');
+      state.selectedStores.add('Willys (Björkgatan)');
       applyFilters();
     });
   }

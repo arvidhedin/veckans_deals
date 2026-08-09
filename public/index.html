@@ -70,6 +70,23 @@
     .store-badge-coop { background-color: #007A33; }
     .store-badge-lidl { background-color: #00509E; }
 
+    /* Store Specific Badge Classes */
+    .store-ica-n-ra-r-byv-gen, .store-ica-nära-råbyvägen { background-color: #E21936; }
+    .store-ica-supermarket-torgkassen { background-color: #E21936; }
+    .store-ica-n-ra-rosendal, .store-ica-nära-rosendal { background-color: #E21936; }
+    .store-ica-supermarket-v-st, .store-ica-supermarket-väst { background-color: #E21936; }
+    .store-ica-vretgr-nd, .store-ica-vretgränd { background-color: #E21936; }
+    .store-ica-supermarket-city { background-color: #E21936; }
+    .store-ica-supermarket-luthagens-livs { background-color: #E21936; }
+    .store-ica-folkes-livs { background-color: #E21936; }
+    .store-ica-n-ra-h-rnan, .store-ica-nära-hörnan { background-color: #E21936; }
+    .store-hemk-p-svava, .store-hemköp-svava, .store-hemk-p, .store-hemköp { background-color: #D31115; }
+    .store-hemk-p-rosendal, .store-hemköp-rosendal { background-color: #D31115; }
+    .store-coop-centralhuset, .store-coop { background-color: #007A33; }
+    .store-coop-liljegatan { background-color: #007A33; }
+    .store-willys { background-color: #009345; }
+    .store-lidl { background-color: #00509E; }
+
     /* Willys Ref Price Box styling */
     .ref-price-box {
       background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 100%);
@@ -125,7 +142,7 @@
       
       <!-- Sidebar Filters -->
       <aside class="lg:col-span-1 space-y-6">
-        <div class="bg-white dark:bg-darkcard p-5 rounded-2xl border border-gray-200/80 dark:border-gray-800 shadow-sm sticky top-6">
+        <div class="bg-white dark:bg-darkcard p-5 rounded-2xl border border-gray-200/80 dark:border-gray-800 shadow-sm sticky top-6 max-h-[calc(100vh-3rem)] overflow-y-auto">
           <div class="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-800">
             <h2 class="text-base font-bold flex items-center gap-2">
               <span>🏬</span> Välj Butiker
@@ -137,56 +154,159 @@
             </div>
           </div>
 
-          <!-- Store Checkboxes -->
-          <div class="mt-4 space-y-3" id="store-checkboxes-container">
-            <!-- Checkboxes will be rendered with dynamic counts by JS -->
-            <label class="flex items-center justify-between text-sm cursor-pointer hover:opacity-80 transition select-none">
-              <div class="flex items-center gap-2.5">
-                <input type="checkbox" id="filter-ica-raby" class="store-filter w-4 h-4 rounded text-red-600 focus:ring-red-500 border-gray-300 dark:border-gray-600 dark:bg-gray-800" checked data-store="ICA Nära Råbyvägen">
-                <span class="font-medium">ICA Nära Råbyvägen</span>
-              </div>
-              <span id="count-ica-raby" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300">0</span>
-            </label>
+          <!-- Store Checkboxes Grouped by Brand -->
+          <div class="mt-4 space-y-4" id="store-checkboxes-container">
+            
+            <!-- ICA Stores Group -->
+            <div>
+              <span class="text-[11px] font-bold uppercase tracking-wider text-red-600 dark:text-red-400 block mb-1.5">ICA</span>
+              <div class="space-y-2">
+                <label class="flex items-center justify-between text-sm cursor-pointer hover:opacity-80 transition select-none">
+                  <div class="flex items-center gap-2.5">
+                    <input type="checkbox" id="filter-ica-raby" class="store-filter w-4 h-4 rounded text-red-600 focus:ring-red-500 border-gray-300 dark:border-gray-600 dark:bg-gray-800" checked data-store="ICA Nära Råbyvägen">
+                    <span class="font-medium">ICA Nära Råbyvägen</span>
+                  </div>
+                  <span id="count-ica-raby" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300">0</span>
+                </label>
 
-            <label class="flex items-center justify-between text-sm cursor-pointer hover:opacity-80 transition select-none">
-              <div class="flex items-center gap-2.5">
-                <input type="checkbox" id="filter-ica-torg" class="store-filter w-4 h-4 rounded text-red-600 focus:ring-red-500 border-gray-300 dark:border-gray-600 dark:bg-gray-800" checked data-store="ICA Supermarket Torgkassen">
-                <span class="font-medium">ICA Torgkassen</span>
-              </div>
-              <span id="count-ica-torg" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300">0</span>
-            </label>
+                <label class="flex items-center justify-between text-sm cursor-pointer hover:opacity-80 transition select-none">
+                  <div class="flex items-center gap-2.5">
+                    <input type="checkbox" id="filter-ica-torg" class="store-filter w-4 h-4 rounded text-red-600 focus:ring-red-500 border-gray-300 dark:border-gray-600 dark:bg-gray-800" checked data-store="ICA Supermarket Torgkassen">
+                    <span class="font-medium">ICA Torgkassen</span>
+                  </div>
+                  <span id="count-ica-torg" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300">0</span>
+                </label>
 
-            <label class="flex items-center justify-between text-sm cursor-pointer hover:opacity-80 transition select-none">
-              <div class="flex items-center gap-2.5">
-                <input type="checkbox" id="filter-willys" class="store-filter w-4 h-4 rounded text-green-600 focus:ring-green-500 border-gray-300 dark:border-gray-600 dark:bg-gray-800" checked data-store="Willys">
-                <span class="font-medium">Willys (Björkgatan)</span>
-              </div>
-              <span id="count-willys" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-300">0</span>
-            </label>
+                <label class="flex items-center justify-between text-sm cursor-pointer hover:opacity-80 transition select-none">
+                  <div class="flex items-center gap-2.5">
+                    <input type="checkbox" id="filter-ica-rosendal" class="store-filter w-4 h-4 rounded text-red-600 focus:ring-red-500 border-gray-300 dark:border-gray-600 dark:bg-gray-800" checked data-store="ICA Nära Rosendal">
+                    <span class="font-medium">ICA Nära Rosendal</span>
+                  </div>
+                  <span id="count-ica-rosendal" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300">0</span>
+                </label>
 
-            <label class="flex items-center justify-between text-sm cursor-pointer hover:opacity-80 transition select-none">
-              <div class="flex items-center gap-2.5">
-                <input type="checkbox" id="filter-hemkop" class="store-filter w-4 h-4 rounded text-red-600 focus:ring-red-500 border-gray-300 dark:border-gray-600 dark:bg-gray-800" checked data-store="Hemköp">
-                <span class="font-medium">Hemköp (Svava)</span>
-              </div>
-              <span id="count-hemkop" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300">0</span>
-            </label>
+                <label class="flex items-center justify-between text-sm cursor-pointer hover:opacity-80 transition select-none">
+                  <div class="flex items-center gap-2.5">
+                    <input type="checkbox" id="filter-ica-vast" class="store-filter w-4 h-4 rounded text-red-600 focus:ring-red-500 border-gray-300 dark:border-gray-600 dark:bg-gray-800" checked data-store="ICA Supermarket Väst">
+                    <span class="font-medium">ICA Supermarket Väst</span>
+                  </div>
+                  <span id="count-ica-vast" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300">0</span>
+                </label>
 
-            <label class="flex items-center justify-between text-sm cursor-pointer hover:opacity-80 transition select-none">
-              <div class="flex items-center gap-2.5">
-                <input type="checkbox" id="filter-coop" class="store-filter w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 border-gray-300 dark:border-gray-600 dark:bg-gray-800" checked data-store="Coop">
-                <span class="font-medium">Coop (Centralhuset)</span>
-              </div>
-              <span id="count-coop" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">0</span>
-            </label>
+                <label class="flex items-center justify-between text-sm cursor-pointer hover:opacity-80 transition select-none">
+                  <div class="flex items-center gap-2.5">
+                    <input type="checkbox" id="filter-ica-vretgrand" class="store-filter w-4 h-4 rounded text-red-600 focus:ring-red-500 border-gray-300 dark:border-gray-600 dark:bg-gray-800" checked data-store="ICA Vretgränd">
+                    <span class="font-medium">ICA Vretgränd</span>
+                  </div>
+                  <span id="count-ica-vretgrand" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300">0</span>
+                </label>
 
-            <label class="flex items-center justify-between text-sm cursor-pointer hover:opacity-80 transition select-none">
-              <div class="flex items-center gap-2.5">
-                <input type="checkbox" id="filter-lidl" class="store-filter w-4 h-4 rounded text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 dark:bg-gray-800" checked data-store="Lidl">
-                <span class="font-medium">Lidl</span>
+                <label class="flex items-center justify-between text-sm cursor-pointer hover:opacity-80 transition select-none">
+                  <div class="flex items-center gap-2.5">
+                    <input type="checkbox" id="filter-ica-city" class="store-filter w-4 h-4 rounded text-red-600 focus:ring-red-500 border-gray-300 dark:border-gray-600 dark:bg-gray-800" checked data-store="ICA Supermarket City">
+                    <span class="font-medium">ICA Supermarket City</span>
+                  </div>
+                  <span id="count-ica-city" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300">0</span>
+                </label>
+
+                <label class="flex items-center justify-between text-sm cursor-pointer hover:opacity-80 transition select-none">
+                  <div class="flex items-center gap-2.5">
+                    <input type="checkbox" id="filter-ica-luthagen" class="store-filter w-4 h-4 rounded text-red-600 focus:ring-red-500 border-gray-300 dark:border-gray-600 dark:bg-gray-800" checked data-store="ICA Supermarket Luthagens Livs">
+                    <span class="font-medium">ICA Luthagens Livs</span>
+                  </div>
+                  <span id="count-ica-luthagen" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300">0</span>
+                </label>
+
+                <label class="flex items-center justify-between text-sm cursor-pointer hover:opacity-80 transition select-none">
+                  <div class="flex items-center gap-2.5">
+                    <input type="checkbox" id="filter-ica-folkes" class="store-filter w-4 h-4 rounded text-red-600 focus:ring-red-500 border-gray-300 dark:border-gray-600 dark:bg-gray-800" checked data-store="ICA Folkes Livs">
+                    <span class="font-medium">ICA Folkes Livs</span>
+                  </div>
+                  <span id="count-ica-folkes" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300">0</span>
+                </label>
+
+                <label class="flex items-center justify-between text-sm cursor-pointer hover:opacity-80 transition select-none">
+                  <div class="flex items-center gap-2.5">
+                    <input type="checkbox" id="filter-ica-hornan" class="store-filter w-4 h-4 rounded text-red-600 focus:ring-red-500 border-gray-300 dark:border-gray-600 dark:bg-gray-800" checked data-store="ICA Nära Hörnan">
+                    <span class="font-medium">ICA Nära Hörnan</span>
+                  </div>
+                  <span id="count-ica-hornan" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300">0</span>
+                </label>
               </div>
-              <span id="count-lidl" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300">0</span>
-            </label>
+            </div>
+
+            <!-- Willys Store Group -->
+            <div class="pt-2 border-t border-gray-100 dark:border-gray-800/60">
+              <span class="text-[11px] font-bold uppercase tracking-wider text-green-600 dark:text-green-400 block mb-1.5">Willys</span>
+              <div class="space-y-2">
+                <label class="flex items-center justify-between text-sm cursor-pointer hover:opacity-80 transition select-none">
+                  <div class="flex items-center gap-2.5">
+                    <input type="checkbox" id="filter-willys" class="store-filter w-4 h-4 rounded text-green-600 focus:ring-green-500 border-gray-300 dark:border-gray-600 dark:bg-gray-800" checked data-store="Willys">
+                    <span class="font-medium">Willys</span>
+                  </div>
+                  <span id="count-willys" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-300">0</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Hemköp Stores Group -->
+            <div class="pt-2 border-t border-gray-100 dark:border-gray-800/60">
+              <span class="text-[11px] font-bold uppercase tracking-wider text-red-700 dark:text-red-400 block mb-1.5">Hemköp</span>
+              <div class="space-y-2">
+                <label class="flex items-center justify-between text-sm cursor-pointer hover:opacity-80 transition select-none">
+                  <div class="flex items-center gap-2.5">
+                    <input type="checkbox" id="filter-hemkop-svava" class="store-filter w-4 h-4 rounded text-red-600 focus:ring-red-500 border-gray-300 dark:border-gray-600 dark:bg-gray-800" checked data-store="Hemköp (Svava)">
+                    <span class="font-medium">Hemköp (Svava)</span>
+                  </div>
+                  <span id="count-hemkop-svava" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300">0</span>
+                </label>
+
+                <label class="flex items-center justify-between text-sm cursor-pointer hover:opacity-80 transition select-none">
+                  <div class="flex items-center gap-2.5">
+                    <input type="checkbox" id="filter-hemkop-rosendal" class="store-filter w-4 h-4 rounded text-red-600 focus:ring-red-500 border-gray-300 dark:border-gray-600 dark:bg-gray-800" checked data-store="Hemköp (Rosendal)">
+                    <span class="font-medium">Hemköp (Rosendal)</span>
+                  </div>
+                  <span id="count-hemkop-rosendal" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300">0</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Coop Stores Group -->
+            <div class="pt-2 border-t border-gray-100 dark:border-gray-800/60">
+              <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400 block mb-1.5">Coop</span>
+              <div class="space-y-2">
+                <label class="flex items-center justify-between text-sm cursor-pointer hover:opacity-80 transition select-none">
+                  <div class="flex items-center gap-2.5">
+                    <input type="checkbox" id="filter-coop-centralhuset" class="store-filter w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 border-gray-300 dark:border-gray-600 dark:bg-gray-800" checked data-store="Coop (Centralhuset)">
+                    <span class="font-medium">Coop (Centralhuset)</span>
+                  </div>
+                  <span id="count-coop-centralhuset" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">0</span>
+                </label>
+
+                <label class="flex items-center justify-between text-sm cursor-pointer hover:opacity-80 transition select-none">
+                  <div class="flex items-center gap-2.5">
+                    <input type="checkbox" id="filter-coop-liljegatan" class="store-filter w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 border-gray-300 dark:border-gray-600 dark:bg-gray-800" checked data-store="Coop (Liljegatan)">
+                    <span class="font-medium">Coop (Liljegatan)</span>
+                  </div>
+                  <span id="count-coop-liljegatan" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">0</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Lidl Store Group -->
+            <div class="pt-2 border-t border-gray-100 dark:border-gray-800/60">
+              <span class="text-[11px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 block mb-1.5">Lidl</span>
+              <div class="space-y-2">
+                <label class="flex items-center justify-between text-sm cursor-pointer hover:opacity-80 transition select-none">
+                  <div class="flex items-center gap-2.5">
+                    <input type="checkbox" id="filter-lidl" class="store-filter w-4 h-4 rounded text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 dark:bg-gray-800" checked data-store="Lidl">
+                    <span class="font-medium">Lidl</span>
+                  </div>
+                  <span id="count-lidl" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300">0</span>
+                </label>
+              </div>
+            </div>
+
           </div>
 
           <!-- Lidl Date Period Filter Sub-menu (active when Lidl is selected) -->
