@@ -99,7 +99,7 @@ const DEFAULT_IMG = "https://images.unsplash.com/photo-1542838132-92c53300491e?a
 
 // Categorization helper for frontend
 function categorizeOfferJS(offer) {
-  if (offer.category && ALL_CATEGORIES.includes(offer.category)) {
+  if (offer.category && ALL_CATEGORIES.includes(offer.category) && offer.category !== 'Övrigt') {
     return offer.category;
   }
 
@@ -114,7 +114,7 @@ function categorizeOfferJS(offer) {
 
   const text = `${offer.product || ''} ${offer.brand || ''} ${offer.description || ''}`.toLowerCase();
   
-  if (/kött|färs|kyckling|fläsk|nötkött|korv|bacon|skinka|karré|karre|kotlett|entrecote|entrecôte|biff|lövbiff|rostbiff|kalkon|lever|chark|salami|medwurst|medwurt|pulled pork|ribs|revbensspjäll|lamm|späck|charkuterier|leverpastej|falukorv|grillkorv|wienerkorv|varmkorv|ölkorv|blodpudding|sylta|oxfilé|fläskfilé|högrev|fransyska|schnitzel|kassler|fläskytterfilé|kebab|grytbitar|chorizo|cabanoss|prinskorv|smörgåspålägg|prosciutto|jamon|mortadella|pasteta|paté|pate|fläskbog|fläsklägg|grillkarré|flapsteak|spickekött|fuet|\bnöt\b|\box\b|\bbog\b|\blägg\b|bringa/i.test(text)) {
+  if (/kött|färs|kyckling|fläsk|nötkött|korv|bacon|skinka|karré|karre|kotlett|entrecote|entrecôte|biff|lövbiff|rostbiff|kalkon|lever|chark|salami|medwurst|medwurt|pulled pork|ribs|revbensspjäll|lamm|späck|charkuterier|leverpastej|falukorv|grillkorv|wienerkorv|varmkorv|ölkorv|blodpudding|sylta|oxfilé|fläskfilé|högrev|fransyska|schnitzel|kassler|fläskytterfilé|kebab|grytbitar|chorizo|cabanoss|prinskorv|smörgåspålägg|prosciutto|jamon|mortadella|pasteta|paté|pate|fläskbog|fläsklägg|grillkarré|flapsteak|spickekött|fuet|\bnöt\b|\box\b|\bbog\b|\blägg\b|bringa|grillskiva|grillskivor|grillkött/i.test(text)) {
     return 'Kött & Fågel';
   }
   if (/fisk|lax|torsk|räkor|räka|sill|makrill|tunnfisk|tuna|tonfisk|kräftor|kräfta|sej|spätta|musslor|skaldjur|lutfisk|\brom\b|fiskpinnar|fiskkaka|fiskgratäng|surströmming|hummer|krabba|fiskfilé|panerad fisk|bläckfisk|scampi|laxfilé|torskfilé|sejfilé|röding|öring|caviar|kaviar|tångcaviar/i.test(text)) {
@@ -129,10 +129,10 @@ function categorizeOfferJS(offer) {
   if (/bröd|kaka|kakor|bulle|bullar|tårta|knäcke|knäckebröd|fralla|frallor|pita|tortilla|toast|croissant|korvbröd|hamburgerbröd|limpa|pågen|pågens|fazer|skogaholm|våffl|donut|muffin|bagel|wienerbröd|kanelbulle|vaniljbulle|semla|kladdkaka|surdeg|rågbröd|lingongrova|hönökaka|vetekaka|tekaka|fullkornsbröd|småbröd|polarbröd|polarkaka|formbröd|formfranska|rostbröd|scones|bageri|pinsa|panini|mellangrova/i.test(text)) {
     return 'Bröd & Bageri';
   }
-  if (/chips|dipp|godis|choklad|popcorn|nötter|nötblandning|nötmix|kex|ostbågar|ostkrokar|lakrits|tuggummi|marabou|estrella|olw|cloetta|haribo|cheez|snacks|wafer|proteinbar|\bbar\b|\bbars\b|corny|cashew|mandel|pistage|valnöt|jordnötter|solroskärnor|chiafrön|lösgodis|kexchoklad|daim|twix|snickers|mars|bounty|dumle|geisha|alesto|nutella|halva|delicatoboll|läkerol|halstabletter|fisherman/i.test(text)) {
+  if (/chips|dipp|godis|choklad|popcorn|nötter|nötblandning|nötmix|kex|ostbågar|ostkrokar|lakrits|tuggummi|marabou|estrella|olw|cloetta|haribo|cheez|snacks|wafer|proteinbar|\bbar\b|\bbars\b|corny|cashew|mandel|pistage|valnöt|jordnötter|solroskärnor|chiafrön|lösgodis|kexchoklad|daim|twix|snickers|mars|bounty|dumle|geisha|alesto|nutella|halva|delicatoboll|läkerol|halstabletter|fisherman|mentos|gott & blandat|gott och blandat|gott&blandat|malaco/i.test(text)) {
     return 'Snacks & Godis';
   }
-  if (/läsk|saft|vatten|juice|energidryck|öl|cider|alkoholfri|must|coca-cola|coca cola|cola|pepsi|fanta|sprite|nocco|celsius|red bull|ramlösa|loka|monster|tonic|iskaffe|smoothie|kombucha|dricka|måltidsdryck|lättöl|festis|tropicana|god morgon|brämhults|trocadero|pucko|zingo|7up|powerade|gainomax|proteindryck|fun light|nyponsoppa|fruktdryck|matlagningsvin|peroni/i.test(text)) {
+  if (/läsk|saft|vatten|juice|energidryck|öl|cider|alkoholfri|must|coca-cola|coca cola|cola|pepsi|fanta|sprite|nocco|celsius|red bull|ramlösa|loka|monster|tonic|iskaffe|smoothie|kombucha|dricka|måltidsdryck|lättöl|festis|tropicana|god morgon|brämhults|trocadero|pucko|zingo|7up|powerade|gainomax|proteindryck|fun light|nyponsoppa|fruktdryck|matlagningsvin|peroni|dr pepper|pepper|dryck|nåbe|aloe vera|aloe/i.test(text)) {
     return 'Dryck';
   }
   if (/pasta|ris|basmati|jasminris|risotto|mjöl|socker|olja|vinäger|kaffe|te|sås|ketchup|senap|konserv|linser|bönor|krydda|kryddor|buljong|müsli|musli|granola|cheerios|frosties|cornflakes|havreringar|cereal|flingor|havregryn|pesto|taco|tacos|spaghetti|macaroni|makaroner|matolja|rapsolja|olivolja|majonnäs|mayo|sylt|marmelad|honung|gevalia|zoegas|arvid nordquist|löfbergs|nescafé|nesquik|nudlar|couscous|bulgur|dressing|marinad|salsa|tomatkross|passerade tomater|kokosmjölk|cornichons|oliver|kapris|barnmat|välling|gröt|sirap|ströbröd|tofu|hummus|\bfond\b|\bsoja\b|lasagne|grytbas/i.test(text)) {

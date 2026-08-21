@@ -1,6 +1,6 @@
 {
-  "updated_at": "2026-08-21T08:19:30.084098+00:00",
-  "updated_at_readable": "2026-08-21 08:19 UTC",
+  "updated_at": "2026-08-21T08:23:52.637897+00:00",
+  "updated_at_readable": "2026-08-21 08:23 UTC",
   "total_offers": 1239,
   "store_counts": {
     "ICA Nära Råbyvägen": 42,
@@ -20,17 +20,17 @@
     "Lidl": 418
   },
   "category_counts": {
-    "Dryck": 56,
+    "Dryck": 64,
     "Frukt & Grönt": 196,
-    "Kött & Fågel": 205,
+    "Kött & Fågel": 206,
     "Mejeri & Ägg": 162,
     "Skafferi": 200,
-    "Snacks & Godis": 48,
+    "Snacks & Godis": 50,
     "Frys & Färdigmat": 38,
     "Bröd & Bageri": 84,
-    "Hushåll & Hygien": 87,
+    "Hushåll & Hygien": 81,
     "Fisk & Skaldjur": 25,
-    "Övrigt": 138
+    "Övrigt": 133
   },
   "offers": [
     {
@@ -6580,7 +6580,7 @@
       "discount": "Ord.pris 20,77-22,66 kr",
       "description": "500 ml",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7350042710003.jpg",
-      "category": "Hushåll & Hygien",
+      "category": "Dryck",
       "restriction": "",
       "original_price": "20,77-22,66 kr",
       "discount_percentage": 21
@@ -6619,7 +6619,7 @@
       "discount": "Ord.pris 20,77-22,66 kr",
       "description": "500 ml",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7350042710003.jpg",
-      "category": "Hushåll & Hygien",
+      "category": "Dryck",
       "restriction": "",
       "original_price": "20,77-22,66 kr",
       "discount_percentage": 21
@@ -6645,7 +6645,7 @@
       "discount": "Ord.pris 20,72-24,61 kr",
       "description": "500 ml",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7350042710003.jpg",
-      "category": "Hushåll & Hygien",
+      "category": "Dryck",
       "restriction": "",
       "original_price": "20,72-24,61 kr",
       "discount_percentage": 21
@@ -6710,7 +6710,7 @@
       "discount": "Ord.pris 20,72-22,61 kr",
       "description": "500 ml",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7350042710003.jpg",
-      "category": "Hushåll & Hygien",
+      "category": "Dryck",
       "restriction": "",
       "original_price": "20,72-22,61 kr",
       "discount_percentage": 21
@@ -6723,7 +6723,7 @@
       "discount": "Ord.pris 20,77-22,66 kr",
       "description": "500 ml",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7350042710003.jpg",
-      "category": "Hushåll & Hygien",
+      "category": "Dryck",
       "restriction": "",
       "original_price": "20,77-22,66 kr",
       "discount_percentage": 21
@@ -8153,7 +8153,7 @@
       "discount": "GENERAL",
       "description": "50cl",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07350042710904_C1N1_s03",
-      "category": "Hushåll & Hygien",
+      "category": "Dryck",
       "restriction": "",
       "original_price": "16,56 kr",
       "discount_percentage": 15
@@ -8764,7 +8764,7 @@
       "discount": "GENERAL",
       "description": "50cl",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07340116870207_C1N1_s04",
-      "category": "Övrigt",
+      "category": "Dryck",
       "restriction": "",
       "original_price": "14,90 kr",
       "discount_percentage": 13
@@ -8829,7 +8829,7 @@
       "discount": "GENERAL",
       "description": "112,5-114g",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/08723400829195_C1N1_s01",
-      "category": "Övrigt",
+      "category": "Snacks & Godis",
       "restriction": "",
       "original_price": "22,90 kr",
       "discount_percentage": 13
@@ -9401,7 +9401,7 @@
       "discount": "GENERAL",
       "description": "170-210g",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310350106844_C1N1_s03",
-      "category": "Övrigt",
+      "category": "Snacks & Godis",
       "restriction": "",
       "original_price": "16,94 kr",
       "discount_percentage": 11
@@ -10799,32 +10799,6 @@
     },
     {
       "store": "Coop (Centralhuset)",
-      "product": "Snack pot/nudlar",
-      "brand": "Knorr",
-      "price": "2 för 20:-",
-      "discount": "",
-      "description": "51-65 g. Välj mellan olika sorter.",
-      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1725632325/cloud/384021.png",
-      "category": "Skafferi",
-      "restriction": "",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Coop (Centralhuset)",
-      "product": "Smör",
-      "brand": "Valio",
-      "price": "39:-",
-      "discount": "Medlemspris",
-      "description": "500 g. Välj mellan normalsaltat, osaltat och extrasaltat.",
-      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1625357382/cloud/126740.png",
-      "category": "Mejeri & Ägg",
-      "restriction": "",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Coop (Centralhuset)",
       "product": "Toalett-/hushållspapper",
       "brand": "Lambi",
       "price": "3 för 99:-",
@@ -10832,6 +10806,19 @@
       "description": "484-776 g. Välj mellan toalettpapper 8-pack och hushållspapper 4-pack.",
       "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1733224393/cloud/412079.png",
       "category": "Hushåll & Hygien",
+      "restriction": "",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Coop (Centralhuset)",
+      "product": "Snack pot/nudlar",
+      "brand": "Knorr",
+      "price": "2 för 20:-",
+      "discount": "",
+      "description": "51-65 g. Välj mellan olika sorter.",
+      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1725632325/cloud/384021.png",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "",
       "discount_percentage": 0
@@ -10851,13 +10838,13 @@
     },
     {
       "store": "Coop (Centralhuset)",
-      "product": "Krögarpytt",
-      "brand": "Felix",
-      "price": "2 för 89:-",
+      "product": "Smör",
+      "brand": "Valio",
+      "price": "39:-",
       "discount": "Medlemspris",
-      "description": "720 g. Fryst.",
-      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1734687965/cloud/420070.png",
-      "category": "Frys & Färdigmat",
+      "description": "500 g. Välj mellan normalsaltat, osaltat och extrasaltat.",
+      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1625357382/cloud/126740.png",
+      "category": "Mejeri & Ägg",
       "restriction": "",
       "original_price": "",
       "discount_percentage": 0
@@ -10884,6 +10871,19 @@
       "description": "Välj mellan original 70 st och Platinum 51 st.",
       "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1772417087/cloud/622499.png",
       "category": "Skafferi",
+      "restriction": "",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Coop (Centralhuset)",
+      "product": "Krögarpytt",
+      "brand": "Felix",
+      "price": "2 för 89:-",
+      "discount": "Medlemspris",
+      "description": "720 g. Fryst.",
+      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1734687965/cloud/420070.png",
+      "category": "Frys & Färdigmat",
       "restriction": "",
       "original_price": "",
       "discount_percentage": 0
@@ -14588,7 +14588,7 @@
       "discount": "",
       "description": "ca 1,5 kg",
       "image_url": "https://www.lidl.se/assets/gcpf5f4b905d39b478dbf24453ee9477026.png",
-      "category": "Övrigt",
+      "category": "Kött & Fågel",
       "restriction": "I butik 17/08 - 23/08",
       "original_price": "",
       "discount_percentage": 0
@@ -15849,7 +15849,7 @@
       "discount": "",
       "description": "33 cl",
       "image_url": "https://www.lidl.se/assets/gcpbb29452fae014e8487861c0fde6c99e9.png",
-      "category": "Övrigt",
+      "category": "Dryck",
       "restriction": "I butik 20/08 - 23/08",
       "original_price": "",
       "discount_percentage": 0
@@ -28904,21 +28904,21 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Olivolja Extra Virgin",
-      "brand": "Farchioni",
-      "price": "94,54 kr",
-      "description": "500ml | Jmf: 189,08 kr/l",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/08007153007476_C1C1_s01",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Olivolja Extra Vergine Classico",
       "brand": "Zeta",
       "price": "88,90 kr",
       "description": "750ml | Jmf: 118,53 kr/l",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07350002400340_C1N1_s07",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Olivolja Extra Virgin",
+      "brand": "Farchioni",
+      "price": "94,54 kr",
+      "description": "500ml | Jmf: 189,08 kr/l",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/08007153007476_C1C1_s01",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -29994,21 +29994,21 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Fläskfilégryta med Cocktailpølser Och Bacon",
-      "brand": "Tulip",
-      "price": "37,76 kr",
-      "description": "400g | Jmf: 94,40 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/05707196342826_C1C1_s01",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Champinjoner Skivade",
       "brand": "Eldorado",
       "price": "9,90 kr",
       "description": "290g | Jmf: 58,24 kr/kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043017164_C1C1_s01",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Fläskfilégryta med Cocktailpølser Och Bacon",
+      "brand": "Tulip",
+      "price": "37,76 kr",
+      "description": "400g | Jmf: 94,40 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/05707196342826_C1C1_s01",
       "original_price": "",
       "discount_percentage": 0
     },

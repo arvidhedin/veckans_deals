@@ -15,7 +15,7 @@ CATEGORIES = [
         "högrev", "fransyska", "schnitzel", "kassler", "fläskytterfilé", "kebab", "grytbitar",
         "chorizo", "cabanoss", "prinskorv", "smörgåspålägg", "prosciutto", "jamon", "mortadella",
         "pasteta", "paté", "pate", "fläskbog", "fläsklägg", "grillkarré", "flapsteak", "spickekött",
-        "fuet", "nöt", "ox", "bog", "lägg", "bringa"
+        "fuet", "nöt", "ox", "bog", "lägg", "bringa", "grillskiva", "grillskivor", "grillkött"
     ]),
     ("Fisk & Skaldjur", [
         "fisk", "lax", "torsk", "räkor", "räka", "sill", "makrill", "tunnfisk", "tuna",
@@ -62,7 +62,7 @@ CATEGORIES = [
         "corny", "cashew", "mandel", "pistage", "valnöt", "jordnötter", "solroskärnor",
         "chiafrön", "lösgodis", "kexchoklad", "daim", "twix", "snickers", "mars", "bounty",
         "dumle", "geisha", "alesto", "nutella", "halva", "delicatoboll", "läkerol",
-        "halstabletter", "fisherman"
+        "halstabletter", "fisherman", "mentos", "gott & blandat", "gott och blandat", "gott&blandat", "malaco"
     ]),
     ("Dryck", [
         "läsk", "saft", "vatten", "juice", "energidryck", "öl", "cider", "alkoholfri",
@@ -71,7 +71,7 @@ CATEGORIES = [
         "smoothie", "kombucha", "dricka", "måltidsdryck", "lättöl", "festis", "tropicana",
         "god morgon", "brämhults", "trocadero", "pucko", "zingo", "7up", "powerade",
         "gainomax", "proteindryck", "fun light", "nyponsoppa", "fruktdryck", "matlagningsvin",
-        "peroni"
+        "peroni", "dr pepper", "pepper", "dryck", "nåbe", "aloe vera", "aloe"
     ]),
     ("Skafferi", [
         "pasta", "ris", "basmati", "jasminris", "risotto", "mjöl", "socker", "olja",
