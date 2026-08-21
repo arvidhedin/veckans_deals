@@ -8,7 +8,7 @@ import os
 import json
 import datetime
 import traceback
-from scrapers import ica, coop, willys, lidl, hemkop
+from scrapers import ica, coop, willys, lidl, hemkop, willys_search
 
 
 def get_discount_pct(offer: dict) -> float:
@@ -58,6 +58,14 @@ def main():
             print(f"   ❌ {name}: Failed with error: {e}")
             traceback.print_exc()
 
+    print("📦 Fetching Willys regular assortment for reference pricing...")
+    willys_assortment = []
+    try:
+        willys_assortment = willys_search.get_willys_assortment()
+        print(f"   ✅ Willys Assortment: Fetched {len(willys_assortment)} regular reference items")
+    except Exception as e:
+        print(f"   ❌ Willys Assortment: Failed with error: {e}")
+
     # Sort all offers by discount percentage descending (highest discount first)
     all_offers.sort(key=get_discount_pct, reverse=True)
 
@@ -72,6 +80,7 @@ def main():
         "total_offers": len(all_offers),
         "store_counts": store_stats,
         "offers": all_offers,
+        "willys_assortment": willys_assortment,
     }
 
     # Write formatted JSON to public/deals.json

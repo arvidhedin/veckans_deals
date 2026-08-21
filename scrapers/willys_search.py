@@ -183,3 +183,106 @@ def search_regular_assortment(query: str) -> list[dict]:
     except Exception as e:
         print(f"Willys sök: Oväntat fel – {e}")
         return []
+
+
+ASSORTMENT_KEYWORDS = [
+    # Kött & Fågel
+    "kyckling", "kycklingfärs", "nötfärs", "blandfärs", "fläskfärs", "köttfärs",
+    "fläskytterfilé", "fläskkarré", "oxfilé", "ryggbiff", "entrecote", "lövbiff",
+    "skinka", "bacon", "falukorv", "korv", "prinskorv", "köttbullar", "kebab",
+
+    # Fisk & Skaldjur
+    "lax", "torsk", "räkor", "sill", "fiskpinnar", "tonfisk", "sejfärs",
+
+    # Mejeri & Ägg
+    "smör", "bregott", "margarin", "lättmargarin", "vispgrädde", "matlagningsgrädde",
+    "mjölk", "mellanmjölk", "lättmjölk", "havredryck", "alpro", "oatly",
+    "fil", "filmjölk", "yoghurt", "kvarg", "creme fraiche", "gräddfil", "ägg",
+
+    # Ost
+    "ost", "hushållsost", "prästost", "herrgård", "svecia", "gouda", "mozzarella",
+    "feta", "fetaost", "halloumi", "riven ost", "färskost",
+
+    # Skafferi & Basvaror
+    "kaffe", "gevalia", "löfbergs", "zoegas", "arvid nordquist", "te",
+    "pasta", "spagetti", "makaroner", "barilla", "ris", "jasminris", "basmatiris",
+    "mjöl", "vetemjöl", "socker", "strösocker", "havregryn", "müsli", "granola",
+    "rapsolja", "olivolja", "krossade tomater", "tomatpuré", "bönor", "linser",
+    "konserv", "majs", "pasta sauce", "tacos", "tortilla", "tacosås", "salsa",
+
+    # Bröd & Kakor
+    "bröd", "limpa", "rostbröd", "knäckebröd", "korvbröd", "hamburgerbröd",
+    "pågen", "skogaholm", "wasa", "kakor", "bullar",
+
+    # Frukt & Grönt
+    "banan", "bananer", "äpple", "äpplen", "potatis", "lök", "rödlök", "vitlök",
+    "gurka", "tomat", "tomater", "paprika", "sallad", "citron", "avokado", "morötter",
+
+    # Frys & Färdigmat
+    "pizza", "grandiosa", "dr oetker", "pommes", "pyttipanna", "glass", "GB",
+
+    # Dryck & Snacks
+    "läsk", "coca cola", "pepsi", "fanta", "sprite", "ramlösa", "loka", "saft",
+    "chips", "estrella", "olw", "nötter", "choklad", "marabou", "godis"
+]
+
+
+def get_willys_assortment() -> list[dict]:
+    """Hämtar ett brett sortiment av ordinarie Willys-varor för referenspriser."""
+    all_items = []
+    seen_codes = set()
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+                      "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Accept": "application/json",
+    }
+
+    for kw in ASSORTMENT_KEYWORDS:
+        try:
+            url = f"{SEARCH_API}?q={urllib.parse.quote(kw)}&page=0&size=30"
+            res = requests.get(url, headers=headers, timeout=5)
+            if res.status_code != 200:
+                continue
+            data = res.json()
+            for item in data.get("results", []):
+                code = item.get("code")
+                if not code or code in seen_codes:
+                    continue
+                seen_codes.add(code)
+
+                price_val = str(item.get("price", "")).replace("kr", "").strip()
+                price_str = f"{price_val} kr" if price_val else ""
+
+                comp_price = str(item.get("comparePrice", "")).replace("kr", "").replace(".", ",").strip()
+                comp_unit = item.get("comparePriceUnit", "")
+                display_vol = item.get("displayVolume", "")
+
+                desc_parts = []
+                if display_vol:
+                    desc_parts.append(display_vol)
+                if comp_price and comp_unit:
+                    desc_parts.append(f"Jmf: {comp_price} kr/{comp_unit}")
+                elif comp_price:
+                    desc_parts.append(f"Jmf: {comp_price} kr")
+
+                img_url = ""
+                img = item.get("image")
+                if isinstance(img, dict) and img.get("url"):
+                    u = img["url"]
+                    img_url = u if u.startswith("http") else IMAGE_BASE + u.lstrip("/")
+
+                all_items.append({
+                    "store": "Willys Ord.pris",
+                    "product": item.get("name", "Okänd produkt"),
+                    "brand": item.get("manufacturer", ""),
+                    "price": price_str,
+                    "description": " | ".join(desc_parts),
+                    "image_url": img_url,
+                    "original_price": "",
+                    "discount_percentage": 0,
+                })
+        except Exception as e:
+            print(f"Fel vid hämtning av ordinarie sortiment för {kw}: {e}")
+
+    return all_items
+

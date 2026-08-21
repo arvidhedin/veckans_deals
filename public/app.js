@@ -13,6 +13,7 @@ localStorage.removeItem('theme');
 const state = {
   allOffers: [],
   filteredOffers: [],
+  willysAssortment: [],
   sidebarCollapsed: localStorage.getItem('sidebarCollapsed') === 'true',
   selectedStores: new Set([
     // ICA
@@ -93,6 +94,7 @@ async function fetchDealsData() {
       state.allOffers = data;
     } else {
       state.allOffers = data.offers || [];
+      state.willysAssortment = data.willys_assortment || [];
       if (data.updated_at_readable && statusEl) {
         statusEl.textContent = `Uppdaterad: ${data.updated_at_readable}`;
       } else if (statusEl) {
@@ -274,10 +276,9 @@ function applyFilters() {
     result.push(...filteredLidl);
   }
 
-  // 3. Search Query Filter & Willys Reference Matches
+  // 3. Search Query Filter
   const rawQ = state.searchQuery.trim();
   const q = rawQ.toLowerCase();
-  let willysReferenceMatches = [];
 
   if (q) {
     const queryTokens = q.split(/\s+/).filter(Boolean);
@@ -291,48 +292,6 @@ function applyFilters() {
       if (combined.includes(q)) return true;
       return queryTokens.every(token => combined.includes(token));
     });
-
-    // Extract Willys reference items from all Willys offers in dataset
-    const willysOffers = state.allOffers.filter(o => {
-      const store = (o.store || '').toLowerCase();
-      return store.includes('willys');
-    });
-
-    const scoredMatches = [];
-    const seenKeys = new Set();
-
-    for (const item of willysOffers) {
-      const prod = (item.product || '').toLowerCase();
-      const brand = (item.brand || '').toLowerCase();
-      const desc = (item.description || '').toLowerCase();
-      const fullText = `${prod} ${brand} ${desc}`;
-
-      let score = 0;
-      if (prod === q) {
-        score = 10;
-      } else if (prod.startsWith(q)) {
-        score = 8;
-      } else if (prod.includes(q)) {
-        score = 6;
-      } else if (fullText.includes(q)) {
-        score = 4;
-      } else if (queryTokens.length > 0 && queryTokens.every(t => fullText.includes(t))) {
-        score = 3;
-      } else if (queryTokens.some(t => t.length >= 3 && (prod.includes(t) || fullText.includes(t)))) {
-        score = 1;
-      }
-
-      if (score > 0) {
-        const key = `${(item.product || '').trim()}_${(item.brand || '').trim()}`.toLowerCase();
-        if (!seenKeys.has(key)) {
-          seenKeys.add(key);
-          scoredMatches.push({ item, score });
-        }
-      }
-    }
-
-    scoredMatches.sort((a, b) => b.score - a.score);
-    willysReferenceMatches = scoredMatches.map(m => m.item).slice(0, 5);
   }
 
   // 4. Sorting
@@ -341,10 +300,12 @@ function applyFilters() {
   state.filteredOffers = result;
 
   // 5. Render UI
-  renderReferenceBox(willysReferenceMatches, q);
   renderDeals();
   renderResultsCount();
   updateMobileFilterBadge();
+
+  // 6. Fetch & Render Willys Reference Prices
+  updateWillysReferenceBox(q);
 }
 
 function parsePriceNumeric(priceStr) {
@@ -377,13 +338,169 @@ function sortOffers(offers, sortBy) {
   });
 }
 
-// --- Willys Reference Box Rendering ---
+// --- Willys Reference Box Logic (Live API + Local Fallback) ---
+const willysSearchCache = new Map();
+let currentWillysSearchToken = 0;
+
+function getLocalWillysMatches(query) {
+  if (!query) return [];
+  const q = query.toLowerCase();
+  const queryTokens = q.split(/\s+/).filter(Boolean);
+
+  const pool = [
+    ...state.allOffers.filter(o => (o.store || '').toLowerCase().includes('willys')),
+    ...state.willysAssortment
+  ];
+
+  const scoredMatches = [];
+  const seenKeys = new Set();
+
+  for (const item of pool) {
+    const prod = (item.product || '').toLowerCase();
+    const brand = (item.brand || '').toLowerCase();
+    const desc = (item.description || '').toLowerCase();
+    const fullText = `${prod} ${brand} ${desc}`;
+
+    let score = 0;
+    if (prod === q) {
+      score = 10;
+    } else if (prod.startsWith(q)) {
+      score = 8;
+    } else if (prod.includes(q)) {
+      score = 6;
+    } else if (fullText.includes(q)) {
+      score = 4;
+    } else if (queryTokens.length > 0 && queryTokens.every(t => fullText.includes(t))) {
+      score = 3;
+    } else if (queryTokens.some(t => t.length >= 3 && (prod.includes(t) || fullText.includes(t)))) {
+      score = 1;
+    }
+
+    if (score > 0) {
+      const key = `${(item.product || '').trim()}_${(item.brand || '').trim()}`.toLowerCase();
+      if (!seenKeys.has(key)) {
+        seenKeys.add(key);
+        scoredMatches.push({ item, score });
+      }
+    }
+  }
+
+  scoredMatches.sort((a, b) => b.score - a.score);
+  return scoredMatches.map(m => m.item).slice(0, 5);
+}
+
+async function fetchWillysReferenceItems(query) {
+  if (!query || query.trim().length < 2) return [];
+  
+  const q = query.trim().toLowerCase();
+  if (willysSearchCache.has(q)) {
+    return willysSearchCache.get(q);
+  }
+
+  try {
+    const url = `https://www.willys.se/axfood/rest/v1/search?q=${encodeURIComponent(q)}&page=0&size=6`;
+    const response = await fetch(url, {
+      headers: {
+        'Accept': 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    const data = await response.json();
+    const results = data.results || [];
+
+    const mapped = results.map(item => {
+      const priceVal = String(item.price || '').replace('kr', '').trim();
+      const priceStr = priceVal ? `${priceVal} kr` : '';
+
+      const compPrice = String(item.comparePrice || '').replace('kr', '').replace('.', ',').trim();
+      const compUnit = item.comparePriceUnit || '';
+      const displayVol = item.displayVolume || '';
+      
+      const descParts = [];
+      if (displayVol) descParts.push(displayVol);
+      if (compPrice && compUnit) descParts.push(`Jmf: ${compPrice} kr/${compUnit}`);
+      else if (compPrice) descParts.push(`Jmf: ${compPrice} kr`);
+
+      let imgUrl = '';
+      if (item.image && item.image.url) {
+        const u = item.image.url;
+        imgUrl = u.startsWith('http') 
+          ? u 
+          : `https://assets.axfood.se/image/upload/f_auto,t_200/${u.replace(/^\//, '')}`;
+      }
+
+      return {
+        product: item.name || 'Okänd produkt',
+        brand: item.manufacturer || '',
+        price: priceStr,
+        description: descParts.join(' | '),
+        image_url: imgUrl
+      };
+    });
+
+    willysSearchCache.set(q, mapped);
+    return mapped;
+  } catch (err) {
+    console.warn('Direct Willys API search failed, falling back to local dataset:', err);
+    return [];
+  }
+}
+
+async function updateWillysReferenceBox(query) {
+  const token = ++currentWillysSearchToken;
+  const box = document.getElementById('willys-reference-box');
+  const container = document.getElementById('willys-reference-items');
+  if (!box || !container) return;
+
+  const q = (query || '').trim();
+
+  if (!q || q.length < 2) {
+    box.classList.add('hidden');
+    container.innerHTML = '';
+    return;
+  }
+
+  // 1. Immediate local feedback from dataset if available
+  const localMatches = getLocalWillysMatches(q);
+  if (localMatches.length > 0) {
+    renderReferenceBox(localMatches, q);
+  }
+
+  // 2. Fetch live items from Willys regular assortment API
+  try {
+    const apiMatches = await fetchWillysReferenceItems(q);
+    if (token !== currentWillysSearchToken) return;
+
+    if (apiMatches && apiMatches.length > 0) {
+      renderReferenceBox(apiMatches, q);
+    } else if (localMatches.length > 0) {
+      renderReferenceBox(localMatches, q);
+    } else {
+      box.classList.add('hidden');
+      container.innerHTML = '';
+    }
+  } catch (e) {
+    if (token === currentWillysSearchToken) {
+      if (localMatches.length > 0) {
+        renderReferenceBox(localMatches, q);
+      } else {
+        box.classList.add('hidden');
+        container.innerHTML = '';
+      }
+    }
+  }
+}
+
 function renderReferenceBox(matches, query) {
   const box = document.getElementById('willys-reference-box');
   const container = document.getElementById('willys-reference-items');
   if (!box || !container) return;
 
-  if (!query || matches.length === 0) {
+  if (!query || !matches || matches.length === 0) {
     box.classList.add('hidden');
     container.innerHTML = '';
     return;
@@ -392,18 +509,24 @@ function renderReferenceBox(matches, query) {
   let html = '';
   for (const ref of matches) {
     const name = escapeHtml(ref.product || 'Okänd produkt');
-    const brand = ref.brand ? ` <span class="text-emerald-800 font-semibold text-xs">(${escapeHtml(ref.brand)})</span>` : '';
-    const desc = ref.description ? ` <span class="text-emerald-800/90 text-xs font-normal">· ${escapeHtml(ref.description)}</span>` : '';
+    const brand = ref.brand ? `<span class="text-emerald-800 font-medium text-xs">(${escapeHtml(ref.brand)})</span>` : '';
+    const desc = ref.description ? `<span class="text-emerald-700/80 text-xs font-normal">· ${escapeHtml(ref.description)}</span>` : '';
     const price = escapeHtml(ref.price || ref.original_price || '');
+    const imgHtml = ref.image_url 
+      ? `<img src="${ref.image_url}" alt="${name}" class="w-7 h-7 sm:w-8 sm:h-8 object-contain rounded bg-white p-0.5 border border-emerald-200/80 flex-shrink-0" onerror="this.style.display='none'">` 
+      : '';
 
     html += `
-      <div class="flex items-baseline justify-between gap-4 text-xs sm:text-sm py-2 border-b border-emerald-200/80 last:border-0 text-emerald-950">
-        <div class="truncate font-bold text-emerald-950">
-          <span>${name}</span>
-          ${brand}
-          ${desc}
+      <div class="flex items-center justify-between gap-3 text-xs sm:text-sm py-2 border-b border-emerald-200/70 last:border-0 text-emerald-950">
+        <div class="flex items-center gap-2.5 min-w-0 truncate">
+          ${imgHtml}
+          <div class="truncate font-bold text-emerald-950">
+            <span>${name}</span>
+            ${brand}
+            ${desc}
+          </div>
         </div>
-        <span class="font-extrabold text-emerald-900 whitespace-nowrap text-sm sm:text-base ml-2">${price}</span>
+        <span class="font-extrabold text-emerald-900 whitespace-nowrap text-xs sm:text-sm ml-2 bg-emerald-100/90 px-2 py-0.5 rounded-lg border border-emerald-200">${price}</span>
       </div>
     `;
   }
@@ -533,6 +656,14 @@ function renderDeals() {
 
   if (state.filteredOffers.length === 0) {
     grid.innerHTML = '';
+    const descEl = emptyState.querySelector('p');
+    if (descEl) {
+      if (state.searchQuery) {
+        descEl.innerHTML = `Det fanns inga rabatterade veckodeals för "<strong>${escapeHtml(state.searchQuery)}</strong>" den här veckan, men du kan se Willys ordinarie referenspriser ovan ⬆️`;
+      } else {
+        descEl.textContent = 'Det fanns inga erbjudanden som matchade dina valda butiksfilter.';
+      }
+    }
     emptyState.classList.remove('hidden');
     return;
   }
