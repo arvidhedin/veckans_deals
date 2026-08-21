@@ -129,16 +129,36 @@ def get_offers() -> list[dict]:
                                         discount_percentage = round((1 - deal / orig) * 100)
                                 except (ValueError, TypeError, ZeroDivisionError):
                                     pass
-                        
-                        if normal_price_num is not None:
-                            try:
-                                orig_val = float(normal_price_num)
-                                if orig_val.is_integer():
-                                    original_price = f"{int(orig_val)}:- kr"
-                                else:
-                                    original_price = f"{orig_val:.2f} kr".replace(".", ",")
-                            except (ValueError, TypeError):
-                                pass
+
+                pkg_info = price_dict.get("packaging", {}) if isinstance(price_dict, dict) else {}
+                pkg_text = pkg_info.get("text", "") if isinstance(pkg_info, dict) else ""
+                
+                base_price_info = price_dict.get("basePrice", {}) if isinstance(price_dict, dict) else {}
+                base_price_text = base_price_info.get("text", "") if isinstance(base_price_info, dict) else ""
+                
+                unit_suffix = ""
+                description = pkg_text
+
+                combined_pkg_check = f"{pkg_text} {base_price_text}".lower()
+                
+                if "/kg" in combined_pkg_check or "kr/kg" in combined_pkg_check:
+                    unit_suffix = "/kg"
+                    clean_pkg = re.sub(r'/kg\s*', '', pkg_text, flags=re.IGNORECASE).strip(' ()')
+                    description = clean_pkg
+                elif "/st" in combined_pkg_check or "kr/st" in combined_pkg_check:
+                    unit_suffix = "/st"
+                    clean_pkg = re.sub(r'/st\s*', '', pkg_text, flags=re.IGNORECASE).strip(' ()')
+                    description = clean_pkg
+
+                if normal_price_num is not None and discount == "Lidl Plus":
+                    try:
+                        orig_val = float(normal_price_num)
+                        if orig_val.is_integer():
+                            original_price = f"{int(orig_val)}:- kr{unit_suffix}"
+                        else:
+                            original_price = f"{orig_val:.2f} kr{unit_suffix}".replace(".", ",")
+                    except (ValueError, TypeError):
+                        pass
 
                 # Extrahera rabattprocent från ribbons om den inte fanns på Lidl Plus
                 if discount_percentage == 0:
@@ -154,19 +174,23 @@ def get_offers() -> list[dict]:
                     try:
                         price_val = float(price_num)
                         if price_val.is_integer():
-                            price_str = f"{int(price_val)}:-"
+                            base_price_str = f"{int(price_val)}:-"
                         else:
-                            price_str = f"{price_val:.2f}".replace(".", ",")
-                            if price_str.endswith(",00"):
-                                price_str = price_str.replace(",00", ":-")
-                            else:
-                                price_str = price_str + "/st"
+                            base_price_str = f"{price_val:.2f}".replace(".", ",")
+                            if base_price_str.endswith(",00"):
+                                base_price_str = base_price_str.replace(",00", ":-")
+
+                        if unit_suffix:
+                            price_str = f"{base_price_str}{unit_suffix}"
+                        elif not price_val.is_integer() and not base_price_str.endswith(":-"):
+                            price_str = f"{base_price_str}/st"
+                        else:
+                            price_str = base_price_str
                     except Exception:
                         price_str = str(price_num)
                 else:
                     price_str = "Se pris i butik"
                     
-                description = price_dict.get("packaging", {}).get("text", "") if isinstance(price_dict, dict) else ""
                 image_url = data_dict.get("image", "")
                 category = ""
                 restriction = _extract_restriction(data_dict)
