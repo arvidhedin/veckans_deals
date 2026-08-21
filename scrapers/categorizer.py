@@ -6,8 +6,33 @@ Assigns standard grocery categories without emojis.
 import re
 
 CATEGORIES = [
+    ("Hushåll & Hygien", [
+        "hundmat", "kattmat", "hund", "katt", "kattsand", "pedigree", "whiskas", "latz", "dentasticks",
+        "tvättmedel", "tvättkapslar", "sköljmedel", "rengöring", "schampo", "shampoo", "tvål", "handtvål",
+        "duschtvål", "duschgel", "duschcreme", "blöjor", "blöjpåse", "toalettpapper", "hushållspapper",
+        "tandkräm", "diskmedel", "fryspåsar", "plastpåsar", "avfallspåsar", "sopsäck", "hundbajspåse",
+        "deodorant", "deo", "balsam", "lotion", "hudkräm", "hårfärg", "multivitamin", "omega 3",
+        "vitamin", "magnesium", "kreatin", "creatine", "gummies", "listerine", "munskölj", "städservetter",
+        "diskborste", "disksvamp", "diskduk", "servetter", "hälsa & skönhet", "tandborste", "tandborsthuvud",
+        "värmeljus", "rakhyvel", "ansiktsmask", "bindor", "trosskydd", "intimtvätt", "libresse",
+        "batterier", "batteri", "plastfolie", "folie", "pappmugg", "hink", "mopp", "tvättlappar", "maskindisktabletter"
+    ]),
+    ("Bröd & Bageri", [
+        "korvbröd", "hamburgerbröd", "bröd", "kaka", "kakor", "bulle", "bullar", "tårta", "knäcke",
+        "knäckebröd", "fralla", "frallor", "pita", "pitabröd", "tortilla", "toast", "croissant",
+        "limpa", "pågen", "pågens", "fazer", "skogaholm", "våffl", "donut", "donuts", "muffin", "muffins",
+        "bagel", "wienerbröd", "kanelbulle", "vaniljbulle", "semla", "kladdkaka", "surdeg", "rågbröd",
+        "lingongrova", "hönökaka", "vetekaka", "tekaka", "fullkornsbröd", "småbröd", "polarbröd",
+        "polarkaka", "formbröd", "formfranska", "rostbröd", "scones", "bageri", "pinsa", "panini", "mellangrova"
+    ]),
+    ("Frys & Färdigmat", [
+        "thaibox", "thaiboxar", "enportionsrätter", "enportionsrätt", "färdigrätt", "färdigrätter",
+        "matlåda", "matlådor", "vårrullar", "pytt", "pizza", "pizzor", "kebabpizza", "pirog",
+        "gorbys", "billys", "dafgård", "felix", "findus", "gooh", "nuggets", "pommes", "glass",
+        "gb glace", "triumf", "paj"
+    ]),
     ("Kött & Fågel", [
-        "kött", "färs", "kyckling", "fläsk", "nötkött", "korv", "bacon", "skinka",
+        "kött", "färs", "kyckling", "fläsk", "nötkött", "korv", "korvar", "bacon", "skinka",
         "karré", "karre", "kotlett", "entrecote", "entrecôte", "biff", "lövbiff", "rostbiff",
         "kalkon", "lever", "chark", "salami", "medwurst", "medwurt", "pulled pork", "ribs",
         "revbensspjäll", "lamm", "späck", "charkuterier", "leverpastej", "falukorv", "grillkorv",
@@ -46,15 +71,6 @@ CATEGORIES = [
         "päron", "vindruvor", "grapefrukt", "småbladsmix", "kronärtskocka", "sharon", "kaki",
         "granatäpple", "solrosor", "blommor", "bukett", "krysantemum", "växt", "krukväxt"
     ]),
-    ("Bröd & Bageri", [
-        "bröd", "kaka", "kakor", "bulle", "bullar", "tårta", "knäcke", "knäckebröd",
-        "fralla", "frallor", "pita", "tortilla", "toast", "croissant", "korvbröd",
-        "hamburgerbröd", "limpa", "pågen", "pågens", "fazer", "skogaholm", "våffl", "donut",
-        "muffin", "bagel", "wienerbröd", "kanelbulle", "vaniljbulle", "semla", "kladdkaka",
-        "surdeg", "rågbröd", "lingongrova", "hönökaka", "vetekaka", "tekaka", "fullkornsbröd",
-        "småbröd", "polarbröd", "polarkaka", "formbröd", "formfranska", "rostbröd", "scones",
-        "bageri", "pinsa", "panini", "mellangrova"
-    ]),
     ("Snacks & Godis", [
         "chips", "dipp", "godis", "choklad", "popcorn", "nötter", "nötblandning", "nötmix",
         "kex", "ostbågar", "ostkrokar", "lakrits", "tuggummi", "marabou", "estrella", "olw",
@@ -84,31 +100,19 @@ CATEGORIES = [
         "dressing", "marinad", "salsa", "tomatkross", "passerade tomater", "kokosmjölk",
         "cornichons", "oliver", "kapris", "barnmat", "välling", "gröt", "sirap", "ströbröd",
         "tofu", "hummus", "fond", "soja", "lasagne", "grytbas"
-    ]),
-    ("Frys & Färdigmat", [
-        "fryst", "djupfryst", "pizza", "pizzor", "pytt", "färdigrätt", "enportionsrätter",
-        "thaibox", "vårrullar", "glass", "paj", "nuggets", "pommes", "gb glace", "triumf",
-        "dafgård", "findus", "felix", "pirog", "gorbys", "billys", "hamburgare", "matlåda"
-    ]),
-    ("Hushåll & Hygien", [
-        "tvättmedel", "tvättkapslar", "sköljmedel", "rengöring", "schampo", "shampoo",
-        "tvål", "handtvål", "duschtvål", "duschgel", "duschcreme", "blöjor", "blöjpåse",
-        "toalettpapper", "hushållspapper", "tandkräm", "diskmedel", "fryspåsar", "plastpåsar",
-        "avfallspåsar", "sopsäck", "hundbajspåse", "deodorant", "deo", "balsam", "lotion",
-        "hudkräm", "hårfärg", "kattmat", "kattsand", "hundmat", "dentasticks", "multivitamin",
-        "omega 3", "vitamin", "vitam", "magnesium", "kreatin", "creatine", "gummies",
-        "listerine", "munskölj", "städservetter", "diskborste", "disksvamp", "diskduk",
-        "servetter", "hälsa & skönhet", "tandborste", "tandborsthuvud", "värmeljus",
-        "ljus", "rakhyvel", "ansiktsmask", "bindor", "trosskydd", "intimtvätt", "libresse",
-        "alunrot", "batterier", "batteri", "plastfolie", "folie", "pappmugg", "hink",
-        "mopp", "tvättlappar", "maskindisktabletter"
     ])
 ]
 
 
 def categorize_offer(offer: dict) -> str:
-    """Categorize an offer dict into a standard category name."""
+    """Categorize an offer dict into a standard category name with priority order."""
+    text = f"{offer.get('product', '')} {offer.get('brand', '')} {offer.get('description', '')}".lower()
     raw_cat = (offer.get("category") or "").lower()
+
+    for cat_name, keywords in CATEGORIES:
+        for kw in keywords:
+            if kw in text:
+                return cat_name
 
     if "frukt" in raw_cat or "grönt" in raw_cat:
         return "Frukt & Grönt"
@@ -124,13 +128,6 @@ def categorize_offer(offer: dict) -> str:
         return "Dryck"
     if "snacks" in raw_cat or "godis" in raw_cat:
         return "Snacks & Godis"
-
-    text = f"{offer.get('product', '')} {offer.get('brand', '')} {offer.get('description', '')}".lower()
-    for cat_name, keywords in CATEGORIES:
-        for kw in keywords:
-            if kw in text:
-                return cat_name
-
     if "djupfryst" in raw_cat or "fryst" in raw_cat:
         return "Frys & Färdigmat"
     if "färskvaror" in raw_cat:
