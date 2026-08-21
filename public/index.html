@@ -102,7 +102,7 @@
 <body class="bg-zinc-50/60 text-zinc-900 min-h-full">
   
   <!-- App Container -->
-  <div class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-8">
+  <div class="max-w-[1920px] w-full mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 py-5 sm:py-8">
 
     <!-- Top Navigation Header -->
     <header class="flex justify-between items-center pb-5 border-b border-zinc-200/80 mb-5 sm:mb-8">
@@ -120,13 +120,13 @@
     </header>
 
     <!-- Main Content Layout (Sidebar + Results) -->
-    <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 lg:gap-8 items-start">
+    <div class="flex flex-col lg:flex-row gap-6 lg:gap-8 items-start">
       
       <!-- Mobile Filter Backdrop (Hidden on Desktop) -->
       <div id="filter-backdrop" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden hidden transition-opacity duration-300 opacity-0"></div>
 
       <!-- Sidebar / Mobile Slide-over Drawer -->
-      <aside id="filter-sidebar" class="fixed inset-y-0 right-0 z-50 w-full max-w-xs sm:max-w-sm bg-white shadow-2xl transition-transform duration-300 ease-out translate-x-full lg:translate-x-0 lg:static lg:w-auto lg:z-auto lg:shadow-none lg:bg-transparent lg:col-span-1">
+      <aside id="filter-sidebar" class="fixed inset-y-0 right-0 z-50 w-full max-w-xs sm:max-w-sm bg-white shadow-2xl transition-transform duration-300 ease-out translate-x-full lg:translate-x-0 lg:static lg:w-64 xl:w-72 lg:shrink-0 lg:shadow-none lg:bg-transparent">
         
         <div class="bg-white lg:p-5 lg:rounded-2xl lg:border lg:border-zinc-200/80 lg:sticky lg:top-6 flex flex-col h-full lg:h-auto max-h-screen lg:max-h-[calc(100vh-3rem)]">
           
@@ -344,7 +344,7 @@
       </aside>
 
       <!-- Main Column: Search Bar, Stats, Willys Reference Box, Deals Grid -->
-      <main class="lg:col-span-4 space-y-5">
+      <main class="flex-1 w-full min-w-0 space-y-5">
         
         <!-- Search, Filter & Sort Controls Bar -->
         <div class="bg-white p-3 sm:p-4 rounded-2xl border border-zinc-200/80 shadow-sm flex flex-col sm:flex-row gap-2.5 sm:gap-3 items-stretch sm:items-center justify-between">
@@ -416,8 +416,8 @@
           </div>
         </div>
 
-        <!-- Deals Grid Container (3 cols on mobile, 4-5 cols on desktop) -->
-        <div id="deals-grid" class="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-2 sm:gap-4 lg:gap-5">
+        <!-- Deals Grid Container (3 cols on mobile, 4-7 cols on desktop) -->
+        <div id="deals-grid" class="grid grid-cols-3 gap-2 sm:gap-4 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 min-[1800px]:grid-cols-7 lg:gap-5">
           <!-- Loading skeleton cards -->
           <div class="deal-skeleton bg-white rounded-xl sm:rounded-2xl p-2.5 sm:p-4 h-[280px] sm:h-[360px] md:h-[400px] animate-pulse border border-zinc-200/80"></div>
           <div class="deal-skeleton bg-white rounded-xl sm:rounded-2xl p-2.5 sm:p-4 h-[280px] sm:h-[360px] md:h-[400px] animate-pulse border border-zinc-200/80"></div>
@@ -446,6 +446,6 @@
   </div>
 
   <!-- Application Logic -->
-  <script src="app.js?v=3"></script>
+  <script src="app.js?v=4"></script>
 </body>
 </html>
