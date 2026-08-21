@@ -322,8 +322,6 @@ function extractPackageWeightInKgJS(text) {
   return 0;
 }
 
-}
-
 // --- Shopping List (Inköpslista) & Savings Calculator Engine ---
 const CART_STORAGE_KEY = 'veckans_deals_cart_v1';
 
@@ -358,7 +356,7 @@ function getOfferCartQty(offer) {
   return item ? item.qty : 0;
 }
 
-function addToCart(offer, qtyDelta = 1) {
+function addToCart(offer, qtyDelta = 1, autoOpenDrawer = true) {
   const id = generateCartItemId(offer);
   const existing = state.cart.find(item => item.id === id);
 
@@ -393,6 +391,10 @@ function addToCart(offer, qtyDelta = 1) {
 
   saveCartToStorage();
   updateCartUI();
+
+  if (autoOpenDrawer && qtyDelta > 0) {
+    toggleCartDrawer(true);
+  }
 }
 
 function removeFromCart(cartItemId) {
