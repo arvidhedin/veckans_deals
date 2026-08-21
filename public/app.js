@@ -13,6 +13,7 @@ localStorage.removeItem('theme');
 const state = {
   allOffers: [],
   filteredOffers: [],
+  sidebarCollapsed: localStorage.getItem('sidebarCollapsed') === 'true',
   selectedStores: new Set([
     // ICA
     'ICA Nära Råbyvägen',
@@ -595,6 +596,43 @@ function closeMobileFilterDrawer() {
   }
 }
 
+// --- Desktop Sidebar Collapse/Expand Handler ---
+function toggleDesktopSidebar(forceState) {
+  const sidebar = document.getElementById('filter-sidebar');
+  const btnToggle = document.getElementById('btn-toggle-sidebar-desktop');
+  if (!sidebar) return;
+
+  if (typeof forceState === 'boolean') {
+    state.sidebarCollapsed = forceState;
+  } else {
+    state.sidebarCollapsed = !state.sidebarCollapsed;
+  }
+
+  localStorage.setItem('sidebarCollapsed', state.sidebarCollapsed);
+
+  if (state.sidebarCollapsed) {
+    sidebar.classList.add('lg:hidden');
+    if (btnToggle) {
+      btnToggle.innerHTML = `
+        <svg class="w-4 h-4 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
+        </svg>
+        <span>Visa filter</span>
+      `;
+    }
+  } else {
+    sidebar.classList.remove('lg:hidden');
+    if (btnToggle) {
+      btnToggle.innerHTML = `
+        <svg class="w-4 h-4 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"></path>
+        </svg>
+        <span>Dölj filter</span>
+      `;
+    }
+  }
+}
+
 // --- Helper Functions ---
 function escapeHtml(str) {
   if (!str) return '';
@@ -608,6 +646,16 @@ function escapeHtml(str) {
 
 // --- Event Listeners Setup ---
 function setupEventListeners() {
+  // Desktop Sidebar Toggle & Collapse Buttons
+  const btnToggleDesktop = document.getElementById('btn-toggle-sidebar-desktop');
+  const btnCollapseDesktop = document.getElementById('btn-collapse-sidebar-desktop');
+
+  if (btnToggleDesktop) btnToggleDesktop.addEventListener('click', () => toggleDesktopSidebar());
+  if (btnCollapseDesktop) btnCollapseDesktop.addEventListener('click', () => toggleDesktopSidebar(true));
+
+  // Initialize desktop sidebar state
+  toggleDesktopSidebar(state.sidebarCollapsed);
+
   // Mobile Drawer Toggle Buttons
   const btnOpenDrawer = document.getElementById('btn-open-filter-drawer');
   const btnCloseDrawer = document.getElementById('btn-close-filter-drawer');
