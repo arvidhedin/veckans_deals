@@ -7,7 +7,7 @@ import re
 # Set page config
 st.set_page_config(
     page_title="Veckans Deals | Jämför matpriser",
-    page_icon="🛒",
+    page_icon="tag",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -326,13 +326,76 @@ st.markdown("""
     }
     .ref-item .ref-price {
         font-weight: 800;
-        color: #2E7D32;
-        margin-left: auto;
-        white-space: nowrap;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.88rem;
+        padding: 0.25rem 0;
+        border-bottom: 1px dashed #A7F3D0;
     }
-    .ref-item .ref-desc {
-        font-size: 0.78rem;
-        opacity: 0.6;
+    .ref-item:last-child {
+        border-bottom: none;
+    }
+    .ref-name {
+        font-weight: 600;
+        color: #064E3B;
+    }
+    .ref-brand {
+        color: #047857;
+        font-weight: 500;
+    }
+    .ref-desc {
+        color: #059669;
+        font-size: 0.8rem;
+    }
+    .ref-price {
+        font-weight: 800;
+        color: #065F46;
+        background: #D1FAE5;
+        padding: 2px 8px;
+        border-radius: 6px;
+        font-size: 0.85rem;
+    }
+    
+    /* Empty state styling */
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1rem;
+        color: #8E8E93;
+    }
+    .empty-state h3 {
+        font-size: 1.2rem;
+        color: #1C1C1E;
+        margin-top: 1rem;
+    }
+    
+    /* Stats Bar */
+    .stats-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        color: #8E8E93;
+        font-size: 0.9rem;
+    }
+    
+    .stats-count {
+        font-weight: 700;
+        color: #1C1C1E;
+    }
+    
+    /* Skeleton loader for smooth loading experience */
+    .skeleton-card {
+        background: #F2F2F7;
+        border-radius: 18px;
+        height: 420px;
+        animation: pulse 1.5s infinite ease-in-out;
+    }
+    
+    @keyframes pulse {
+        0% { opacity: 0.6; }
+        50% { opacity: 1; }
+        100% { opacity: 0.6; }
     }
 </style>
 """, unsafe_allow_html=True)
@@ -340,7 +403,7 @@ st.markdown("""
 # Custom header
 st.markdown("""
 <div class="title-container">
-    <h1>🛒 Veckans Deals</h1>
+    <h1>Veckans Deals</h1>
     <p>Hitta och jämför de bästa mataffärserbjudandena i din stad helt utan krångel.</p>
 </div>
 """, unsafe_allow_html=True)
@@ -364,7 +427,7 @@ if show_lidl:
     )
 
 # Search bar
-search_query = st.text_input("🔍 Sök efter varor (t.ex. kaffe, blandfärs, lax)...", "").strip().lower()
+search_query = st.text_input("Sök efter varor (t.ex. kaffe, blandfärs, lax)...", "").strip().lower()
 
 # Fetch data based on selection
 all_offers = []
@@ -494,7 +557,7 @@ if willys_reference_offers:
     
     ref_html = f"""
     <div class="ref-price-box">
-        <h4>🏷️ Referenspris på Willys (ordinarie sortiment)</h4>
+        <h4>Referenspris på Willys (ordinarie sortiment)</h4>
         <div class="ref-items">
             {ref_items_html}
         </div>

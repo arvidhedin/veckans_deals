@@ -9,6 +9,21 @@ if (document.documentElement.classList.contains('dark')) {
 }
 localStorage.removeItem('theme');
 
+// Standard Grocery Categories
+const ALL_CATEGORIES = [
+  'Kött & Fågel',
+  'Fisk & Skaldjur',
+  'Mejeri & Ägg',
+  'Frukt & Grönt',
+  'Bröd & Bageri',
+  'Skafferi',
+  'Snacks & Godis',
+  'Dryck',
+  'Frys & Färdigmat',
+  'Hushåll & Hygien',
+  'Övrigt'
+];
+
 // Global State
 const state = {
   allOffers: [],
@@ -40,10 +55,13 @@ const state = {
     // Lidl
     'Lidl'
   ]),
+  selectedCategories: new Set(ALL_CATEGORIES),
+  activeCategoryPill: 'all', // 'all' or category string
   lidlPeriod: 'all', // 'all' | 'this-week' | 'next-week'
   searchQuery: '',
   sortBy: 'discount-desc',
-  storeCounts: {}
+  storeCounts: {},
+  categoryCounts: {}
 };
 
 // Store color configuration
@@ -79,6 +97,61 @@ const STORE_COLORS = {
 
 const DEFAULT_IMG = "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=300&q=80";
 
+// Categorization helper for frontend
+function categorizeOfferJS(offer) {
+  if (offer.category && ALL_CATEGORIES.includes(offer.category)) {
+    return offer.category;
+  }
+
+  const rawCat = (offer.category || '').toLowerCase();
+  if (rawCat.includes('frukt') || rawCat.includes('grönt')) return 'Frukt & Grönt';
+  if (rawCat.includes('mejeri')) return 'Mejeri & Ägg';
+  if (rawCat.includes('bröd') || rawCat.includes('bageri') || rawCat.includes('kex')) return 'Bröd & Bageri';
+  if (rawCat.includes('skafferi')) return 'Skafferi';
+  if (rawCat.includes('kött') || rawCat.includes('chark')) return 'Kött & Fågel';
+  if (rawCat.includes('fisk') || rawCat.includes('skaldjur')) return 'Fisk & Skaldjur';
+  if (rawCat.includes('dryck')) return 'Dryck';
+  if (rawCat.includes('snacks') || rawCat.includes('godis')) return 'Snacks & Godis';
+
+  const text = `${offer.product || ''} ${offer.brand || ''} ${offer.description || ''}`.toLowerCase();
+  
+  if (/kött|färs|kyckling|fläsk|nötkött|korv|bacon|skinka|karré|kotlett|entrecote|biff|kalkon|lever|chark|salami|medwurst|falukorv|grillkorv|blodpudding|rostbiff|kebab/i.test(text)) {
+    return 'Kött & Fågel';
+  }
+  if (/fisk|lax|torsk|räkor|räka|sill|makrill|tunnfisk|tuna|kräftor|sej|spätta|musslor|skaldjur|rom|fiskpinnar/i.test(text)) {
+    return 'Fisk & Skaldjur';
+  }
+  if (/mjölk|grädde|smör|ost|ostar|margarin|yoggi|yoghurt|fil|filmjölk|kvarg|ägg|crème fraiche|creme fraiche|keso|halloumi|mozzarella|vispgrädde|bregott|flora|lätta|kesella|gräddfil|ricotta|feta|vitost|brie|gouda|hushållsost|prästost|herrgård|grevé|västerbottensost/i.test(text)) {
+    return 'Mejeri & Ägg';
+  }
+  if (/frukt|grönsak|bär|äpple|äpplen|banan|bananer|potatis|tomat|tomater|gurka|gurkor|sallad|lök|morot|morötter|majs|avokado|melon|citron|citroner|apelsin|apelsiner|druvor|jordgubb|hallon|blåbär|paprika|vitlök|champinjon|svamp|clementin|nektarin|persika|plommon|kiwi|kolv|broccoli|blomkål|spenat|rotfrukter|purjolök|ruccola|basilika|persilja|dill|kål|lime|ingefära|chili|mango|ananas|päron/i.test(text)) {
+    return 'Frukt & Grönt';
+  }
+  if (/bröd|kaka|kakor|bulle|bullar|tårta|knäcke|knäckebröd|fralla|frallor|pita|tortilla|toast|croissant|korvbröd|hamburgerbröd|limpa|pågen|fazer|skogaholm|våffl|donut|muffin|kanelbulle|vaniljbulle|semla/i.test(text)) {
+    return 'Bröd & Bageri';
+  }
+  if (/chips|dipp|godis|choklad|popcorn|nötter|kex|ostbågar|lakrits|tuggummi|marabou|estrella|olw|cloetta|haribo|cheez|snacks|cashew|mandel|pistage|valnöt|jordnötter|kexchoklad|daim|twix|snickers|dumle/i.test(text)) {
+    return 'Snacks & Godis';
+  }
+  if (/läsk|saft|vatten|juice|energidryck|öl|cider|alkoholfri|must|coca-cola|cola|pepsi|fanta|sprite|nocco|celsius|red bull|ramlösa|loka|monster|tonic|iskaffe|smoothie|dricka/i.test(text)) {
+    return 'Dryck';
+  }
+  if (/pasta|ris|mjöl|socker|olja|vinäger|kaffe|te|sås|ketchup|senap|konserv|linser|bönor|krydda|kryddor|buljong|müsli|musli|flingor|havregryn|pesto|taco|tacos|spaghetti|makaroner|matolja|rapsolja|olivolja|majonnäs|sylt|marmelad|honung|gevalia|zoegas|arvid nordquist|löfbergs|nudlar|couscous|dressing|tomatkross/i.test(text)) {
+    return 'Skafferi';
+  }
+  if (/fryst|djupfryst|pizza|pizzor|pytt|färdigrätt|glass|paj|nuggets|pommes|gb glace|dafgård|findus|felix|pirog|gorbys|billys/i.test(text)) {
+    return 'Frys & Färdigmat';
+  }
+  if (/tvättmedel|sköljmedel|rengöring|schampo|tvål|blöjor|toalettpapper|hushållspapper|tandkräm|diskmedel|fryspåsar|plastpåsar|avfallspåsar|deodorant|balsam|duschgel|lotion|kattmat|hundmat|multivitamin|omega 3|listerine|munskölj|städservetter/i.test(text)) {
+    return 'Hushåll & Hygien';
+  }
+
+  if (rawCat.includes('djupfryst') || rawCat.includes('fryst')) return 'Frys & Färdigmat';
+  if (rawCat.includes('färskvaror')) return 'Kött & Fågel';
+
+  return 'Övrigt';
+}
+
 // --- Data Fetching ---
 async function fetchDealsData() {
   const statusEl = document.getElementById('status-update-text');
@@ -103,6 +176,7 @@ async function fetchDealsData() {
     }
 
     computeStoreCounts();
+    computeCategoryCounts();
     applyFilters();
   } catch (error) {
     console.error('Fel vid hämtning av erbjudanden:', error);
@@ -123,7 +197,6 @@ function computeStoreCounts() {
     }
   }
 
-  // Helper to find count by exact name, aliases, or case-insensitive match
   const getCount = (name, aliases = []) => {
     if (state.storeCounts[name] !== undefined) return state.storeCounts[name];
     for (const alias of aliases) {
@@ -172,10 +245,133 @@ function updateCountElement(id, count) {
 function updateMobileFilterBadge() {
   const badge = document.getElementById('mobile-filter-badge');
   const mobileCount = document.getElementById('mobile-filter-count');
-  const checkboxes = document.querySelectorAll('.store-filter:checked');
-  const count = checkboxes.length;
+  const storeCheckboxes = document.querySelectorAll('.store-filter:checked');
+  const count = storeCheckboxes.length;
   if (badge) badge.textContent = count;
-  if (mobileCount) mobileCount.textContent = `${count} valda`;
+  if (mobileCount) mobileCount.textContent = `${count} valda butiker`;
+}
+
+// Compute Category Counts based on active store filter
+function computeCategoryCounts() {
+  state.categoryCounts = {};
+  for (const cat of ALL_CATEGORIES) {
+    state.categoryCounts[cat] = 0;
+  }
+
+  for (const offer of state.allOffers) {
+    const store = (offer.store || '').trim();
+    const isStoreSelected = store === 'Lidl' 
+      ? state.selectedStores.has('Lidl') 
+      : state.selectedStores.has(store);
+    
+    if (!isStoreSelected) continue;
+
+    const cat = offer.category || categorizeOfferJS(offer);
+    state.categoryCounts[cat] = (state.categoryCounts[cat] || 0) + 1;
+  }
+}
+
+// Render horizontal Category Quick-Filter Pills
+function renderCategoryPills() {
+  const container = document.getElementById('category-pills-container');
+  if (!container) return;
+
+  const totalStoreOffers = Object.values(state.categoryCounts).reduce((a, b) => a + b, 0);
+
+  let html = `
+    <button 
+      type="button" 
+      data-cat="all" 
+      class="cat-pill cursor-pointer select-none px-3 py-1.5 rounded-full text-xs font-semibold border transition-all duration-150 flex items-center gap-1.5 ${
+        state.activeCategoryPill === 'all'
+          ? 'bg-zinc-900 text-white border-zinc-900 shadow-sm'
+          : 'bg-white text-zinc-700 border-zinc-200 hover:bg-zinc-100 hover:border-zinc-300'
+      }"
+    >
+      <span>Alla</span>
+      <span class="px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
+        state.activeCategoryPill === 'all' ? 'bg-zinc-700 text-zinc-100' : 'bg-zinc-100 text-zinc-600'
+      }">${totalStoreOffers}</span>
+    </button>
+  `;
+
+  for (const cat of ALL_CATEGORIES) {
+    const count = state.categoryCounts[cat] || 0;
+    if (count === 0 && state.activeCategoryPill !== cat) continue;
+
+    const isActive = state.activeCategoryPill === cat;
+    html += `
+      <button 
+        type="button" 
+        data-cat="${escapeHtml(cat)}" 
+        class="cat-pill cursor-pointer select-none px-3 py-1.5 rounded-full text-xs font-semibold border transition-all duration-150 flex items-center gap-1.5 ${
+          isActive
+            ? 'bg-rose-600 text-white border-rose-600 shadow-sm'
+            : 'bg-white text-zinc-700 border-zinc-200 hover:bg-zinc-100 hover:border-zinc-300'
+        }"
+      >
+        <span>${escapeHtml(cat)}</span>
+        <span class="px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
+          isActive ? 'bg-rose-800 text-rose-100' : 'bg-zinc-100 text-zinc-600'
+        }">${count}</span>
+      </button>
+    `;
+  }
+
+  container.innerHTML = html;
+
+  container.querySelectorAll('.cat-pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const cat = btn.dataset.cat;
+      if (cat === 'all') {
+        state.activeCategoryPill = 'all';
+      } else {
+        state.activeCategoryPill = state.activeCategoryPill === cat ? 'all' : cat;
+      }
+      applyFilters();
+    });
+  });
+}
+
+// Render Sidebar Category Checkboxes
+function renderCategoryCheckboxes() {
+  const container = document.getElementById('category-checkboxes-container');
+  if (!container) return;
+
+  let html = '';
+  for (const cat of ALL_CATEGORIES) {
+    const count = state.categoryCounts[cat] || 0;
+    const isChecked = state.selectedCategories.has(cat);
+
+    html += `
+      <label class="flex items-center justify-between text-xs cursor-pointer hover:opacity-80 transition select-none">
+        <div class="flex items-center gap-2">
+          <input 
+            type="checkbox" 
+            class="cat-checkbox w-3.5 h-3.5 rounded text-rose-600 focus:ring-rose-500 border-zinc-300" 
+            data-cat="${escapeHtml(cat)}"
+            ${isChecked ? 'checked' : ''}
+          >
+          <span class="font-medium text-zinc-800">${escapeHtml(cat)}</span>
+        </div>
+        <span class="text-[10px] font-semibold px-1.5 py-0.2 rounded-full bg-zinc-100 text-zinc-600">${count}</span>
+      </label>
+    `;
+  }
+
+  container.innerHTML = html;
+
+  container.querySelectorAll('.cat-checkbox').forEach(cb => {
+    cb.addEventListener('change', (e) => {
+      const cat = e.target.dataset.cat;
+      if (e.target.checked) {
+        state.selectedCategories.add(cat);
+      } else {
+        state.selectedCategories.delete(cat);
+      }
+      applyFilters();
+    });
+  });
 }
 
 // --- Lidl Date Filtering Logic ---
@@ -187,7 +383,7 @@ function parseLidlDates(restrictionStr, today) {
   
   for (const match of matches) {
     const day = parseInt(match[1], 10);
-    const month = parseInt(match[2], 10) - 1; // 0-indexed month
+    const month = parseInt(match[2], 10) - 1;
     let year = today.getFullYear();
 
     if (today.getMonth() === 11 && month === 0) {
@@ -212,7 +408,7 @@ function filterLidlOffers(lidlOffers, period) {
   const now = new Date();
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   
-  const dayOfWeek = (today.getDay() + 6) % 7; // Monday is 0, Sunday is 6
+  const dayOfWeek = (today.getDay() + 6) % 7; // Monday is 0
   const startOfThisWeek = new Date(today);
   startOfThisWeek.setDate(today.getDate() - dayOfWeek);
 
@@ -276,7 +472,15 @@ function applyFilters() {
     result.push(...filteredLidl);
   }
 
-  // 3. Search Query Filter
+  // 3. Filter by Category
+  result = result.filter(offer => {
+    const cat = offer.category || categorizeOfferJS(offer);
+    if (!state.selectedCategories.has(cat)) return false;
+    if (state.activeCategoryPill !== 'all' && state.activeCategoryPill !== cat) return false;
+    return true;
+  });
+
+  // 4. Search Query Filter
   const rawQ = state.searchQuery.trim();
   const q = rawQ.toLowerCase();
 
@@ -287,24 +491,28 @@ function applyFilters() {
       const product = (offer.product || '').toLowerCase();
       const brand = (offer.brand || '').toLowerCase();
       const desc = (offer.description || '').toLowerCase();
-      const combined = `${product} ${brand} ${desc}`;
+      const cat = (offer.category || '').toLowerCase();
+      const combined = `${product} ${brand} ${desc} ${cat}`;
       
       if (combined.includes(q)) return true;
       return queryTokens.every(token => combined.includes(token));
     });
   }
 
-  // 4. Sorting
+  // 5. Sorting
   sortOffers(result, state.sortBy);
 
   state.filteredOffers = result;
 
-  // 5. Render UI
+  // 6. Compute counts and render UI
+  computeCategoryCounts();
+  renderCategoryPills();
+  renderCategoryCheckboxes();
   renderDeals();
   renderResultsCount();
   updateMobileFilterBadge();
 
-  // 6. Fetch & Render Willys Reference Prices
+  // 7. Willys Reference Prices
   updateWillysReferenceBox(q);
 }
 
@@ -338,7 +546,7 @@ function sortOffers(offers, sortBy) {
   });
 }
 
-// --- Willys Reference Box Logic (Live API + Local Fallback) ---
+// --- Willys Reference Box Logic ---
 const willysSearchCache = new Map();
 let currentWillysSearchToken = 0;
 
@@ -362,19 +570,12 @@ function getLocalWillysMatches(query) {
     const fullText = `${prod} ${brand} ${desc}`;
 
     let score = 0;
-    if (prod === q) {
-      score = 10;
-    } else if (prod.startsWith(q)) {
-      score = 8;
-    } else if (prod.includes(q)) {
-      score = 6;
-    } else if (fullText.includes(q)) {
-      score = 4;
-    } else if (queryTokens.length > 0 && queryTokens.every(t => fullText.includes(t))) {
-      score = 3;
-    } else if (queryTokens.some(t => t.length >= 3 && (prod.includes(t) || fullText.includes(t)))) {
-      score = 1;
-    }
+    if (prod === q) score = 10;
+    else if (prod.startsWith(q)) score = 8;
+    else if (prod.includes(q)) score = 6;
+    else if (fullText.includes(q)) score = 4;
+    else if (queryTokens.length > 0 && queryTokens.every(t => fullText.includes(t))) score = 3;
+    else if (queryTokens.some(t => t.length >= 3 && (prod.includes(t) || fullText.includes(t)))) score = 1;
 
     if (score > 0) {
       const key = `${(item.product || '').trim()}_${(item.brand || '').trim()}`.toLowerCase();
@@ -464,13 +665,11 @@ async function updateWillysReferenceBox(query) {
     return;
   }
 
-  // 1. Immediate local feedback from dataset if available
   const localMatches = getLocalWillysMatches(q);
   if (localMatches.length > 0) {
     renderReferenceBox(localMatches, q);
   }
 
-  // 2. Fetch live items from Willys regular assortment API
   try {
     const apiMatches = await fetchWillysReferenceItems(q);
     if (token !== currentWillysSearchToken) return;
@@ -574,6 +773,11 @@ function createDealCardHtml(offer) {
   const shortStore = getShortStoreName(store);
   const storeBadgeColor = STORE_COLORS[store]?.bg || (store.toLowerCase().includes('ica') ? '#E21936' : (store.toLowerCase().includes('hemköp') ? '#D31115' : '#4B5563'));
   
+  const cat = offer.category || categorizeOfferJS(offer);
+  const catBadgeHtml = cat 
+    ? `<span class="text-[9px] sm:text-[10px] font-semibold text-zinc-500 bg-zinc-100 px-1.5 py-0.5 rounded border border-zinc-200/60 truncate max-w-full block w-fit mt-0.5">${escapeHtml(cat)}</span>`
+    : '';
+
   const discountPct = parseFloat(offer.discount_percentage) || 0;
   const pctBadgeHtml = discountPct > 0 
     ? `<span class="absolute top-1.5 right-1.5 sm:top-2.5 sm:right-2.5 bg-rose-600 text-white font-extrabold text-[8px] sm:text-[10px] md:text-[11px] px-1 sm:px-2 py-0.5 rounded shadow-sm z-10 tracking-wider">-${Math.round(discountPct)}%</span>` 
@@ -593,7 +797,6 @@ function createDealCardHtml(offer) {
     ? `<div class="text-[8px] sm:text-[10px] md:text-[11px] font-semibold bg-rose-50 text-rose-600 border border-rose-200/60 px-1 sm:px-2 py-0.5 rounded w-fit mt-1 truncate max-w-full">${escapeHtml(offer.discount)}</div>` 
     : '';
 
-  // Restriction badge (e.g. Endast Tor-Sön)
   const restriction = (offer.restriction || '').toLowerCase();
   const isTorSon = restriction.includes('tor') || restriction.includes('sön') || restriction.includes('son');
   const restrictionBadgeHtml = isTorSon 
@@ -601,7 +804,7 @@ function createDealCardHtml(offer) {
     : (offer.restriction ? `<div class="text-[8px] sm:text-[10px] md:text-[11px] font-medium text-amber-600 mt-1 truncate">${escapeHtml(offer.restriction)}</div>` : '');
 
   return `
-    <div class="deal-card group bg-white rounded-xl sm:rounded-2xl border border-zinc-200/80 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-200 flex flex-col h-[280px] sm:h-[350px] md:h-[390px] relative overflow-hidden">
+    <div class="deal-card group bg-white rounded-xl sm:rounded-2xl border border-zinc-200/80 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-200 flex flex-col h-[290px] sm:h-[360px] md:h-[400px] relative overflow-hidden">
       <!-- Store Badge Overlay -->
       <span class="absolute top-1.5 left-1.5 sm:top-2.5 sm:left-2.5 px-1.5 py-0.5 sm:px-2 sm:py-0.75 rounded text-[7.5px] leading-[1.1] sm:text-[10px] md:text-[11px] font-bold tracking-wide uppercase text-white shadow-sm z-10 max-w-[calc(100%-42px)] sm:max-w-none line-clamp-2 break-words text-left" style="background-color: ${storeBadgeColor};" title="${escapeHtml(store)}">
         ${escapeHtml(shortStore)}
@@ -624,15 +827,18 @@ function createDealCardHtml(offer) {
       <!-- Card Body -->
       <div class="p-2 sm:p-3 md:p-4 flex flex-col flex-grow justify-between">
         <div>
-          <span class="text-[9px] sm:text-[10px] md:text-[11px] font-bold uppercase tracking-wider text-zinc-400 block truncate">
-            ${brandTag}
-          </span>
+          <div class="flex items-center justify-between gap-1 flex-wrap">
+            <span class="text-[9px] sm:text-[10px] md:text-[11px] font-bold uppercase tracking-wider text-zinc-400 block truncate">
+              ${brandTag}
+            </span>
+          </div>
           <h3 class="text-xs sm:text-sm md:text-base font-bold text-zinc-900 line-clamp-2 leading-tight mt-0.5" title="${productName}">
             ${productName}
           </h3>
           <p class="text-[9px] sm:text-xs text-zinc-500 mt-0.5 truncate hidden sm:block">
             ${descTag}
           </p>
+          ${catBadgeHtml}
         </div>
 
         <div class="pt-1 sm:pt-2">
@@ -659,9 +865,9 @@ function renderDeals() {
     const descEl = emptyState.querySelector('p');
     if (descEl) {
       if (state.searchQuery) {
-        descEl.innerHTML = `Det fanns inga rabatterade veckodeals för "<strong>${escapeHtml(state.searchQuery)}</strong>" den här veckan, men du kan se Willys ordinarie referenspriser ovan ⬆️`;
+        descEl.innerHTML = `Det fanns inga rabatterade veckodeals för "<strong>${escapeHtml(state.searchQuery)}</strong>" den här veckan, men du kan se Willys ordinarie referenspriser ovan.`;
       } else {
-        descEl.textContent = 'Det fanns inga erbjudanden som matchade dina valda butiksfilter.';
+        descEl.textContent = 'Det fanns inga erbjudanden som matchade dina valda butiks- och kategorifilter.';
       }
     }
     emptyState.classList.remove('hidden');
@@ -684,7 +890,11 @@ function renderErrorState(message) {
   if (grid) {
     grid.innerHTML = `
       <div class="col-span-full bg-red-50 border border-red-200 rounded-2xl p-8 text-center text-red-700">
-        <div class="text-3xl mb-2">⚠️</div>
+        <div class="w-10 h-10 mx-auto mb-2 text-red-500 flex items-center justify-center bg-red-100 rounded-full">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+          </svg>
+        </div>
         <h3 class="font-bold text-base mb-1">Kunde inte ladda erbjudanden</h3>
         <p class="text-sm opacity-80 mb-4">${escapeHtml(message)}</p>
         <button onclick="fetchDealsData()" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold transition shadow">
@@ -777,17 +987,14 @@ function escapeHtml(str) {
 
 // --- Event Listeners Setup ---
 function setupEventListeners() {
-  // Desktop Sidebar Toggle & Collapse Buttons
   const btnToggleDesktop = document.getElementById('btn-toggle-sidebar-desktop');
   const btnCollapseDesktop = document.getElementById('btn-collapse-sidebar-desktop');
 
   if (btnToggleDesktop) btnToggleDesktop.addEventListener('click', () => toggleDesktopSidebar());
   if (btnCollapseDesktop) btnCollapseDesktop.addEventListener('click', () => toggleDesktopSidebar(true));
 
-  // Initialize desktop sidebar state
   toggleDesktopSidebar(state.sidebarCollapsed);
 
-  // Mobile Drawer Toggle Buttons
   const btnOpenDrawer = document.getElementById('btn-open-filter-drawer');
   const btnCloseDrawer = document.getElementById('btn-close-filter-drawer');
   const btnApplyMobile = document.getElementById('btn-apply-filter-mobile');
@@ -802,9 +1009,28 @@ function setupEventListeners() {
     if (e.key === 'Escape') closeMobileFilterDrawer();
   });
 
+  // Category select all / deselect all in sidebar
+  const btnSelectAllCats = document.getElementById('btn-select-all-cats');
+  if (btnSelectAllCats) {
+    btnSelectAllCats.addEventListener('click', () => {
+      ALL_CATEGORIES.forEach(c => state.selectedCategories.add(c));
+      state.activeCategoryPill = 'all';
+      applyFilters();
+    });
+  }
+
+  const btnDeselectAllCats = document.getElementById('btn-deselect-all-cats');
+  if (btnDeselectAllCats) {
+    btnDeselectAllCats.addEventListener('click', () => {
+      state.selectedCategories.clear();
+      state.activeCategoryPill = 'all';
+      applyFilters();
+    });
+  }
+
   // Store filter checkboxes
-  const checkboxes = document.querySelectorAll('.store-filter');
-  checkboxes.forEach(cb => {
+  const storeCheckboxes = document.querySelectorAll('.store-filter');
+  storeCheckboxes.forEach(cb => {
     cb.addEventListener('change', (e) => {
       const storeName = e.target.dataset.store;
       if (e.target.checked) {
@@ -819,7 +1045,6 @@ function setupEventListeners() {
         if (storeName === 'Willys') state.selectedStores.delete('Willys (Björkgatan)');
       }
       
-      // Toggle Lidl period filter visibility
       const lidlSection = document.getElementById('lidl-filter-section');
       if (lidlSection) {
         if (state.selectedStores.has('Lidl')) {
@@ -848,7 +1073,7 @@ function setupEventListeners() {
   const btnSelectAll = document.getElementById('btn-select-all');
   if (btnSelectAll) {
     btnSelectAll.addEventListener('click', () => {
-      checkboxes.forEach(cb => {
+      storeCheckboxes.forEach(cb => {
         cb.checked = true;
         state.selectedStores.add(cb.dataset.store);
       });
@@ -863,7 +1088,7 @@ function setupEventListeners() {
   const btnDeselectAll = document.getElementById('btn-deselect-all');
   if (btnDeselectAll) {
     btnDeselectAll.addEventListener('click', () => {
-      checkboxes.forEach(cb => {
+      storeCheckboxes.forEach(cb => {
         cb.checked = false;
       });
       state.selectedStores.clear();
@@ -918,10 +1143,12 @@ function setupEventListeners() {
   const btnReset = document.getElementById('btn-reset-filters');
   if (btnReset) {
     btnReset.addEventListener('click', () => {
-      checkboxes.forEach(cb => {
+      storeCheckboxes.forEach(cb => {
         cb.checked = true;
         state.selectedStores.add(cb.dataset.store);
       });
+      ALL_CATEGORIES.forEach(c => state.selectedCategories.add(c));
+      state.activeCategoryPill = 'all';
       if (searchInput) {
         searchInput.value = '';
         if (btnClearSearch) btnClearSearch.classList.add('hidden');

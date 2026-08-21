@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Veckans Deals | Jämför matpriser</title>
   <meta name="description" content="Hitta och jämför veckans bästa erbjudanden från ICA, Willys, Hemköp, Coop och Lidl i Uppsala.">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220%22%20width=%22100%22%20height=%22100%22><text y=%22.9em%22 font-size=%2290%22>🏷️</text></svg>">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23E11D48'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z'/></svg>">
 
   <!-- Google Fonts: Plus Jakarta Sans -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -87,6 +87,7 @@
 
     /* Custom Scrollbar for filter list */
     .custom-scrollbar::-webkit-scrollbar {
+      height: 4px;
       width: 4px;
     }
     .custom-scrollbar::-webkit-scrollbar-track {
@@ -134,7 +135,7 @@
           <div class="flex items-center justify-between p-4 lg:p-0 pb-3 border-b border-zinc-100">
             <div class="flex items-center gap-2">
               <h2 class="text-sm sm:text-base font-bold text-zinc-900">
-                Välj Butiker
+                Filter & Butiker
               </h2>
               <span id="mobile-filter-count" class="lg:hidden text-xs font-semibold px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-600">
                 0
@@ -143,7 +144,7 @@
 
             <div class="flex items-center gap-3">
               <div class="flex gap-2 text-xs">
-                <button id="btn-select-all" class="font-semibold text-rose-600 hover:underline">Alla</button>
+                <button id="btn-select-all" class="font-semibold text-rose-600 hover:underline">Alla butiker</button>
                 <span class="text-zinc-300">|</span>
                 <button id="btn-deselect-all" class="text-zinc-500 hover:underline">Inga</button>
               </div>
@@ -164,9 +165,24 @@
             </div>
           </div>
 
-          <!-- Store Checkboxes List (Scrollable on mobile) -->
+          <!-- Store Checkboxes & Category Checkboxes List (Scrollable on mobile) -->
           <div class="p-4 lg:p-0 mt-2 lg:mt-4 space-y-4 overflow-y-auto custom-scrollbar flex-grow" id="store-checkboxes-container">
             
+            <!-- Category Filter Section in Sidebar -->
+            <div class="pb-3 border-b border-zinc-100">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-zinc-500 block">Kategorier</span>
+                <div class="flex gap-2 text-xs">
+                  <button id="btn-select-all-cats" class="font-semibold text-rose-600 hover:underline">Alla</button>
+                  <span class="text-zinc-300">|</span>
+                  <button id="btn-deselect-all-cats" class="text-zinc-500 hover:underline">Inga</button>
+                </div>
+              </div>
+              <div class="space-y-1.5" id="category-checkboxes-container">
+                <!-- Checkboxes populated via JS -->
+              </div>
+            </div>
+
             <!-- ICA Stores Group -->
             <div>
               <span class="text-[11px] font-bold uppercase tracking-wider text-rose-600 block mb-1.5">ICA</span>
@@ -351,7 +367,7 @@
       </aside>
 
       <!-- Main Column: Search Bar, Stats, Willys Reference Box, Deals Grid -->
-      <main class="flex-1 w-full min-w-0 space-y-5">
+      <main class="flex-1 w-full min-w-0 space-y-4 sm:space-y-5">
         
         <!-- Search, Filter & Sort Controls Bar -->
         <div class="bg-white p-3 sm:p-4 rounded-2xl border border-zinc-200/80 shadow-sm flex flex-col sm:flex-row gap-2.5 sm:gap-3 items-stretch sm:items-center justify-between">
@@ -414,6 +430,13 @@
           </div>
         </div>
 
+        <!-- Category Horizontal Quick-Filter Bar -->
+        <div class="overflow-x-auto pb-1.5 custom-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0">
+          <div id="category-pills-container" class="flex items-center gap-1.5 min-w-max">
+            <!-- Populated dynamically via app.js -->
+          </div>
+        </div>
+
         <!-- Live Offers Count -->
         <div class="flex items-center justify-between px-1 text-xs sm:text-sm text-zinc-500">
           <div id="results-count" class="font-medium">
@@ -424,7 +447,10 @@
         <!-- Willys Reference Price Section (Shown dynamically when searching) -->
         <div id="willys-reference-box" class="hidden ref-price-box rounded-xl p-4 sm:p-5 transition-all duration-200">
           <h4 class="text-xs sm:text-sm font-bold text-emerald-800 flex items-center gap-2 mb-2.5">
-            <span>🏷️</span> Referenspris på Willys (ordinarie sortiment / matchningar)
+            <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+            </svg>
+            <span>Referenspris på Willys (ordinarie sortiment / matchningar)</span>
           </h4>
           <div id="willys-reference-items" class="space-y-2">
             <!-- Populated via JS -->
@@ -441,10 +467,14 @@
 
         <!-- Empty State (Hidden by default) -->
         <div id="empty-state" class="hidden bg-white rounded-2xl p-8 sm:p-12 text-center border border-zinc-200/80 my-6">
-          <div class="text-4xl sm:text-5xl mb-3">🔍</div>
+          <div class="w-12 h-12 mx-auto mb-3 text-zinc-400 flex items-center justify-center bg-zinc-100 rounded-full">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+          </div>
           <h3 class="text-base sm:text-lg font-bold text-zinc-900 mb-1">Inga erbjudanden hittades</h3>
           <p class="text-zinc-500 text-xs sm:text-sm max-w-sm mx-auto mb-5">
-            Det fanns inga erbjudanden som matchade din sökning eller dina valda butiksfilter.
+            Det fanns inga erbjudanden som matchade din sökning eller dina valda butiks- och kategorifilter.
           </p>
           <button id="btn-reset-filters" class="px-4 py-2 bg-zinc-900 text-white rounded-xl font-semibold text-xs sm:text-sm hover:opacity-90 transition active:scale-95">
             Återställ filter och sökning
@@ -461,6 +491,6 @@
   </div>
 
   <!-- Application Logic -->
-  <script src="app.js?v=7"></script>
+  <script src="app.js?v=8"></script>
 </body>
 </html>

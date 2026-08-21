@@ -9,6 +9,7 @@ import json
 import datetime
 import traceback
 from scrapers import ica, coop, willys, lidl, hemkop, willys_search
+from scrapers.categorizer import categorize_offer
 
 
 def get_discount_pct(offer: dict) -> float:
@@ -24,8 +25,8 @@ def get_discount_pct(offer: dict) -> float:
 
 def main():
     print("=" * 60)
-    print("🚀 Starting Veckans Deals Data Build")
-    print(f"⏰ Timestamp: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    print("Starting Veckans Deals Data Build")
+    print(f"Timestamp: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print("=" * 60)
 
     all_offers = []
@@ -41,7 +42,7 @@ def main():
     ]
 
     for name, scraper_fn in scrapers:
-        print(f"📦 Scraping {name}...")
+        print(f"Scraping {name}...")
         try:
             offers = scraper_fn()
             if not isinstance(offers, list):
@@ -53,18 +54,29 @@ def main():
                 store_stats[store_key] = store_stats.get(store_key, 0) + 1
 
             all_offers.extend(offers)
-            print(f"   ✅ {name}: Fetched {len(offers)} offers")
+            print(f"   [OK] {name}: Fetched {len(offers)} offers")
         except Exception as e:
-            print(f"   ❌ {name}: Failed with error: {e}")
+            print(f"   [FAIL] {name}: Failed with error: {e}")
             traceback.print_exc()
 
-    print("📦 Fetching Willys regular assortment for reference pricing...")
+    print("Fetching Willys regular assortment for reference pricing...")
     willys_assortment = []
     try:
         willys_assortment = willys_search.get_willys_assortment()
-        print(f"   ✅ Willys Assortment: Fetched {len(willys_assortment)} regular reference items")
+        print(f"   [OK] Willys Assortment: Fetched {len(willys_assortment)} regular reference items")
     except Exception as e:
-        print(f"   ❌ Willys Assortment: Failed with error: {e}")
+        print(f"   [FAIL] Willys Assortment: Failed with error: {e}")
+
+    # Categorize all offers
+    print("Categorizing offers into standard categories...")
+    cat_counts = {}
+    for o in all_offers:
+        cat = categorize_offer(o)
+        o["category"] = cat
+        cat_counts[cat] = cat_counts.get(cat, 0) + 1
+    
+    for cat_name, count in sorted(cat_counts.items(), key=lambda x: x[1], reverse=True):
+        print(f"   - {cat_name}: {count}")
 
     # Sort all offers by discount percentage descending (highest discount first)
     all_offers.sort(key=get_discount_pct, reverse=True)
@@ -79,6 +91,7 @@ def main():
         "updated_at_readable": now.strftime("%Y-%m-%d %H:%M UTC"),
         "total_offers": len(all_offers),
         "store_counts": store_stats,
+        "category_counts": cat_counts,
         "offers": all_offers,
         "willys_assortment": willys_assortment,
     }
@@ -88,10 +101,10 @@ def main():
         json.dump(payload, f, ensure_ascii=False, indent=2)
 
     print("-" * 60)
-    print(f"🎉 Build complete! Total offers collected: {len(all_offers)}")
+    print(f"Build complete! Total offers collected: {len(all_offers)}")
     for store_name, count in sorted(store_stats.items()):
         print(f"   - {store_name}: {count} offers")
-    print(f"💾 Saved to: {output_path} ({os.path.getsize(output_path) / 1024:.1f} KB)")
+    print(f"Saved to: {output_path} ({os.path.getsize(output_path) / 1024:.1f} KB)")
     print("=" * 60)
 
 
