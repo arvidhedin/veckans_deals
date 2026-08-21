@@ -149,12 +149,6 @@
             </div>
 
             <div class="flex items-center gap-3">
-              <div class="flex gap-2 text-xs">
-                <button id="btn-select-all" class="font-semibold text-rose-600 hover:underline">Alla butiker</button>
-                <span class="text-zinc-300">|</span>
-                <button id="btn-deselect-all" class="text-zinc-500 hover:underline">Inga</button>
-              </div>
-
               <!-- Desktop Collapse Button -->
               <button id="btn-collapse-sidebar-desktop" class="hidden lg:flex items-center justify-center p-1.5 text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100 rounded-lg transition" title="Dölj sidomeny">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -174,18 +168,13 @@
           <!-- Store Checkboxes & Category Checkboxes List (Scrollable on mobile) -->
           <div class="p-4 lg:p-0 mt-2 lg:mt-4 space-y-4 overflow-y-auto custom-scrollbar flex-grow" id="store-checkboxes-container">
             
-            <!-- Category Filter Section in Sidebar -->
-            <div class="pb-3 border-b border-zinc-100">
-              <div class="flex items-center justify-between mb-2">
-                <span class="text-[11px] font-bold uppercase tracking-wider text-zinc-500 block">Kategorier</span>
-                <div class="flex gap-2 text-xs">
-                  <button id="btn-select-all-cats" class="font-semibold text-rose-600 hover:underline">Alla</button>
-                  <span class="text-zinc-300">|</span>
-                  <button id="btn-deselect-all-cats" class="text-zinc-500 hover:underline">Inga</button>
-                </div>
-              </div>
-              <div class="space-y-1.5" id="category-checkboxes-container">
-                <!-- Checkboxes populated via JS -->
+            <!-- Store Section Header -->
+            <div class="flex items-center justify-between pb-2 border-b border-zinc-100">
+              <span class="text-[11px] font-bold uppercase tracking-wider text-zinc-500 block">Butiker</span>
+              <div class="flex gap-2 text-xs">
+                <button id="btn-select-all" class="font-semibold text-rose-600 hover:underline">Alla</button>
+                <span class="text-zinc-300">|</span>
+                <button id="btn-deselect-all" class="text-zinc-500 hover:underline">Inga</button>
               </div>
             </div>
 
@@ -339,27 +328,42 @@
               </div>
             </div>
 
-          </div>
-
-          <!-- Lidl Date Period Filter Sub-menu (active when Lidl is selected) -->
-          <div id="lidl-filter-section" class="p-4 lg:p-0 mt-3 pt-3 border-t border-zinc-100 transition-all">
-            <h3 class="text-[11px] font-bold uppercase tracking-wider text-zinc-500 mb-2">
-              Lidl-period
-            </h3>
-            <div class="space-y-1.5 text-xs sm:text-sm">
-              <label class="flex items-center gap-2 cursor-pointer">
-                <input type="radio" name="lidl-period" value="all" class="text-blue-600 focus:ring-blue-500">
-                <span>Alla Lidl-erbjudanden</span>
-              </label>
-              <label class="flex items-center gap-2 cursor-pointer">
-                <input type="radio" name="lidl-period" value="this-week" class="text-blue-600 focus:ring-blue-500" checked>
-                <span>Endast denna vecka</span>
-              </label>
-              <label class="flex items-center gap-2 cursor-pointer">
-                <input type="radio" name="lidl-period" value="next-week" class="text-blue-600 focus:ring-blue-500">
-                <span>Endast nästa vecka</span>
-              </label>
+            <!-- Lidl Date Period Filter Sub-menu (active when Lidl is selected) -->
+            <div id="lidl-filter-section" class="pt-2 border-t border-zinc-100 transition-all">
+              <h3 class="text-[11px] font-bold uppercase tracking-wider text-zinc-500 mb-2">
+                Lidl-period
+              </h3>
+              <div class="space-y-1.5 text-xs sm:text-sm">
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="radio" name="lidl-period" value="all" class="text-blue-600 focus:ring-blue-500">
+                  <span>Alla Lidl-erbjudanden</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="radio" name="lidl-period" value="this-week" class="text-blue-600 focus:ring-blue-500" checked>
+                  <span>Endast denna vecka</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="radio" name="lidl-period" value="next-week" class="text-blue-600 focus:ring-blue-500">
+                  <span>Endast nästa vecka</span>
+                </label>
+              </div>
             </div>
+
+            <!-- Category Filter Section in Sidebar (placed BELOW stores & lidl-period) -->
+            <div class="pt-4 border-t border-zinc-100">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-zinc-500 block">Kategorier</span>
+                <div class="flex gap-2 text-xs">
+                  <button id="btn-select-all-cats" class="font-semibold text-rose-600 hover:underline">Alla</button>
+                  <span class="text-zinc-300">|</span>
+                  <button id="btn-deselect-all-cats" class="text-zinc-500 hover:underline">Inga</button>
+                </div>
+              </div>
+              <div class="space-y-1.5" id="category-checkboxes-container">
+                <!-- Checkboxes populated via JS -->
+              </div>
+            </div>
+
           </div>
 
           <!-- Mobile Drawer Done Button -->
@@ -690,7 +694,7 @@
   </div>
 
   <!-- Application Logic -->
-  <script src="app.js?v=20260821_1136"></script>
+  <script src="app.js?v=20260821_1143"></script>
 </body>
 </html>
 
