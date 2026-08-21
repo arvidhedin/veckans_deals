@@ -271,59 +271,85 @@ function updateMobileFilterBadge() {
   if (mobileCount) mobileCount.textContent = `${count} valda butiker`;
 }
 
+// --- Helpers for Price & Weight Parsing ---
+function extractPerUnitDealPriceJS(priceStr) {
+  if (!priceStr) return { pricePerUnit: 0, isExplicitPerKg: false };
+
+  const s = String(priceStr).toLowerCase().replace(/\s+/g, ' ').trim();
+  const isExplicitPerKg = s.includes('/kg') || s.includes('kr/kg');
+
+  // Match "X för Y" or "X st för Y" (fixing typo 'fölr')
+  const xForY = s.match(/(\d+)\s*(?:st)?\s*f[öo]r\s*(\d+(?:[.,]\d+)?)/i);
+  if (xForY) {
+    const qty = parseFloat(xForY[1]);
+    const total = parseFloat(xForY[2].replace(',', '.'));
+    if (qty > 0 && total > 0) {
+      return { pricePerUnit: total / qty, isExplicitPerKg };
+    }
+  }
+
+  const cleanStr = s.replace(/.*f[öo]r\s*/i, '');
+  const match = cleanStr.match(/(\d+(?:[.,]\d+)?)/);
+  const val = match ? parseFloat(match[1].replace(',', '.')) : 0;
+
+  return { pricePerUnit: val, isExplicitPerKg };
+}
+
+function extractPackageWeightInKgJS(text) {
+  if (!text) return 0;
+  const s = String(text).toLowerCase().replace(/\s+/g, ' ');
+
+  // Gram range (e.g. 90-100g, 80-100 g)
+  const mGramRange = s.match(/(\d+(?:[.,]\d+)?)\s*[-–—]\s*(\d+(?:[.,]\d+)?)\s*g\b/i);
+  if (mGramRange) {
+    const g1 = parseFloat(mGramRange[1].replace(',', '.'));
+    const g2 = parseFloat(mGramRange[2].replace(',', '.'));
+    return ((g1 + g2) / 2.0) / 1000.0;
+  }
+
+  // Kg range (e.g. 1-1.5kg, 800g-1700g)
+  const mKgRange = s.match(/(\d+(?:[.,]\d+)?)\s*[-–—]\s*(\d+(?:[.,]\d+)?)\s*kg\b/i);
+  if (mKgRange) {
+    const k1 = parseFloat(mKgRange[1].replace(',', '.'));
+    const k2 = parseFloat(mKgRange[2].replace(',', '.'));
+    return (k1 + k2) / 2.0;
+  }
+
+  // Single kg
+  const mKg = s.match(/(\d+(?:[.,]\d+)?)\s*kg\b/i);
+  if (mKg) {
+    return parseFloat(mKg[1].replace(',', '.'));
+  }
+
+  // Single gram
+  const mGram = s.match(/(\d+(?:[.,]\d+)?)\s*g\b/i);
+  if (mGram) {
+    return parseFloat(mGram[1].replace(',', '.')) / 1000.0;
+  }
+
+  return 0;
+}
+
 // --- Helper for Kött & Fågel < 80 kr/kg Filter ---
 function isMeatUnder80PerKg(offer) {
   const cat = offer.category || categorizeOfferJS(offer);
   if (cat !== 'Kött & Fågel') return false;
 
-  const priceStr = (offer.price || '').toLowerCase();
-  const descStr = (offer.description || '').toLowerCase();
+  const { pricePerUnit, isExplicitPerKg } = extractPerUnitDealPriceJS(offer.price);
+  if (pricePerUnit <= 0) return false;
 
-  // Extract deal price per unit (handles "2 för 40:-" -> 20 kr)
-  let unitPrice = 0;
-  const xForY = priceStr.match(/(\d+)\s*fölr?\s*(\d+(?:[.,]\d+)?)/i);
-  if (xForY) {
-    const qty = parseFloat(xForY[1]);
-    const totalPrice = parseFloat(xForY[2].replace(',', '.'));
-    if (qty > 0) unitPrice = totalPrice / qty;
-  } else {
-    unitPrice = parsePriceNumeric(priceStr);
+  // Case 1: Explicit per kg price string (e.g. "64,90/kg", "79,90 kr/kg")
+  if (isExplicitPerKg) {
+    return pricePerUnit <= 80.0;
   }
 
-  if (unitPrice <= 0) return false;
+  // Case 2: Calculate exact price per kg from package weight
+  const textForWeight = `${offer.product || ''} ${offer.description || ''}`;
+  const weightKg = extractPackageWeightInKgJS(textForWeight);
 
-  // Case 1: Explicit per-kg price string (e.g. "64,90/kg", "79,90 kr/kg")
-  if (priceStr.includes('/kg') || priceStr.includes('kr/kg')) {
-    return unitPrice <= 80.0;
-  }
-
-  // Case 2: Fixed-weight package (e.g. 500g for 35 kr -> 70 kr/kg)
-  const textForWeight = `${offer.product || ''} ${descStr}`.toLowerCase();
-  
-  // Weight range like "80-100 g"
-  const mRange = textForWeight.match(/(\d+(?:[.,]\d+)?)\s*-\s*(\d+(?:[.,]\d+)?)\s*(g|kg)\b/i);
-  if (mRange) {
-    const w1 = parseFloat(mRange[1].replace(',', '.'));
-    const w2 = parseFloat(mRange[2].replace(',', '.'));
-    const unit = mRange[3].toLowerCase();
-    const wAvg = (w1 + w2) / 2.0;
-    const wKg = unit === 'kg' ? wAvg : wAvg / 1000.0;
-    if (wKg > 0) {
-      const calcPerKg = unitPrice / wKg;
-      return calcPerKg <= 80.0;
-    }
-  }
-
-  // Single weight like "500 g" or "1 kg"
-  const mW = textForWeight.match(/(\d+(?:[.,]\d+)?)\s*(g|kg)\b/i);
-  if (mW) {
-    const wNum = parseFloat(mW[1].replace(',', '.'));
-    const unit = mW[2].toLowerCase();
-    const wKg = unit === 'kg' ? wNum : wNum / 1000.0;
-    if (wKg > 0) {
-      const calcPerKg = unitPrice / wKg;
-      return calcPerKg <= 80.0;
-    }
+  if (weightKg > 0) {
+    const calculatedPricePerKg = pricePerUnit / weightKg;
+    return calculatedPricePerKg <= 80.0;
   }
 
   return false;
