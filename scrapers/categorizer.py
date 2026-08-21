@@ -17,6 +17,16 @@ CATEGORIES = [
         "värmeljus", "rakhyvel", "ansiktsmask", "bindor", "trosskydd", "intimtvätt", "libresse",
         "batterier", "batteri", "plastfolie", "folie", "pappmugg", "hink", "mopp", "tvättlappar", "maskindisktabletter"
     ]),
+    ("Mejeri & Ägg", [
+        "färskost", "mjölk", "grädde", "smör", "ost", "ostar", "margarin", "yoggi", "yoghurt",
+        "fil", "filmjölk", "kvarg", "ägg", "crème fraiche", "creme fraiche", "fraiche", "keso",
+        "halloumi", "norrloumi", "mozzarella", "vispgrädde", "matlagningsgrädde", "bregott", "flora",
+        "lätta", "kesella", "gräddfil", "ricotta", "feta", "vitost", "brie", "camembert",
+        "parmesan", "parmigiano", "gouda", "hushållsost", "prästost", "herrgård", "grevé", "svecia",
+        "västerbottensost", "gräddost", "havredryck", "mandeldryck", "sojadryck", "oatly", "yalla",
+        "actimel", "danonino", "skyr", "hamburgerost", "smältost", "mjukost", "skivost", "rivost",
+        "proteinshake"
+    ]),
     ("Frukt & Grönt", [
         "frukt", "grönsak", "grönsaker", "grönt", "bär", "äpple", "äpplen", "banan", "bananer",
         "potatis", "färskpotatis", "tomat", "tomater", "gurka", "gurkor", "sallad", "lök", "morot",
@@ -71,16 +81,6 @@ CATEGORIES = [
         "rom", "fiskpinnar", "fiskkaka", "fiskgratäng", "surströmming", "hummer", "krabba",
         "fiskfilé", "panerad fisk", "bläckfisk", "scampi", "laxfilé", "torskfilé", "sejfilé",
         "röding", "öring", "caviar", "kaviar", "tångcaviar"
-    ]),
-    ("Mejeri & Ägg", [
-        "mjölk", "grädde", "smör", "ost", "ostar", "margarin", "yoggi", "yoghurt",
-        "fil", "filmjölk", "kvarg", "ägg", "crème fraiche", "creme fraiche", "fraiche", "keso",
-        "halloumi", "norrloumi", "mozzarella", "vispgrädde", "matlagningsgrädde", "bregott", "flora",
-        "lätta", "kesella", "gräddfil", "ricotta", "feta", "vitost", "brie", "camembert",
-        "parmesan", "parmigiano", "gouda", "hushållsost", "prästost", "herrgård", "grevé", "svecia",
-        "västerbottensost", "gräddost", "havredryck", "mandeldryck", "sojadryck", "oatly", "yalla",
-        "actimel", "danonino", "skyr", "hamburgerost", "smältost", "mjukost", "skivost", "rivost",
-        "proteinshake"
     ]),
     ("Snacks & Godis", [
         "chips", "dipp", "godis", "choklad", "popcorn", "nötter", "nötblandning", "nötmix",
