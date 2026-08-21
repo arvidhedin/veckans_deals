@@ -251,12 +251,55 @@ function updateMobileFilterBadge() {
   if (mobileCount) mobileCount.textContent = `${count} valda butiker`;
 }
 
+// --- Helper for Kött & Fågel < 80 kr/kg Filter ---
+function isMeatUnder80PerKg(offer) {
+  const cat = offer.category || categorizeOfferJS(offer);
+  if (cat !== 'Kött & Fågel') return false;
+
+  const priceStr = (offer.price || '').toLowerCase();
+  const descStr = (offer.description || '').toLowerCase();
+  const origStr = (offer.original_price || '').toLowerCase();
+  const fullText = `${priceStr} ${descStr} ${origStr}`;
+
+  // 1. Direct per kg price in offer.price (e.g. "69,90/kg", "74,90 kr/kg", "46,90:-/kg")
+  if (priceStr.includes('/kg') || priceStr.includes('kr/kg')) {
+    const val = parsePriceNumeric(priceStr);
+    if (val > 0 && val <= 80) return true;
+  }
+
+  // 2. Compare price in description or text (e.g. "Jmf: 65,00 kr/kg", "Jfr 71,43 kr/kg")
+  const mJmf = fullText.match(/(?:jmf|jfr|jämförpris)?\s*:?\s*(\d+(?:[.,]\d+)?)\s*kr?\s*\/\s*kg/i);
+  if (mJmf) {
+    const val = parseFloat(mJmf[1].replace(',', '.'));
+    if (val > 0 && val <= 80) return true;
+  }
+
+  // 3. Package weight calculation (e.g. 500g for 35 kr -> 70 kr/kg)
+  const priceVal = parsePriceNumeric(priceStr);
+  if (priceVal > 0) {
+    const textForWeight = `${offer.product || ''} ${descStr}`.toLowerCase();
+    const mW = textForWeight.match(/(\d+(?:[.,]\d+)?)\s*(g|kg)\b/i);
+    if (mW) {
+      const wNum = parseFloat(mW[1].replace(',', '.'));
+      const unit = mW[2].toLowerCase();
+      const wKg = unit === 'kg' ? wNum : wNum / 1000.0;
+      if (wKg > 0) {
+        const calcPerKg = priceVal / wKg;
+        if (calcPerKg > 0 && calcPerKg <= 80) return true;
+      }
+    }
+  }
+
+  return false;
+}
+
 // Compute Category Counts based on active store filter
 function computeCategoryCounts() {
   state.categoryCounts = {};
   for (const cat of ALL_CATEGORIES) {
     state.categoryCounts[cat] = 0;
   }
+  state.categoryCounts['Kött & Fågel <80 kr/kg'] = 0;
 
   for (const offer of state.allOffers) {
     const store = (offer.store || '').trim();
@@ -268,6 +311,10 @@ function computeCategoryCounts() {
 
     const cat = offer.category || categorizeOfferJS(offer);
     state.categoryCounts[cat] = (state.categoryCounts[cat] || 0) + 1;
+
+    if (isMeatUnder80PerKg(offer)) {
+      state.categoryCounts['Kött & Fågel <80 kr/kg']++;
+    }
   }
 }
 
@@ -316,6 +363,30 @@ function renderCategoryPills() {
         }">${count}</span>
       </button>
     `;
+
+    // Render Kött & Fågel <80 kr/kg right after Kött & Fågel
+    if (cat === 'Kött & Fågel') {
+      const meatUnder80Count = state.categoryCounts['Kött & Fågel <80 kr/kg'] || 0;
+      if (meatUnder80Count > 0) {
+        const isMeatUnder80Active = state.activeCategoryPill === 'Kött & Fågel <80 kr/kg';
+        html += `
+          <button 
+            type="button" 
+            data-cat="Kött & Fågel <80 kr/kg" 
+            class="cat-pill cursor-pointer select-none px-3 py-1.5 rounded-full text-xs font-bold border transition-all duration-150 flex items-center gap-1.5 ${
+              isMeatUnder80Active
+                ? 'bg-rose-700 text-white border-rose-700 shadow-sm'
+                : 'bg-rose-50 text-rose-900 border-rose-200/90 hover:bg-rose-100 hover:border-rose-300'
+            }"
+          >
+            <span>🥩 Kött <80 kr/kg</span>
+            <span class="px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
+              isMeatUnder80Active ? 'bg-rose-900 text-rose-100' : 'bg-rose-200/80 text-rose-900'
+            }">${meatUnder80Count}</span>
+          </button>
+        `;
+      }
+    }
   }
 
   container.innerHTML = html;
@@ -474,6 +545,9 @@ function applyFilters() {
 
   // 3. Filter by Category
   result = result.filter(offer => {
+    if (state.activeCategoryPill === 'Kött & Fågel <80 kr/kg') {
+      return isMeatUnder80PerKg(offer);
+    }
     const cat = offer.category || categorizeOfferJS(offer);
     if (!state.selectedCategories.has(cat)) return false;
     if (state.activeCategoryPill !== 'all' && state.activeCategoryPill !== cat) return false;
