@@ -57,7 +57,7 @@ const state = {
   ]),
   selectedCategories: new Set(ALL_CATEGORIES),
   activeCategoryPill: 'all', // 'all' or category string
-  lidlPeriod: 'all', // 'all' | 'this-week' | 'next-week'
+  lidlPeriod: 'this-week', // 'all' | 'this-week' | 'next-week'
   searchQuery: '',
   sortBy: 'discount-desc',
   storeCounts: {},
@@ -1461,8 +1461,8 @@ function setupEventListeners() {
         if (btnClearSearch) btnClearSearch.classList.add('hidden');
       }
       state.searchQuery = '';
-      state.lidlPeriod = 'all';
-      const defaultRadio = document.querySelector('input[name="lidl-period"][value="all"]');
+      state.lidlPeriod = 'this-week';
+      const defaultRadio = document.querySelector('input[name="lidl-period"][value="this-week"]');
       if (defaultRadio) defaultRadio.checked = true;
       if (sortSelect) sortSelect.value = 'discount-desc';
       state.sortBy = 'discount-desc';
