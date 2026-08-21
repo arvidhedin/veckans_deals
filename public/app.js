@@ -411,10 +411,44 @@ function renderReferenceBox(matches, query) {
   box.classList.remove('hidden');
 }
 
+// Store shortener for card badges
+function getShortStoreName(store) {
+  if (!store) return '';
+  const s = store.trim();
+
+  const exactMap = {
+    'ICA Supermarket Torgkassen': 'ICA Torgkassen',
+    'ICA Supermarket Luthagens Livs': 'ICA Luthagens Livs',
+    'ICA Supermarket Väst': 'ICA Väst',
+    'ICA Supermarket City': 'ICA City',
+    'ICA Nära Råbyvägen': 'ICA Råbyvägen',
+    'ICA Nära Rosendal': 'ICA Rosendal',
+    'ICA Nära Hörnan': 'ICA Hörnan',
+    'ICA Folkes Livs': 'ICA Folkes',
+    'ICA Vretgränd': 'ICA Vretgränd',
+    'Hemköp (Svava)': 'Hemköp Svava',
+    'Hemköp (Rosendal)': 'Hemköp Rosendal',
+    'Coop (Centralhuset)': 'Coop Centralhuset',
+    'Coop (Liljegatan)': 'Coop Liljegatan',
+    'Willys (Björkgatan)': 'Willys',
+  };
+
+  if (exactMap[s]) {
+    return exactMap[s];
+  }
+
+  let cleaned = s
+    .replace(/^ICA\s+(Supermarket|Nära|Kvantum|Maxi)\s+/i, 'ICA ')
+    .replace(/\s*\((.*?)\)/g, ' $1');
+
+  return cleaned.trim();
+}
+
 // --- Deal Card Template Generator ---
 function createDealCardHtml(offer) {
   const store = (offer.store || 'Okänd butik').trim();
-  const storeBadgeColor = STORE_COLORS[store]?.bg || (store.toLowerCase().includes('hemköp') ? '#D31115' : '#4B5563');
+  const shortStore = getShortStoreName(store);
+  const storeBadgeColor = STORE_COLORS[store]?.bg || (store.toLowerCase().includes('ica') ? '#E21936' : (store.toLowerCase().includes('hemköp') ? '#D31115' : '#4B5563'));
   
   const discountPct = parseFloat(offer.discount_percentage) || 0;
   const pctBadgeHtml = discountPct > 0 
@@ -445,8 +479,8 @@ function createDealCardHtml(offer) {
   return `
     <div class="deal-card group bg-white rounded-xl sm:rounded-2xl border border-zinc-200/80 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-200 flex flex-col h-[280px] sm:h-[350px] md:h-[390px] relative overflow-hidden">
       <!-- Store Badge Overlay -->
-      <span class="absolute top-1.5 left-1.5 sm:top-2.5 sm:left-2.5 px-1.5 py-0.5 sm:px-2.5 sm:py-0.75 rounded text-[8px] sm:text-[10px] md:text-[11px] font-bold tracking-wide uppercase text-white shadow-sm z-10 max-w-[65px] sm:max-w-none truncate" style="background-color: ${storeBadgeColor};">
-        ${escapeHtml(store)}
+      <span class="absolute top-1.5 left-1.5 sm:top-2.5 sm:left-2.5 px-1.5 py-0.5 sm:px-2 sm:py-0.75 rounded text-[7.5px] leading-[1.1] sm:text-[10px] md:text-[11px] font-bold tracking-wide uppercase text-white shadow-sm z-10 max-w-[calc(100%-42px)] sm:max-w-none line-clamp-2 break-words text-left" style="background-color: ${storeBadgeColor};" title="${escapeHtml(store)}">
+        ${escapeHtml(shortStore)}
       </span>
 
       <!-- Discount Percentage Badge -->
