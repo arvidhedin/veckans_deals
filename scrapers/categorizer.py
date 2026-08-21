@@ -17,6 +17,29 @@ CATEGORIES = [
         "värmeljus", "rakhyvel", "ansiktsmask", "bindor", "trosskydd", "intimtvätt", "libresse",
         "batterier", "batteri", "plastfolie", "folie", "pappmugg", "hink", "mopp", "tvättlappar", "maskindisktabletter"
     ]),
+    ("Frukt & Grönt", [
+        "frukt", "grönsak", "grönsaker", "grönt", "bär", "äpple", "äpplen", "banan", "bananer",
+        "potatis", "färskpotatis", "tomat", "tomater", "gurka", "gurkor", "sallad", "lök", "morot",
+        "morötter", "majs", "majskolv", "avokado", "melon", "citron", "citroner", "apelsin", "apelsiner",
+        "druvor", "jordgubb", "hallon", "blåbär", "paprika", "vitlök", "champinjon", "svamp",
+        "clementin", "satsumas", "nektarin", "persika", "plommon", "kiwi", "kolv", "broccoli",
+        "blomkål", "spenat", "rotfrukter", "sparris", "purjolök", "ruccola", "basilika", "persilja",
+        "dill", "krasse", "selleri", "palsternacka", "rödbetor", "kål", "vitkål", "rödkål", "grönkål",
+        "lime", "ingefära", "chili", "mango", "ananas", "päron", "vindruvor", "grapefrukt",
+        "småbladsmix", "kronärtskocka", "sharon", "kaki", "granatäpple", "solrosor", "blommor",
+        "bukett", "krysantemum", "växt", "krukväxt"
+    ]),
+    ("Skafferi", [
+        "jordnötssmör", "nötssmör", "pasta", "ris", "basmati", "jasminris", "risotto", "mjöl", "socker", "olja",
+        "vinäger", "kaffe", "te", "sås", "ketchup", "senap", "konserv", "linser", "bönor", "krydda", "kryddor",
+        "buljong", "müsli", "musli", "granola", "cheerios", "frosties", "cornflakes", "havreringar",
+        "cereal", "flingor", "havregryn", "pesto", "taco", "tacos", "spaghetti", "macaroni",
+        "makaroner", "matolja", "rapsolja", "olivolja", "majonnäs", "mayo", "sylt", "marmelad",
+        "honung", "gevalia", "zoegas", "arvid nordquist", "löfbergs", "nescafé", "nesquik",
+        "nudlar", "couscous", "bulgur", "dressing", "marinad", "salsa", "tomatkross",
+        "passerade tomater", "kokosmjölk", "cornichons", "oliver", "kapris", "barnmat", "välling",
+        "gröt", "sirap", "ströbröd", "tofu", "hummus", "fond", "soja", "lasagne", "grytbas"
+    ]),
     ("Bröd & Bageri", [
         "korvbröd", "hamburgerbröd", "bröd", "kaka", "kakor", "bulle", "bullar", "tårta", "knäcke",
         "knäckebröd", "fralla", "frallor", "pita", "pitabröd", "tortilla", "toast", "croissant",
@@ -59,18 +82,6 @@ CATEGORIES = [
         "actimel", "danonino", "skyr", "hamburgerost", "smältost", "mjukost", "skivost", "rivost",
         "proteinshake"
     ]),
-    ("Frukt & Grönt", [
-        "frukt", "grönsak", "grönsaker", "grönt", "bär", "äpple", "äpplen", "banan", "bananer",
-        "potatis", "färskpotatis", "tomat", "tomater", "gurka", "gurkor", "sallad", "lök",
-        "morot", "morötter", "majs", "majskolv", "avokado", "melon", "citron", "citroner",
-        "apelsin", "apelsiner", "druvor", "jordgubb", "hallon", "blåbär", "paprika", "vitlök",
-        "champinjon", "svamp", "clementin", "satsumas", "nektarin", "persika", "plommon", "kiwi",
-        "kolv", "broccoli", "blomkål", "spenat", "rotfrukter", "sparris", "purjolök", "ruccola",
-        "basilika", "persilja", "dill", "krasse", "selleri", "palsternacka", "rödbetor", "kål",
-        "vitkål", "rödkål", "grönkål", "lime", "ingefära", "chili", "mango", "ananas",
-        "päron", "vindruvor", "grapefrukt", "småbladsmix", "kronärtskocka", "sharon", "kaki",
-        "granatäpple", "solrosor", "blommor", "bukett", "krysantemum", "växt", "krukväxt"
-    ]),
     ("Snacks & Godis", [
         "chips", "dipp", "godis", "choklad", "popcorn", "nötter", "nötblandning", "nötmix",
         "kex", "ostbågar", "ostkrokar", "lakrits", "tuggummi", "marabou", "estrella", "olw",
@@ -88,18 +99,6 @@ CATEGORIES = [
         "god morgon", "brämhults", "trocadero", "pucko", "zingo", "7up", "powerade",
         "gainomax", "proteindryck", "fun light", "nyponsoppa", "fruktdryck", "matlagningsvin",
         "peroni", "dr pepper", "pepper", "dryck", "nåbe", "aloe vera", "aloe"
-    ]),
-    ("Skafferi", [
-        "pasta", "ris", "basmati", "jasminris", "risotto", "mjöl", "socker", "olja",
-        "vinäger", "kaffe", "te", "sås", "ketchup", "senap", "konserv", "linser",
-        "bönor", "krydda", "kryddor", "buljong", "müsli", "musli", "granola", "cheerios",
-        "frosties", "cornflakes", "havreringar", "cereal", "flingor", "havregryn", "pesto",
-        "taco", "tacos", "spaghetti", "macaroni", "makaroner", "matolja", "rapsolja",
-        "olivolja", "majonnäs", "mayo", "sylt", "marmelad", "honung", "gevalia", "zoegas",
-        "arvid nordquist", "löfbergs", "nescafé", "nesquik", "nudlar", "couscous", "bulgur",
-        "dressing", "marinad", "salsa", "tomatkross", "passerade tomater", "kokosmjölk",
-        "cornichons", "oliver", "kapris", "barnmat", "välling", "gröt", "sirap", "ströbröd",
-        "tofu", "hummus", "fond", "soja", "lasagne", "grytbas"
     ])
 ]
 

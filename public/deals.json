@@ -1,6 +1,6 @@
 {
-  "updated_at": "2026-08-21T08:29:30.771165+00:00",
-  "updated_at_readable": "2026-08-21 08:29 UTC",
+  "updated_at": "2026-08-21T08:32:32.009201+00:00",
+  "updated_at_readable": "2026-08-21 08:32 UTC",
   "total_offers": 1239,
   "store_counts": {
     "ICA Nära Råbyvägen": 42,
@@ -20,16 +20,16 @@
     "Lidl": 418
   },
   "category_counts": {
-    "Dryck": 58,
-    "Frukt & Grönt": 182,
-    "Kött & Fågel": 194,
-    "Mejeri & Ägg": 148,
-    "Skafferi": 149,
-    "Snacks & Godis": 47,
-    "Frys & Färdigmat": 72,
+    "Skafferi": 317,
+    "Frukt & Grönt": 209,
+    "Kött & Fågel": 148,
+    "Frys & Färdigmat": 50,
     "Hushåll & Hygien": 136,
-    "Bröd & Bageri": 100,
-    "Fisk & Skaldjur": 18,
+    "Mejeri & Ägg": 85,
+    "Bröd & Bageri": 79,
+    "Snacks & Godis": 31,
+    "Dryck": 33,
+    "Fisk & Skaldjur": 16,
     "Övrigt": 135
   },
   "offers": [
@@ -41,7 +41,7 @@
       "discount": "GENERAL",
       "description": "310g",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042001454_C1N0_s01",
-      "category": "Kött & Fågel",
+      "category": "Frukt & Grönt",
       "restriction": "",
       "original_price": "18,95 kr",
       "discount_percentage": 68
@@ -80,7 +80,7 @@
       "discount": "GENERAL",
       "description": "310g",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042001454_C1N0_s01",
-      "category": "Kött & Fågel",
+      "category": "Frukt & Grönt",
       "restriction": "",
       "original_price": "16,95 kr",
       "discount_percentage": 65
@@ -106,7 +106,7 @@
       "discount": "LOYALTY",
       "description": "900g",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042002536_C1L1_s02",
-      "category": "Kött & Fågel",
+      "category": "Frukt & Grönt",
       "restriction": "",
       "original_price": "27,50 kr",
       "discount_percentage": 64
@@ -223,7 +223,7 @@
       "discount": "LOYALTY",
       "description": "900g",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042002536_C1L1_s02",
-      "category": "Kött & Fågel",
+      "category": "Frukt & Grönt",
       "restriction": "",
       "original_price": "24,95 kr",
       "discount_percentage": 60
@@ -314,7 +314,7 @@
       "discount": "Ord.pris 24,05 kr",
       "description": "500g",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/8076809585194.jpg",
-      "category": "Snacks & Godis",
+      "category": "Skafferi",
       "restriction": "Max 4 köp/hushåll",
       "original_price": "24,05 kr",
       "discount_percentage": 54
@@ -574,7 +574,7 @@
       "discount": "Ord.pris 15,99 kr",
       "description": "150 cl",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7310401000091.jpg",
-      "category": "Dryck",
+      "category": "Skafferi",
       "restriction": "Max 1 köp/hushåll",
       "original_price": "15,99 kr",
       "discount_percentage": 48
@@ -626,7 +626,7 @@
       "discount": "Ord.pris 13,15 kr",
       "description": "56 g",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7040110663200.jpg",
-      "category": "Snacks & Godis",
+      "category": "Skafferi",
       "restriction": "Max 1 köp/hushåll",
       "original_price": "13,15 kr",
       "discount_percentage": 47
@@ -808,7 +808,7 @@
       "discount": "Lidl Plus",
       "description": "",
       "image_url": "https://www.lidl.se/assets/gcpcef7180d18b94fa188ec405e2b4c210b.png",
-      "category": "Kött & Fågel",
+      "category": "Frukt & Grönt",
       "restriction": "I butik 24/08 - 30/08",
       "original_price": "",
       "discount_percentage": 46
@@ -886,7 +886,7 @@
       "discount": "Ord.pris 15,04 kr",
       "description": "250 g",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690038559.jpg",
-      "category": "Mejeri & Ägg",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "15,04 kr",
       "discount_percentage": 45
@@ -1016,7 +1016,7 @@
       "discount": "Ord.pris 18,01 kr",
       "description": "125 Gra",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690518747.jpg",
-      "category": "Bröd & Bageri",
+      "category": "Frukt & Grönt",
       "restriction": "Max 4 köp/hushåll",
       "original_price": "18,01 kr",
       "discount_percentage": 44
@@ -1250,7 +1250,7 @@
       "discount": "LOYALTY",
       "description": "1,5l",
       "image_url": "https://res.cloudinary.com/willys-eu/image/upload/w_198,h_198,c_fill,f_auto,q_auto/v1/promotionImagesWillys/26969638469662",
-      "category": "Dryck",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "19,40 kr",
       "discount_percentage": 43
@@ -1393,7 +1393,7 @@
       "discount": "GENERAL",
       "description": "1l",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083427299_C1L1_s04",
-      "category": "Mejeri & Ägg",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "13,74 kr",
       "discount_percentage": 42
@@ -1445,7 +1445,7 @@
       "discount": "Ord.pris 14,14 kr",
       "description": "400 ml",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690029700.jpg",
-      "category": "Mejeri & Ägg",
+      "category": "Skafferi",
       "restriction": "Max 1 köp/hushåll",
       "original_price": "14,14 kr",
       "discount_percentage": 41
@@ -1536,7 +1536,7 @@
       "discount": "Ord.pris 14,14 kr",
       "description": "400 ml",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690029700.jpg",
-      "category": "Mejeri & Ägg",
+      "category": "Skafferi",
       "restriction": "Max 1 köp/hushåll",
       "original_price": "14,14 kr",
       "discount_percentage": 41
@@ -1549,7 +1549,7 @@
       "discount": "Ord.pris 14,10-16,88 kr",
       "description": "400 ml",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690029700.jpg",
-      "category": "Mejeri & Ägg",
+      "category": "Skafferi",
       "restriction": "Max 1 köp/hushåll",
       "original_price": "14,10-16,88 kr",
       "discount_percentage": 41
@@ -1588,7 +1588,7 @@
       "discount": "Ord.pris 14,10-16,94 kr",
       "description": "400 ml",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690029700.jpg",
-      "category": "Mejeri & Ägg",
+      "category": "Skafferi",
       "restriction": "Max 1 köp/hushåll",
       "original_price": "14,10-16,94 kr",
       "discount_percentage": 41
@@ -1848,7 +1848,7 @@
       "discount": "GENERAL",
       "description": "1l",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083427299_C1L1_s04",
-      "category": "Mejeri & Ägg",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "13,32 kr",
       "discount_percentage": 40
@@ -1874,7 +1874,7 @@
       "discount": "Ord.pris 13,72-14,14 kr",
       "description": "400 ml",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690029700.jpg",
-      "category": "Mejeri & Ägg",
+      "category": "Skafferi",
       "restriction": "Max 1 köp/hushåll",
       "original_price": "13,72-14,14 kr",
       "discount_percentage": 39
@@ -2173,7 +2173,7 @@
       "discount": "Ord.pris 13,20 kr",
       "description": "400 ml",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690029700.jpg",
-      "category": "Mejeri & Ägg",
+      "category": "Skafferi",
       "restriction": "Max 1 köp/hushåll",
       "original_price": "13,20 kr",
       "discount_percentage": 37
@@ -2316,7 +2316,7 @@
       "discount": "LOYALTY",
       "description": "450g",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043024964_C1L1_s01",
-      "category": "Bröd & Bageri",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "18,88 kr",
       "discount_percentage": 36
@@ -2342,7 +2342,7 @@
       "discount": "LOYALTY",
       "description": "450g",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043024964_C1L1_s01",
-      "category": "Bröd & Bageri",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "18,88 kr",
       "discount_percentage": 36
@@ -2407,7 +2407,7 @@
       "discount": "Ord.pris 12,77-13,20 kr",
       "description": "150 cl",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7310401000091.jpg",
-      "category": "Dryck",
+      "category": "Skafferi",
       "restriction": "Max 1 köp/hushåll",
       "original_price": "12,77-13,20 kr",
       "discount_percentage": 35
@@ -2433,7 +2433,7 @@
       "discount": "Ord.pris 12,77-13,20 kr",
       "description": "150 cl",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7310401000091.jpg",
-      "category": "Dryck",
+      "category": "Skafferi",
       "restriction": "Max 1 köp/hushåll",
       "original_price": "12,77-13,20 kr",
       "discount_percentage": 35
@@ -2459,7 +2459,7 @@
       "discount": "Ord.pris 12,77-13,15 kr",
       "description": "150 cl",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7310401000091.jpg",
-      "category": "Dryck",
+      "category": "Skafferi",
       "restriction": "Max 1 köp/hushåll",
       "original_price": "12,77-13,15 kr",
       "discount_percentage": 35
@@ -2498,7 +2498,7 @@
       "discount": "Ord.pris 12,64-13,15 kr",
       "description": "400 ml",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690029700.jpg",
-      "category": "Mejeri & Ägg",
+      "category": "Skafferi",
       "restriction": "Max 1 köp/hushåll",
       "original_price": "12,64-13,15 kr",
       "discount_percentage": 34
@@ -2576,7 +2576,7 @@
       "discount": "Ord.pris 18,96 kr",
       "description": "125-130 g",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690497967.jpg",
-      "category": "Bröd & Bageri",
+      "category": "Frukt & Grönt",
       "restriction": "",
       "original_price": "18,96 kr",
       "discount_percentage": 34
@@ -2589,7 +2589,7 @@
       "discount": "Ord.pris 18,80 kr",
       "description": "45 g",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690519089.jpg",
-      "category": "Snacks & Godis",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "18,80 kr",
       "discount_percentage": 34
@@ -2628,7 +2628,7 @@
       "discount": "Ord.pris 12,64-15,90 kr",
       "description": "400 ml",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690029700.jpg",
-      "category": "Mejeri & Ägg",
+      "category": "Skafferi",
       "restriction": "Max 1 köp/hushåll",
       "original_price": "12,64-15,90 kr",
       "discount_percentage": 34
@@ -2693,7 +2693,7 @@
       "discount": "Ord.pris 12,57-12,77 kr",
       "description": "400 ml",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690029700.jpg",
-      "category": "Mejeri & Ägg",
+      "category": "Skafferi",
       "restriction": "Max 1 köp/hushåll",
       "original_price": "12,57-12,77 kr",
       "discount_percentage": 34
@@ -2797,7 +2797,7 @@
       "discount": "GENERAL",
       "description": "200g",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042016342_C1N1_s01",
-      "category": "Fisk & Skaldjur",
+      "category": "Frukt & Grönt",
       "restriction": "",
       "original_price": "14,90 kr",
       "discount_percentage": 34
@@ -2979,7 +2979,7 @@
       "discount": "Ord.pris 37,41 kr",
       "description": "800 g",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690488040.jpg",
-      "category": "Bröd & Bageri",
+      "category": "Frukt & Grönt",
       "restriction": "",
       "original_price": "37,41 kr",
       "discount_percentage": 33
@@ -3148,7 +3148,7 @@
       "discount": "Ord.pris 12,20-12,25 kr",
       "description": "150 cl",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7310401000091.jpg",
-      "category": "Dryck",
+      "category": "Skafferi",
       "restriction": "Max 1 köp/hushåll",
       "original_price": "12,20-12,25 kr",
       "discount_percentage": 32
@@ -3174,7 +3174,7 @@
       "discount": "Ord.pris 12,20 kr",
       "description": "150 cl",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7310401000091.jpg",
-      "category": "Dryck",
+      "category": "Skafferi",
       "restriction": "Max 1 köp/hushåll",
       "original_price": "12,20 kr",
       "discount_percentage": 32
@@ -3213,7 +3213,7 @@
       "discount": "Ord.pris 12,25 kr",
       "description": "200 g",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690520900.jpg",
-      "category": "Frys & Färdigmat",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "12,25 kr",
       "discount_percentage": 32
@@ -3226,7 +3226,7 @@
       "discount": "Ord.pris 12,20-13,15 kr",
       "description": "150 cl",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7310401000091.jpg",
-      "category": "Dryck",
+      "category": "Skafferi",
       "restriction": "Max 1 köp/hushåll",
       "original_price": "12,20-13,15 kr",
       "discount_percentage": 32
@@ -3252,7 +3252,7 @@
       "discount": "Ord.pris 58,58 kr",
       "description": "3x2kg",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7310130009297.jpg",
-      "category": "Dryck",
+      "category": "Skafferi",
       "restriction": "Max 4 köp/hushåll",
       "original_price": "58,58 kr",
       "discount_percentage": 32
@@ -3304,7 +3304,7 @@
       "discount": "Ord.pris 12,20 kr",
       "description": "250 g",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690038559.jpg",
-      "category": "Mejeri & Ägg",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "12,20 kr",
       "discount_percentage": 32
@@ -3447,7 +3447,7 @@
       "discount": "Ord.pris 28,37-30,95 kr",
       "description": "1000 g",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7310861012429.jpg",
-      "category": "Mejeri & Ägg",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "28,37-30,95 kr",
       "discount_percentage": 31
@@ -3486,7 +3486,7 @@
       "discount": "Ord.pris 36,20 kr",
       "description": "350 g",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690522751.jpg",
-      "category": "Kött & Fågel",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "36,20 kr",
       "discount_percentage": 31
@@ -3512,7 +3512,7 @@
       "discount": "Ord.pris 28,37-31,28 kr",
       "description": "1000 g",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7310861012429.jpg",
-      "category": "Mejeri & Ägg",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "28,37-31,28 kr",
       "discount_percentage": 31
@@ -3538,7 +3538,7 @@
       "discount": "Ord.pris 28,37-31,13 kr",
       "description": "1000 g",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7310861012429.jpg",
-      "category": "Mejeri & Ägg",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "28,37-31,13 kr",
       "discount_percentage": 31
@@ -3564,7 +3564,7 @@
       "discount": "Ord.pris 28,37-30,94 kr",
       "description": "1000 g",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7310861012429.jpg",
-      "category": "Mejeri & Ägg",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "28,37-30,94 kr",
       "discount_percentage": 31
@@ -3668,7 +3668,7 @@
       "discount": "Ord.pris 27,81-30,95 kr",
       "description": "1000 g",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7310861012429.jpg",
-      "category": "Mejeri & Ägg",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "27,81-30,95 kr",
       "discount_percentage": 30
@@ -3746,7 +3746,7 @@
       "discount": "Ord.pris 11,90 kr",
       "description": "250 g",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690038559.jpg",
-      "category": "Mejeri & Ägg",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "11,90 kr",
       "discount_percentage": 30
@@ -3798,7 +3798,7 @@
       "discount": "Ord.pris 11,83-12,25 kr",
       "description": "150 cl",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7310401000091.jpg",
-      "category": "Dryck",
+      "category": "Skafferi",
       "restriction": "Max 1 köp/hushåll",
       "original_price": "11,83-12,25 kr",
       "discount_percentage": 30
@@ -3993,7 +3993,7 @@
       "discount": "Ord.pris 91,29 kr",
       "description": "Ca 1000 g",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/2319124000000.jpg",
-      "category": "Kött & Fågel",
+      "category": "Skafferi",
       "restriction": "Max 2 köp/hushåll",
       "original_price": "91,29 kr",
       "discount_percentage": 29
@@ -4123,7 +4123,7 @@
       "discount": "GENERAL",
       "description": "190-250g",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/04062300122284_C1N1_s03",
-      "category": "Snacks & Godis",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "19,90 kr",
       "discount_percentage": 29
@@ -4149,7 +4149,7 @@
       "discount": "GENERAL",
       "description": "15-50g",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042015888_C1N1_s03",
-      "category": "Kött & Fågel",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "13,90 kr",
       "discount_percentage": 29
@@ -4240,7 +4240,7 @@
       "discount": "Ord.pris 20-22,71 kr",
       "description": "",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690051640.jpg",
-      "category": "Kött & Fågel",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "20-22,71 kr",
       "discount_percentage": 28
@@ -4292,7 +4292,7 @@
       "discount": "Ord.pris 20,59 kr",
       "description": "250ml",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7350028548903.jpg",
-      "category": "Dryck",
+      "category": "Skafferi",
       "restriction": "Max 4 köp/hushåll",
       "original_price": "20,59 kr",
       "discount_percentage": 28
@@ -4305,7 +4305,7 @@
       "discount": "Ord.pris 11,59 kr",
       "description": "250 g",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690038559.jpg",
-      "category": "Mejeri & Ägg",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "11,59 kr",
       "discount_percentage": 28
@@ -4357,7 +4357,7 @@
       "discount": "Ord.pris 17,30 kr",
       "description": "20 g",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690518891.jpg",
-      "category": "Kött & Fågel",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "17,30 kr",
       "discount_percentage": 28
@@ -4500,7 +4500,7 @@
       "discount": "Ord.pris 15,04-25,45 kr",
       "description": "320 g, 200 g, 230 g, 185 g",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7311312002075.jpg",
-      "category": "Bröd & Bageri",
+      "category": "Skafferi",
       "restriction": "Max 1 köp/hushåll",
       "original_price": "15,04-25,45 kr",
       "discount_percentage": 27
@@ -4565,7 +4565,7 @@
       "discount": "Ord.pris 15,09 kr",
       "description": "1 liter",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690041443.jpg",
-      "category": "Dryck",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "15,09 kr",
       "discount_percentage": 27
@@ -4604,7 +4604,7 @@
       "discount": "Ord.pris 89,50 kr",
       "description": "Ca 1000 g",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/2319124000000.jpg",
-      "category": "Kött & Fågel",
+      "category": "Skafferi",
       "restriction": "Max 2 köp/hushåll",
       "original_price": "89,50 kr",
       "discount_percentage": 27
@@ -4617,7 +4617,7 @@
       "discount": "Ord.pris 15,09-24,13 kr",
       "description": "320 g, 200 g, 230 g, 185 g",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7311312002075.jpg",
-      "category": "Bröd & Bageri",
+      "category": "Skafferi",
       "restriction": "Max 1 köp/hushåll",
       "original_price": "15,09-24,13 kr",
       "discount_percentage": 27
@@ -4825,7 +4825,7 @@
       "discount": "Lidl Plus",
       "description": "200 g",
       "image_url": "https://www.lidl.se/assets/gcpd777fc8af54646c7a2229216ffae6d90.png",
-      "category": "Kött & Fågel",
+      "category": "Skafferi",
       "restriction": "I butik 17/08 - 23/08",
       "original_price": "",
       "discount_percentage": 27
@@ -4851,7 +4851,7 @@
       "discount": "Ord.pris 16,87 kr",
       "description": "25 g",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7310350118595.jpg",
-      "category": "Snacks & Godis",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "16,87 kr",
       "discount_percentage": 26
@@ -4903,7 +4903,7 @@
       "discount": "Ord.pris 11,26 kr",
       "description": "250 g",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690038559.jpg",
-      "category": "Mejeri & Ägg",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "11,26 kr",
       "discount_percentage": 26
@@ -4955,7 +4955,7 @@
       "discount": "Ord.pris 16,94-17,93 kr",
       "description": "25 g",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7310350118595.jpg",
-      "category": "Snacks & Godis",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "16,94-17,93 kr",
       "discount_percentage": 26
@@ -4968,7 +4968,7 @@
       "discount": "Ord.pris 47,27-61,46 kr",
       "description": "1,75-2 liter",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7310867561006.jpg",
-      "category": "Dryck",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "47,27-61,46 kr",
       "discount_percentage": 26
@@ -5020,7 +5020,7 @@
       "discount": "Ord.pris 16,94 kr",
       "description": "25 g",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7310350118595.jpg",
-      "category": "Snacks & Godis",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "16,94 kr",
       "discount_percentage": 26
@@ -5085,7 +5085,7 @@
       "discount": "Ord.pris 47,27-59,62 kr",
       "description": "1,75-2 liter",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7310867561006.jpg",
-      "category": "Dryck",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "47,27-59,62 kr",
       "discount_percentage": 26
@@ -5098,7 +5098,7 @@
       "discount": "LOYALTY",
       "description": "900g",
       "image_url": "https://www.willys.se/medias/axfood-300-Garant-Vetekaka-Ra-gkaka-SFMC.jpg?context=bWFzdGVyfGltYWdlc3w3ODIxfGltYWdlL2pwZWd8YzNsekxXMWhjM1JsY2k5cGJXRm5aWE12YURRM0wyaG1ZUzh4TmpRNE56UXpNVGsyTWpZMU5DOWhlR1p2YjJSZk16QXdYMGRoY21GdWRDQldaWFJsYTJGcllTQlNZY3lLWjJ0aGEyRWdVMFpOUXk1cWNHY3w4ZDZkM2RkZTk2MzVlMGQ2NDM0OTJmMTcwMmE5ZTUxYmE0MzM3M2I1NTU2NDBhZDU0ZmUyODQ5NDU2MTg3MTg5",
-      "category": "Bröd & Bageri",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "26,90 kr",
       "discount_percentage": 26
@@ -5137,7 +5137,7 @@
       "discount": "Ord.pris 11,15 kr",
       "description": "250 g",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690038559.jpg",
-      "category": "Mejeri & Ägg",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "11,15 kr",
       "discount_percentage": 25
@@ -5163,7 +5163,7 @@
       "discount": "Ord.pris 46,89-49,21 kr",
       "description": "360 -380 g",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7310240076806.jpg",
-      "category": "Frys & Färdigmat",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "46,89-49,21 kr",
       "discount_percentage": 25
@@ -5267,7 +5267,7 @@
       "discount": "Ord.pris 25,45 kr",
       "description": "1,5 liter",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7310865085733.jpg",
-      "category": "Mejeri & Ägg",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "25,45 kr",
       "discount_percentage": 25
@@ -5280,7 +5280,7 @@
       "discount": "Ord.pris 11,15-13,15 kr",
       "description": "150 cl",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7310401000091.jpg",
-      "category": "Dryck",
+      "category": "Skafferi",
       "restriction": "Max 1 köp/hushåll",
       "original_price": "11,15-13,15 kr",
       "discount_percentage": 25
@@ -5553,7 +5553,7 @@
       "discount": "Lidl Plus",
       "description": "500 g",
       "image_url": "https://www.lidl.se/assets/gcp97de072f88ca48d9b7e4d15e1031f5c1.png",
-      "category": "Mejeri & Ägg",
+      "category": "Skafferi",
       "restriction": "I butik 24/08 - 30/08",
       "original_price": "",
       "discount_percentage": 25
@@ -5683,7 +5683,7 @@
       "discount": "Ord.pris 30,19 kr",
       "description": "1l",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7316110001978.jpg",
-      "category": "Dryck",
+      "category": "Skafferi",
       "restriction": "Max 4 köp/hushåll",
       "original_price": "30,19 kr",
       "discount_percentage": 24
@@ -5722,7 +5722,7 @@
       "discount": "Ord.pris 16,49 kr",
       "description": "25 g",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7310350118595.jpg",
-      "category": "Snacks & Godis",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "16,49 kr",
       "discount_percentage": 24
@@ -5943,7 +5943,7 @@
       "discount": "Ord.pris 55,28-63,40 kr",
       "description": "480-490 g",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7310500186641.jpg",
-      "category": "Frys & Färdigmat",
+      "category": "Skafferi",
       "restriction": "Max 1 köp/hushåll",
       "original_price": "55,28-63,40 kr",
       "discount_percentage": 23
@@ -6047,7 +6047,7 @@
       "discount": "Ord.pris 54,84-61,51 kr",
       "description": "480-490 g",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7310500186641.jpg",
-      "category": "Frys & Färdigmat",
+      "category": "Skafferi",
       "restriction": "Max 1 köp/hushåll",
       "original_price": "54,84-61,51 kr",
       "discount_percentage": 23
@@ -6073,7 +6073,7 @@
       "discount": "Ord.pris 18,83-19,93 kr",
       "description": "",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690051640.jpg",
-      "category": "Kött & Fågel",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "18,83-19,93 kr",
       "discount_percentage": 23
@@ -6086,7 +6086,7 @@
       "discount": "Ord.pris 10,84 kr",
       "description": "250 g",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690038559.jpg",
-      "category": "Mejeri & Ägg",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "10,84 kr",
       "discount_percentage": 23
@@ -6138,7 +6138,7 @@
       "discount": "GENERAL",
       "description": "150-185g",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07350115944168_C1N1_s01",
-      "category": "Snacks & Godis",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "22,61 kr",
       "discount_percentage": 23
@@ -6229,7 +6229,7 @@
       "discount": "Ord.pris 16,04 kr",
       "description": "20 g",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690518891.jpg",
-      "category": "Kött & Fågel",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "16,04 kr",
       "discount_percentage": 22
@@ -6255,7 +6255,7 @@
       "discount": "Ord.pris 21,29-21,67 kr",
       "description": "1,5 liter",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/5449000050212.jpg",
-      "category": "Dryck",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "21,29-21,67 kr",
       "discount_percentage": 22
@@ -6294,7 +6294,7 @@
       "discount": "Ord.pris 15,99-17,30 kr",
       "description": "20 g",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690518891.jpg",
-      "category": "Kött & Fågel",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "15,99-17,30 kr",
       "discount_percentage": 22
@@ -6320,7 +6320,7 @@
       "discount": "Ord.pris 38,40 kr",
       "description": "1,25kg",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7310240060157.jpg",
-      "category": "Frys & Färdigmat",
+      "category": "Skafferi",
       "restriction": "Max 4 köp/hushåll",
       "original_price": "38,40 kr",
       "discount_percentage": 22
@@ -6333,7 +6333,7 @@
       "discount": "Ord.pris 15,99-18,88 kr",
       "description": "20 g",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690518891.jpg",
-      "category": "Kött & Fågel",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "15,99-18,88 kr",
       "discount_percentage": 22
@@ -6372,7 +6372,7 @@
       "discount": "Ord.pris 28,29-38,70 kr",
       "description": "500 ml",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7311870652194.jpg",
-      "category": "Mejeri & Ägg",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "28,29-38,70 kr",
       "discount_percentage": 22
@@ -6385,7 +6385,7 @@
       "discount": "Ord.pris 15,99 kr",
       "description": "20 g",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690518891.jpg",
-      "category": "Kött & Fågel",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "15,99 kr",
       "discount_percentage": 22
@@ -6606,7 +6606,7 @@
       "discount": "Ord.pris 15,92 kr",
       "description": "25 g",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7310350118595.jpg",
-      "category": "Snacks & Godis",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "15,92 kr",
       "discount_percentage": 21
@@ -6931,7 +6931,7 @@
       "discount": "Ord.pris 93,69-103,15 kr",
       "description": "1000 g, 1400 g",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7310960608318.jpg",
-      "category": "Frys & Färdigmat",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "93,69-103,15 kr",
       "discount_percentage": 20
@@ -6970,7 +6970,7 @@
       "discount": "Ord.pris 20,72-20,77 kr",
       "description": "1,5 liter",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/5449000050212.jpg",
-      "category": "Dryck",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "20,72-20,77 kr",
       "discount_percentage": 20
@@ -6983,7 +6983,7 @@
       "discount": "Ord.pris 44-45,37 kr",
       "description": "360 -380 g",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7310240076806.jpg",
-      "category": "Frys & Färdigmat",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "44-45,37 kr",
       "discount_percentage": 20
@@ -7399,7 +7399,7 @@
       "discount": "Lidl Plus",
       "description": "450 g",
       "image_url": "https://www.lidl.se/assets/gcp1144c90447024e3aa8d2ec1e6100f030.png",
-      "category": "Mejeri & Ägg",
+      "category": "Skafferi",
       "restriction": "I butik 17/08 - 23/08",
       "original_price": "",
       "discount_percentage": 19
@@ -7425,7 +7425,7 @@
       "discount": "Ord.pris 23,09 kr",
       "description": "1,5 liter",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7310865085733.jpg",
-      "category": "Mejeri & Ägg",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "23,09 kr",
       "discount_percentage": 18
@@ -7438,7 +7438,7 @@
       "discount": "Ord.pris 26,71-38,75 kr",
       "description": "500 ml",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7311870652194.jpg",
-      "category": "Mejeri & Ägg",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "26,71-38,75 kr",
       "discount_percentage": 18
@@ -7477,7 +7477,7 @@
       "discount": "Ord.pris 42,49-51,01 kr",
       "description": "1,75-2 liter",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7310867561006.jpg",
-      "category": "Dryck",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "42,49-51,01 kr",
       "discount_percentage": 18
@@ -7490,7 +7490,7 @@
       "discount": "Ord.pris 23,09 kr",
       "description": "1,5 liter",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7310865085733.jpg",
-      "category": "Mejeri & Ägg",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "23,09 kr",
       "discount_percentage": 18
@@ -7568,7 +7568,7 @@
       "discount": "Ord.pris 22,95 kr",
       "description": "1,5 liter",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7310865085733.jpg",
-      "category": "Mejeri & Ägg",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "22,95 kr",
       "discount_percentage": 17
@@ -7581,7 +7581,7 @@
       "discount": "Ord.pris 22,95 kr",
       "description": "1,5 liter",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7310865085733.jpg",
-      "category": "Mejeri & Ägg",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "22,95 kr",
       "discount_percentage": 17
@@ -7594,7 +7594,7 @@
       "discount": "Ord.pris 26,45-37,80 kr",
       "description": "500 ml",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7311870652194.jpg",
-      "category": "Mejeri & Ägg",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "26,45-37,80 kr",
       "discount_percentage": 17
@@ -7607,7 +7607,7 @@
       "discount": "Ord.pris 12,06-14,13 kr",
       "description": "500 g",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690512127.jpg",
-      "category": "Kött & Fågel",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "12,06-14,13 kr",
       "discount_percentage": 17
@@ -7620,7 +7620,7 @@
       "discount": "Ord.pris 89,90-91,80 kr",
       "description": "1000 g, 1400 g",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7310960608318.jpg",
-      "category": "Frys & Färdigmat",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "89,90-91,80 kr",
       "discount_percentage": 17
@@ -7646,7 +7646,7 @@
       "discount": "Ord.pris 26,49-38,18 kr",
       "description": "500 ml",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7311870652194.jpg",
-      "category": "Mejeri & Ägg",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "26,49-38,18 kr",
       "discount_percentage": 17
@@ -7815,7 +7815,7 @@
       "discount": "GENERAL",
       "description": "450-620g",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/05059319023229_C1L1_s01",
-      "category": "Mejeri & Ägg",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "60,52 kr",
       "discount_percentage": 17
@@ -7841,7 +7841,7 @@
       "discount": "Ord.pris 17,88-24,51 kr",
       "description": "1 liter",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7394376616105.jpg",
-      "category": "Mejeri & Ägg",
+      "category": "Skafferi",
       "restriction": "Max 1 köp/hushåll",
       "original_price": "17,88-24,51 kr",
       "discount_percentage": 16
@@ -7854,7 +7854,7 @@
       "discount": "Ord.pris 41,59-51,05 kr",
       "description": "1,75-2 liter",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7310867561006.jpg",
-      "category": "Dryck",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "41,59-51,05 kr",
       "discount_percentage": 16
@@ -7984,7 +7984,7 @@
       "discount": "GENERAL",
       "description": "324g",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311379536292_C1L1_s04",
-      "category": "Bröd & Bageri",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "20,90 kr",
       "discount_percentage": 16
@@ -8010,7 +8010,7 @@
       "discount": "GENERAL",
       "description": "670/360g",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07340062803892_C1C1_s01",
-      "category": "Mejeri & Ägg",
+      "category": "Frukt & Grönt",
       "restriction": "",
       "original_price": "23,56 kr",
       "discount_percentage": 16
@@ -8049,7 +8049,7 @@
       "discount": "GENERAL",
       "description": "335ml",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07350126089032_C1N1_s01",
-      "category": "Frys & Färdigmat",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "27,35 kr",
       "discount_percentage": 16
@@ -8088,7 +8088,7 @@
       "discount": "GENERAL",
       "description": "1l",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083444715_C1L1_s07",
-      "category": "Mejeri & Ägg",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "18,88 kr",
       "discount_percentage": 16
@@ -8101,7 +8101,7 @@
       "discount": "GENERAL",
       "description": "450-620g",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/05059319023229_C1L1_s01",
-      "category": "Mejeri & Ägg",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "59,57 kr",
       "discount_percentage": 16
@@ -8127,7 +8127,7 @@
       "discount": "Ord.pris 25,99 kr",
       "description": "500 ml",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7311870652194.jpg",
-      "category": "Mejeri & Ägg",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "25,99 kr",
       "discount_percentage": 15
@@ -8192,7 +8192,7 @@
       "discount": "GENERAL",
       "description": "330ml",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/04002971341904_C1C1_s01",
-      "category": "Dryck",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "18,83 kr",
       "discount_percentage": 15
@@ -8348,7 +8348,7 @@
       "discount": "LOYALTY",
       "description": "480-490g",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07035119999269_C1N1_s02",
-      "category": "Frys & Färdigmat",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "58,75 kr",
       "discount_percentage": 15
@@ -8374,7 +8374,7 @@
       "discount": "Ord.pris 40,64-49,21 kr",
       "description": "1,75-2 liter",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7310867561006.jpg",
-      "category": "Dryck",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "40,64-49,21 kr",
       "discount_percentage": 14
@@ -8387,7 +8387,7 @@
       "discount": "Ord.pris 9,73 kr",
       "description": "250 g",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690038559.jpg",
-      "category": "Mejeri & Ägg",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "9,73 kr",
       "discount_percentage": 14
@@ -8400,7 +8400,7 @@
       "discount": "Ord.pris 9,64 kr",
       "description": "250 g",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690038559.jpg",
-      "category": "Mejeri & Ägg",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "9,64 kr",
       "discount_percentage": 14
@@ -8426,7 +8426,7 @@
       "discount": "Ord.pris 17,50-22,66 kr",
       "description": "1 liter",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7394376616105.jpg",
-      "category": "Mejeri & Ägg",
+      "category": "Skafferi",
       "restriction": "Max 1 köp/hushåll",
       "original_price": "17,50-22,66 kr",
       "discount_percentage": 14
@@ -8491,7 +8491,7 @@
       "discount": "GENERAL",
       "description": "1l",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07394376616037_C1R1_s04",
-      "category": "Mejeri & Ägg",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "17,50 kr",
       "discount_percentage": 14
@@ -8608,7 +8608,7 @@
       "discount": "GENERAL",
       "description": "370-400g",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07393914000147_C1N1_s01",
-      "category": "Frys & Färdigmat",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "69,98 kr",
       "discount_percentage": 14
@@ -8699,7 +8699,7 @@
       "discount": "GENERAL",
       "description": "500ml",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083458064_C1N1_s03",
-      "category": "Mejeri & Ägg",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "21,67 kr",
       "discount_percentage": 13
@@ -8803,7 +8803,7 @@
       "discount": "GENERAL",
       "description": "300g",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07300300054301_C1N1_s01",
-      "category": "Kött & Fågel",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "43,43 kr",
       "discount_percentage": 13
@@ -8855,7 +8855,7 @@
       "discount": "GENERAL",
       "description": "400g",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07611612142595_C1N1_s02",
-      "category": "Frys & Färdigmat",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "15,90 kr",
       "discount_percentage": 13
@@ -8868,7 +8868,7 @@
       "discount": "GENERAL",
       "description": "25g",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/00000050818907_C1C1_s01",
-      "category": "Snacks & Godis",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "11,50 kr",
       "discount_percentage": 13
@@ -8881,7 +8881,7 @@
       "discount": "GENERAL",
       "description": "75-100g",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/04000417700001_C1N1_s01",
-      "category": "Bröd & Bageri",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "22,90 kr",
       "discount_percentage": 13
@@ -8946,7 +8946,7 @@
       "discount": "LOYALTY",
       "description": "480-490g",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07035119999269_C1N1_s02",
-      "category": "Frys & Färdigmat",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "57,55 kr",
       "discount_percentage": 13
@@ -9037,7 +9037,7 @@
       "discount": "GENERAL",
       "description": "400g",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043012527_C1N1_s01",
-      "category": "Kött & Fågel",
+      "category": "Frukt & Grönt",
       "restriction": "",
       "original_price": "56,68 kr",
       "discount_percentage": 12
@@ -9089,7 +9089,7 @@
       "discount": "GENERAL",
       "description": "150-200g",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310941801301_C1L1_s01",
-      "category": "Kött & Fågel",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "12,50 kr",
       "discount_percentage": 12
@@ -9258,7 +9258,7 @@
       "discount": "GENERAL",
       "description": "370-400g",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07393914000147_C1N1_s01",
-      "category": "Frys & Färdigmat",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "68,09 kr",
       "discount_percentage": 12
@@ -9336,7 +9336,7 @@
       "discount": "GENERAL",
       "description": "125g",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07350028546411_C1N1_s03",
-      "category": "Bröd & Bageri",
+      "category": "Frukt & Grönt",
       "restriction": "",
       "original_price": "16,90 kr",
       "discount_percentage": 11
@@ -9596,7 +9596,7 @@
       "discount": "GENERAL",
       "description": "1l",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083444715_C1L1_s07",
-      "category": "Mejeri & Ägg",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "17,93 kr",
       "discount_percentage": 11
@@ -9648,7 +9648,7 @@
       "discount": "GENERAL",
       "description": "350g",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/00000080177173_C1L1_s01",
-      "category": "Snacks & Godis",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "37,76 kr",
       "discount_percentage": 10
@@ -9791,7 +9791,7 @@
       "discount": "GENERAL",
       "description": "500g",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/05711953068881_C1N1_s04",
-      "category": "Mejeri & Ägg",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "19,90 kr",
       "discount_percentage": 10
@@ -9869,7 +9869,7 @@
       "discount": "GENERAL",
       "description": "420g",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07314871981003_C1L1_s01",
-      "category": "Bröd & Bageri",
+      "category": "Frukt & Grönt",
       "restriction": "",
       "original_price": "31,18 kr",
       "discount_percentage": 10
@@ -9882,7 +9882,7 @@
       "discount": "GENERAL",
       "description": "420g",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07314871981003_C1L1_s01",
-      "category": "Bröd & Bageri",
+      "category": "Frukt & Grönt",
       "restriction": "",
       "original_price": "31,18 kr",
       "discount_percentage": 10
@@ -9999,7 +9999,7 @@
       "discount": "GENERAL",
       "description": "350-420g",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310960044130_C1R1_s01",
-      "category": "Frys & Färdigmat",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "28,50 kr",
       "discount_percentage": 9
@@ -10064,7 +10064,7 @@
       "discount": "LOYALTY",
       "description": "240-420g",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310960044130_C1R1_s01",
-      "category": "Frys & Färdigmat",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "29,92 kr",
       "discount_percentage": 8
@@ -10077,7 +10077,7 @@
       "discount": "LOYALTY",
       "description": "240-420g",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310960044130_C1R1_s01",
-      "category": "Frys & Färdigmat",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "29,92 kr",
       "discount_percentage": 8
@@ -10337,7 +10337,7 @@
       "discount": "LOYALTY",
       "description": "Ca 1kg",
       "image_url": "https://res.cloudinary.com/willys-eu/image/upload/w_198,h_198,c_fill,f_auto,q_auto/v1/promotionImagesWillys/26928317169694",
-      "category": "Kött & Fågel",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "99,37 kr",
       "discount_percentage": 0
@@ -10350,7 +10350,7 @@
       "discount": "LOYALTY",
       "description": "Ca 1kg",
       "image_url": "https://res.cloudinary.com/willys-eu/image/upload/w_198,h_198,c_fill,f_auto,q_auto/v1/promotionImagesWillys/26969640632350",
-      "category": "Kött & Fågel",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "89,81 kr",
       "discount_percentage": 0
@@ -10389,7 +10389,7 @@
       "discount": "LOYALTY",
       "description": "Ca 1,7kg",
       "image_url": "https://res.cloudinary.com/willys-eu/image/upload/w_198,h_198,c_fill,f_auto,q_auto/v1/promotionImagesWillys/26969639452702",
-      "category": "Kött & Fågel",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "93,90 kr",
       "discount_percentage": 0
@@ -10415,7 +10415,7 @@
       "discount": "LOYALTY",
       "description": "Ca 1kg",
       "image_url": "https://res.cloudinary.com/willys-eu/image/upload/w_198,h_198,c_fill,f_auto,q_auto/v1/promotionImagesWillys/26969640042526",
-      "category": "Kött & Fågel",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "429,00 kr",
       "discount_percentage": 0
@@ -10428,7 +10428,7 @@
       "discount": "LOYALTY",
       "description": "Ca 800g",
       "image_url": "https://res.cloudinary.com/willys-eu/image/upload/w_198,h_198,c_fill,f_auto,q_auto/v1/promotionImagesWillys/26928315990046",
-      "category": "Kött & Fågel",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "149,00 kr",
       "discount_percentage": 0
@@ -10441,7 +10441,7 @@
       "discount": "LOYALTY",
       "description": "Ca 750g",
       "image_url": "https://res.cloudinary.com/willys-eu/image/upload/w_198,h_198,c_fill,f_auto,q_auto/v1/promotionImagesWillys/26969639845918",
-      "category": "Kött & Fågel",
+      "category": "Frukt & Grönt",
       "restriction": "",
       "original_price": "165,00 kr",
       "discount_percentage": 0
@@ -10480,7 +10480,7 @@
       "discount": "GENERAL",
       "description": "400g",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07350013134838_C1N1_s01",
-      "category": "Fisk & Skaldjur",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "39,90 kr",
       "discount_percentage": 0
@@ -10597,7 +10597,7 @@
       "discount": "GENERAL",
       "description": "ca 1,1kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/02338760100004_C1N1_s01",
-      "category": "Mejeri & Ägg",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "79,95 kr",
       "discount_percentage": 0
@@ -10610,7 +10610,7 @@
       "discount": "LOYALTY",
       "description": "450g",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043028214_S01",
-      "category": "Bröd & Bageri",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "",
       "discount_percentage": 0
@@ -10701,7 +10701,7 @@
       "discount": "GENERAL",
       "description": "ca 1,1kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/02338760100004_C1N1_s01",
-      "category": "Mejeri & Ägg",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "79,95 kr",
       "discount_percentage": 0
@@ -10714,7 +10714,7 @@
       "discount": "LOYALTY",
       "description": "450g",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043028214_S01",
-      "category": "Bröd & Bageri",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "",
       "discount_percentage": 0
@@ -10799,19 +10799,6 @@
     },
     {
       "store": "Coop (Centralhuset)",
-      "product": "Snack pot/nudlar",
-      "brand": "Knorr",
-      "price": "2 för 20:-",
-      "discount": "",
-      "description": "51-65 g. Välj mellan olika sorter.",
-      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1725632325/cloud/384021.png",
-      "category": "Skafferi",
-      "restriction": "",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Coop (Centralhuset)",
       "product": "Smör",
       "brand": "Valio",
       "price": "39:-",
@@ -10844,7 +10831,20 @@
       "discount": "Medlemspris",
       "description": "Ca 850-900 g. Kyld. Välj mellan pepperjack, mörad eller chimichurri.",
       "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1673851160/cloud/271053.png",
-      "category": "Kött & Fågel",
+      "category": "Skafferi",
+      "restriction": "",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Coop (Centralhuset)",
+      "product": "Snack pot/nudlar",
+      "brand": "Knorr",
+      "price": "2 för 20:-",
+      "discount": "",
+      "description": "51-65 g. Välj mellan olika sorter.",
+      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1725632325/cloud/384021.png",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "",
       "discount_percentage": 0
@@ -10870,7 +10870,7 @@
       "discount": "Medlemspris",
       "description": "480-490 g. Frysta.",
       "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1760133405/cloud/539344.png",
-      "category": "Frys & Färdigmat",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "",
       "discount_percentage": 0
@@ -10903,13 +10903,13 @@
     },
     {
       "store": "Coop (Liljegatan)",
-      "product": "Smör",
-      "brand": "Valio",
-      "price": "39:-",
+      "product": "Fläskytterfilé",
+      "brand": "Sverige/Dalsjöfors",
+      "price": "65:-/kg",
       "discount": "Medlemspris",
-      "description": "500 g. Välj mellan normalsaltat, osaltat och extrasaltat.",
-      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1625357382/cloud/126740.png",
-      "category": "Mejeri & Ägg",
+      "description": "Ca 850-900 g. Kyld. Välj mellan pepperjack, mörad eller chimichurri.",
+      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1673851160/cloud/271053.png",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "",
       "discount_percentage": 0
@@ -10955,65 +10955,13 @@
     },
     {
       "store": "Coop (Liljegatan)",
-      "product": "Fläskytterfilé",
-      "brand": "Sverige/Dalsjöfors",
-      "price": "65:-/kg",
+      "product": "Smör",
+      "brand": "Valio",
+      "price": "39:-",
       "discount": "Medlemspris",
-      "description": "Ca 850-900 g. Kyld. Välj mellan pepperjack, mörad eller chimichurri.",
-      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1673851160/cloud/271053.png",
-      "category": "Kött & Fågel",
-      "restriction": "",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Coop (Liljegatan)",
-      "product": "Riven ost",
-      "brand": "Arla Köket",
-      "price": "19,90/st",
-      "discount": "Medlemspris",
-      "description": "150 g. Välj mellan olika sorter.",
-      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1734529132/cloud/416723.png",
+      "description": "500 g. Välj mellan normalsaltat, osaltat och extrasaltat.",
+      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1625357382/cloud/126740.png",
       "category": "Mejeri & Ägg",
-      "restriction": "",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Coop (Liljegatan)",
-      "product": "Krögarpytt",
-      "brand": "Felix",
-      "price": "2 för 89:-",
-      "discount": "Medlemspris",
-      "description": "720 g. Fryst.",
-      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1734687965/cloud/420070.png",
-      "category": "Frys & Färdigmat",
-      "restriction": "",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Coop (Liljegatan)",
-      "product": "Fish & Crisp/Fish nuggets",
-      "brand": "Findus",
-      "price": "2 för 95:-",
-      "discount": "Medlemspris",
-      "description": "480-490 g. Frysta.",
-      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1760133405/cloud/539344.png",
-      "category": "Frys & Färdigmat",
-      "restriction": "",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Coop (Liljegatan)",
-      "product": "Smörgåspålägg",
-      "brand": "Sverige/Jakobsdals",
-      "price": "20:-",
-      "discount": "Medlemspris",
-      "description": "80-100 g. Kylda. Välj mellan olika sorter.",
-      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1741862045/cloud/453369.png",
-      "category": "Kött & Fågel",
       "restriction": "",
       "original_price": "",
       "discount_percentage": 0
@@ -11033,6 +10981,71 @@
     },
     {
       "store": "Coop (Liljegatan)",
+      "product": "Fish & Crisp/Fish nuggets",
+      "brand": "Findus",
+      "price": "2 för 95:-",
+      "discount": "Medlemspris",
+      "description": "480-490 g. Frysta.",
+      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1760133405/cloud/539344.png",
+      "category": "Skafferi",
+      "restriction": "",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Coop (Liljegatan)",
+      "product": "Smörgåspålägg",
+      "brand": "Sverige/Jakobsdals",
+      "price": "20:-",
+      "discount": "Medlemspris",
+      "description": "80-100 g. Kylda. Välj mellan olika sorter.",
+      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1741862045/cloud/453369.png",
+      "category": "Skafferi",
+      "restriction": "",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Coop (Liljegatan)",
+      "product": "Riven ost",
+      "brand": "Arla Köket",
+      "price": "19,90/st",
+      "discount": "Medlemspris",
+      "description": "150 g. Välj mellan olika sorter.",
+      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1734529132/cloud/416723.png",
+      "category": "Skafferi",
+      "restriction": "",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Coop (Liljegatan)",
+      "product": "Färdigrätter",
+      "brand": "Gooh!",
+      "price": "49,90/st",
+      "discount": "Medlemspris",
+      "description": "370-400 g. Kylda. Välj mellan olika sorter.",
+      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1758767466/cloud/522182.png",
+      "category": "Skafferi",
+      "restriction": "",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Coop (Liljegatan)",
+      "product": "Krögarpytt",
+      "brand": "Felix",
+      "price": "2 för 89:-",
+      "discount": "Medlemspris",
+      "description": "720 g. Fryst.",
+      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1734687965/cloud/420070.png",
+      "category": "Frys & Färdigmat",
+      "restriction": "",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Coop (Liljegatan)",
       "product": "Maskindisktabletter",
       "brand": "Yes",
       "price": "Se butik",
@@ -11046,13 +11059,13 @@
     },
     {
       "store": "Coop (Liljegatan)",
-      "product": "Färdigrätter",
-      "brand": "Gooh!",
-      "price": "49,90/st",
-      "discount": "Medlemspris",
-      "description": "370-400 g. Kylda. Välj mellan olika sorter.",
-      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1758767466/cloud/522182.png",
-      "category": "Frys & Färdigmat",
+      "product": "Honungsmelon",
+      "brand": "Spanien",
+      "price": "20:-/kg",
+      "discount": "",
+      "description": "Klass 1.",
+      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1649772927/cloud/24621.png",
+      "category": "Frukt & Grönt",
       "restriction": "",
       "original_price": "",
       "discount_percentage": 0
@@ -11065,7 +11078,7 @@
       "discount": "",
       "description": "100 g. Välj mellan olika sorter.",
       "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1732694864/cloud/408818.png",
-      "category": "Bröd & Bageri",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "",
       "discount_percentage": 0
@@ -11078,7 +11091,7 @@
       "discount": "",
       "description": "33 cl. Välj mellan jordgubb, björnbär/hallon och päron/vanilj.",
       "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1740483612/cloud/444877.png",
-      "category": "Mejeri & Ägg",
+      "category": "Frukt & Grönt",
       "restriction": "",
       "original_price": "",
       "discount_percentage": 0
@@ -11098,6 +11111,19 @@
     },
     {
       "store": "Coop (Liljegatan)",
+      "product": "Kryddiga korvar",
+      "brand": "Sverige/Scan",
+      "price": "2 för 55:-",
+      "discount": "",
+      "description": "180-300 g. Kylda. Välj mellan olika sorter. Gäller ej entrecotekorv.",
+      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1764434752/cloud/564909.png",
+      "category": "Skafferi",
+      "restriction": "",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Coop (Liljegatan)",
       "product": "Röda druvor",
       "brand": "Italien/Spanien/Coop",
       "price": "25:-",
@@ -11105,6 +11131,19 @@
       "description": "500 g. Klass 1. Kärnfria.",
       "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1439903914/48644.png",
       "category": "Frukt & Grönt",
+      "restriction": "",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Coop (Liljegatan)",
+      "product": "Färsk pasta",
+      "brand": "Coop",
+      "price": "25:-",
+      "discount": "",
+      "description": "250-500 g. Välj mellan olika sorter.",
+      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1717590616/cloud/361252.png",
+      "category": "Skafferi",
       "restriction": "",
       "original_price": "",
       "discount_percentage": 0
@@ -11124,51 +11163,12 @@
     },
     {
       "store": "Coop (Liljegatan)",
-      "product": "Kryddiga korvar",
-      "brand": "Sverige/Scan",
-      "price": "2 för 55:-",
-      "discount": "",
-      "description": "180-300 g. Kylda. Välj mellan olika sorter. Gäller ej entrecotekorv.",
-      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1764434752/cloud/564909.png",
-      "category": "Kött & Fågel",
-      "restriction": "",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Coop (Liljegatan)",
       "product": "Ekologiska morötter",
       "brand": "Sverige/Änglamark",
       "price": "15:-",
       "discount": "",
       "description": "1 kg. Klass 1. I påse.",
       "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1537172233/350348.png",
-      "category": "Frukt & Grönt",
-      "restriction": "",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Coop (Liljegatan)",
-      "product": "Färsk pasta",
-      "brand": "Coop",
-      "price": "25:-",
-      "discount": "",
-      "description": "250-500 g. Välj mellan olika sorter.",
-      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1717590616/cloud/361252.png",
-      "category": "Kött & Fågel",
-      "restriction": "",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Coop (Liljegatan)",
-      "product": "Honungsmelon",
-      "brand": "Spanien",
-      "price": "20:-/kg",
-      "discount": "",
-      "description": "Klass 1.",
-      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1649772927/cloud/24621.png",
       "category": "Frukt & Grönt",
       "restriction": "",
       "original_price": "",
@@ -11494,7 +11494,7 @@
       "discount": "",
       "description": "1 l",
       "image_url": "https://www.lidl.se/assets/gcp54e7f1ce736e44929d1f48166cc4bc8f.png",
-      "category": "Mejeri & Ägg",
+      "category": "Skafferi",
       "restriction": "I butik 17/08 - 23/08",
       "original_price": "",
       "discount_percentage": 0
@@ -11507,7 +11507,7 @@
       "discount": "",
       "description": "1 l",
       "image_url": "https://www.lidl.se/assets/gcpde93a0c6c7c741718ee81d8e42a03637.png",
-      "category": "Mejeri & Ägg",
+      "category": "Skafferi",
       "restriction": "I butik 17/08 - 23/08",
       "original_price": "",
       "discount_percentage": 0
@@ -11559,7 +11559,7 @@
       "discount": "",
       "description": "150 g",
       "image_url": "https://www.lidl.se/assets/gcpb075c92bbfb34bd7a05f367fd6f8f438.png",
-      "category": "Kött & Fågel",
+      "category": "Skafferi",
       "restriction": "I butik 29/06",
       "original_price": "",
       "discount_percentage": 0
@@ -11611,7 +11611,7 @@
       "discount": "",
       "description": "500 ml",
       "image_url": "https://www.lidl.se/assets/gcp9aa3905948bb4bf79af2dd7459583e26.png",
-      "category": "Snacks & Godis",
+      "category": "Skafferi",
       "restriction": "I butik 17/08",
       "original_price": "",
       "discount_percentage": 0
@@ -11806,7 +11806,7 @@
       "discount": "",
       "description": "200 g",
       "image_url": "https://www.lidl.se/assets/gcp9d3ca6e1d33e4b0c83eb16c63ea25955.png",
-      "category": "Mejeri & Ägg",
+      "category": "Skafferi",
       "restriction": "I butik 17/08 - 23/08",
       "original_price": "",
       "discount_percentage": 0
@@ -11819,7 +11819,7 @@
       "discount": "",
       "description": "200 g",
       "image_url": "https://www.lidl.se/assets/gcpd6cee67887414cef9ff612f955645df0.png",
-      "category": "Kött & Fågel",
+      "category": "Frukt & Grönt",
       "restriction": "I butik 17/08",
       "original_price": "",
       "discount_percentage": 0
@@ -11832,7 +11832,7 @@
       "discount": "",
       "description": "300 g",
       "image_url": "https://www.lidl.se/assets/gcpb6578d898d3247a182a4632889a0eb05.png",
-      "category": "Kött & Fågel",
+      "category": "Frukt & Grönt",
       "restriction": "I butik 24/08",
       "original_price": "",
       "discount_percentage": 0
@@ -11897,7 +11897,7 @@
       "discount": "",
       "description": "",
       "image_url": "https://www.lidl.se/assets/gcpe6cb2ad7a88c48e5b78cde917600a8f0.png",
-      "category": "Mejeri & Ägg",
+      "category": "Frukt & Grönt",
       "restriction": "I butik 27/08 - 30/08",
       "original_price": "",
       "discount_percentage": 0
@@ -12508,7 +12508,7 @@
       "discount": "",
       "description": "",
       "image_url": "https://www.lidl.se/assets/gcpa3000faaaf6147439ed7a48c98501ed0.png",
-      "category": "Dryck",
+      "category": "Skafferi",
       "restriction": "I butik 27/08 - 30/08",
       "original_price": "",
       "discount_percentage": 0
@@ -12677,7 +12677,7 @@
       "discount": "",
       "description": "650 g",
       "image_url": "https://www.lidl.se/assets/gcp555c3855b1ab4119a385718618882cdc.png",
-      "category": "Kött & Fågel",
+      "category": "Skafferi",
       "restriction": "I butik 17/08 - 23/08",
       "original_price": "",
       "discount_percentage": 0
@@ -13132,7 +13132,7 @@
       "discount": "",
       "description": "",
       "image_url": "https://www.lidl.se/assets/gcp3d85a4794ee740599bc58bddeebc33f2.png",
-      "category": "Mejeri & Ägg",
+      "category": "Skafferi",
       "restriction": "I butik 27/08 - 30/08",
       "original_price": "",
       "discount_percentage": 0
@@ -13288,7 +13288,7 @@
       "discount": "",
       "description": "4x 300 g",
       "image_url": "https://www.lidl.se/assets/gcp1ac081a6b23a43a894f561cfe05c020d.png",
-      "category": "Frys & Färdigmat",
+      "category": "Skafferi",
       "restriction": "I butik 17/08",
       "original_price": "",
       "discount_percentage": 0
@@ -13574,7 +13574,7 @@
       "discount": "",
       "description": "350 g",
       "image_url": "https://www.lidl.se/assets/gcp9add0d8177af48aa9651429487cabbd0.png",
-      "category": "Snacks & Godis",
+      "category": "Skafferi",
       "restriction": "I butik 29/06",
       "original_price": "",
       "discount_percentage": 0
@@ -13704,7 +13704,7 @@
       "discount": "",
       "description": "500 g",
       "image_url": "https://www.lidl.se/assets/gcpb84ddf759a324f8ba7f91d9d7db0479c.png",
-      "category": "Kött & Fågel",
+      "category": "Skafferi",
       "restriction": "I butik 24/08 - 30/08",
       "original_price": "",
       "discount_percentage": 0
@@ -13847,7 +13847,7 @@
       "discount": "",
       "description": "200 g",
       "image_url": "https://www.lidl.se/assets/gcp57a69528df11464e9705d0e2dc3193fc.png",
-      "category": "Snacks & Godis",
+      "category": "Skafferi",
       "restriction": "I butik 24/08 - 30/08",
       "original_price": "",
       "discount_percentage": 0
@@ -14081,7 +14081,7 @@
       "discount": "",
       "description": "1 kg",
       "image_url": "https://www.lidl.se/assets/gcpc9e201aac64249bb8321e624afbf564f.png",
-      "category": "Kött & Fågel",
+      "category": "Frukt & Grönt",
       "restriction": "I butik 24/08 - 30/08",
       "original_price": "",
       "discount_percentage": 0
@@ -14172,7 +14172,7 @@
       "discount": "",
       "description": "750 ml",
       "image_url": "https://www.lidl.se/assets/gcp53c7ea76cee54de3acb2b31b70a7fe35.png",
-      "category": "Mejeri & Ägg",
+      "category": "Skafferi",
       "restriction": "I butik 27/08 - 30/08",
       "original_price": "",
       "discount_percentage": 0
@@ -14367,7 +14367,7 @@
       "discount": "",
       "description": "1 kg",
       "image_url": "https://www.lidl.se/assets/gcp2da40da8c63c448d9269719e87145439.png",
-      "category": "Mejeri & Ägg",
+      "category": "Frukt & Grönt",
       "restriction": "I butik 17/08 - 23/08",
       "original_price": "",
       "discount_percentage": 0
@@ -14393,7 +14393,7 @@
       "discount": "",
       "description": "1 l",
       "image_url": "https://www.lidl.se/assets/gcpb2dde19515ec4078848b0c8bd7f47fff.png",
-      "category": "Mejeri & Ägg",
+      "category": "Skafferi",
       "restriction": "I butik 17/08 - 23/08",
       "original_price": "",
       "discount_percentage": 0
@@ -14406,7 +14406,7 @@
       "discount": "",
       "description": "420 g",
       "image_url": "https://www.lidl.se/assets/gcpb6520b4357a14175b307d722a080dc8e.png",
-      "category": "Bröd & Bageri",
+      "category": "Skafferi",
       "restriction": "I butik 27/08 - 30/08",
       "original_price": "",
       "discount_percentage": 0
@@ -14419,7 +14419,7 @@
       "discount": "",
       "description": "125 g/förp.",
       "image_url": "https://www.lidl.se/assets/gcp3f7d911b16784ed0b2fee13f9e9ed498.png",
-      "category": "Bröd & Bageri",
+      "category": "Frukt & Grönt",
       "restriction": "I butik 24/08 - 30/08",
       "original_price": "",
       "discount_percentage": 0
@@ -14445,7 +14445,7 @@
       "discount": "",
       "description": "340 g",
       "image_url": "https://www.lidl.se/assets/gcp8f432209636a4e948907c59fd6f0ca08.png",
-      "category": "Bröd & Bageri",
+      "category": "Skafferi",
       "restriction": "I butik 24/08 - 30/08",
       "original_price": "",
       "discount_percentage": 0
@@ -14601,7 +14601,7 @@
       "discount": "",
       "description": "ca 650 g",
       "image_url": "https://www.lidl.se/assets/gcp2e58dfd0f9a24a6fa09d5b38eecbc94a.png",
-      "category": "Kött & Fågel",
+      "category": "Skafferi",
       "restriction": "I butik 17/08 - 23/08",
       "original_price": "",
       "discount_percentage": 0
@@ -14640,7 +14640,7 @@
       "discount": "",
       "description": "1.5 l",
       "image_url": "https://www.lidl.se/assets/gcp34a6b70efcda4d008af4fc8c05ba3106.png",
-      "category": "Mejeri & Ägg",
+      "category": "Skafferi",
       "restriction": "I butik 24/08 - 30/08",
       "original_price": "",
       "discount_percentage": 0
@@ -14718,7 +14718,7 @@
       "discount": "",
       "description": "1,2 kg",
       "image_url": "https://www.lidl.se/assets/gcp282bf0ef682e4511a4d4e85efd9c0849.png",
-      "category": "Mejeri & Ägg",
+      "category": "Skafferi",
       "restriction": "I butik 17/08 - 23/08",
       "original_price": "",
       "discount_percentage": 0
@@ -14731,7 +14731,7 @@
       "discount": "",
       "description": "40 g, 50 g",
       "image_url": "https://www.lidl.se/assets/gcp11dee2de18f649ecbcf8b15df70f16ec.png",
-      "category": "Snacks & Godis",
+      "category": "Skafferi",
       "restriction": "I butik 27/08 - 30/08",
       "original_price": "",
       "discount_percentage": 0
@@ -14757,7 +14757,7 @@
       "discount": "",
       "description": "475 g",
       "image_url": "https://www.lidl.se/assets/gcp934b3766aac24efb979f7d4b41483c60.png",
-      "category": "Kött & Fågel",
+      "category": "Frukt & Grönt",
       "restriction": "I butik 17/08 - 23/08",
       "original_price": "",
       "discount_percentage": 0
@@ -14783,7 +14783,7 @@
       "discount": "",
       "description": "350 g",
       "image_url": "https://www.lidl.se/assets/gcp7db57d9bb5924e3697d782143639c9e9.png",
-      "category": "Kött & Fågel",
+      "category": "Skafferi",
       "restriction": "I butik 17/08 - 23/08",
       "original_price": "",
       "discount_percentage": 0
@@ -14835,7 +14835,7 @@
       "discount": "",
       "description": "1.5 l",
       "image_url": "https://www.lidl.se/assets/gcp83f2d8a20f8a484c82017a7e04750ba0.png",
-      "category": "Mejeri & Ägg",
+      "category": "Skafferi",
       "restriction": "I butik 24/08 - 30/08",
       "original_price": "",
       "discount_percentage": 0
@@ -14861,7 +14861,7 @@
       "discount": "",
       "description": "ca 2,2 kg",
       "image_url": "https://www.lidl.se/assets/gcp883d202525cf4e6795923dc154e1b3bb.png",
-      "category": "Kött & Fågel",
+      "category": "Skafferi",
       "restriction": "I butik 17/08 - 23/08",
       "original_price": "",
       "discount_percentage": 0
@@ -14887,7 +14887,7 @@
       "discount": "",
       "description": "90 g",
       "image_url": "https://www.lidl.se/assets/gcpabc3bf187329482a962ac453c03528ae.png",
-      "category": "Bröd & Bageri",
+      "category": "Skafferi",
       "restriction": "I butik 20/08 - 23/08",
       "original_price": "",
       "discount_percentage": 0
@@ -15030,7 +15030,7 @@
       "discount": "",
       "description": "200 g",
       "image_url": "https://www.lidl.se/assets/gcpd624e4a557e641d097030ff656808372.png",
-      "category": "Kött & Fågel",
+      "category": "Frukt & Grönt",
       "restriction": "I butik 17/08 - 23/08",
       "original_price": "",
       "discount_percentage": 0
@@ -15043,7 +15043,7 @@
       "discount": "",
       "description": "175 g",
       "image_url": "https://www.lidl.se/assets/gcp89ce4fd471a34900bd790c17ebc2d98b.png",
-      "category": "Kött & Fågel",
+      "category": "Frukt & Grönt",
       "restriction": "I butik 17/08 - 23/08",
       "original_price": "",
       "discount_percentage": 0
@@ -15095,7 +15095,7 @@
       "discount": "",
       "description": "1 kg",
       "image_url": "https://www.lidl.se/assets/gcp4abe8ec918dc41078fe34045136fcec8.png",
-      "category": "Mejeri & Ägg",
+      "category": "Frukt & Grönt",
       "restriction": "I butik 17/08 - 23/08",
       "original_price": "",
       "discount_percentage": 0
@@ -15212,7 +15212,7 @@
       "discount": "",
       "description": "Ca 900 g",
       "image_url": "https://www.lidl.se/assets/gcp115c42a87d324c08bc993662727a2e9b.png",
-      "category": "Kött & Fågel",
+      "category": "Frukt & Grönt",
       "restriction": "I butik 24/08 - 30/08",
       "original_price": "",
       "discount_percentage": 0
@@ -15225,7 +15225,7 @@
       "discount": "",
       "description": "160 g",
       "image_url": "https://www.lidl.se/assets/gcp64a5a99059294d5f95862db95cabeaa9.png",
-      "category": "Bröd & Bageri",
+      "category": "Skafferi",
       "restriction": "I butik 24/08 - 20/09",
       "original_price": "",
       "discount_percentage": 0
@@ -15602,7 +15602,7 @@
       "discount": "",
       "description": "210 g, 230 g",
       "image_url": "https://www.lidl.se/assets/gcpba1b754d2d5246988e36bfe06594bd77.png",
-      "category": "Frys & Färdigmat",
+      "category": "Skafferi",
       "restriction": "I butik 24/08 - 30/08",
       "original_price": "",
       "discount_percentage": 0
@@ -15628,7 +15628,7 @@
       "discount": "",
       "description": "12×33 cl",
       "image_url": "https://www.lidl.se/assets/gcp8aac02dbd2834199bc3c755fa9912324.png",
-      "category": "Dryck",
+      "category": "Skafferi",
       "restriction": "I butik 27/08 - 30/08",
       "original_price": "",
       "discount_percentage": 0
@@ -15901,7 +15901,7 @@
       "discount": "",
       "description": "500 g",
       "image_url": "https://www.lidl.se/assets/gcp16dcb1ff44c0478f82a94150f30a2c4a.png",
-      "category": "Kött & Fågel",
+      "category": "Skafferi",
       "restriction": "I butik 24/08 - 30/08",
       "original_price": "",
       "discount_percentage": 0
@@ -16031,7 +16031,7 @@
       "discount": "",
       "description": "250 ml",
       "image_url": "https://www.lidl.se/assets/gcpf2057bc545794796979d5b04b617dc28.png",
-      "category": "Dryck",
+      "category": "Skafferi",
       "restriction": "I butik 20/08 - 23/08",
       "original_price": "",
       "discount_percentage": 0

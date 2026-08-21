@@ -111,39 +111,42 @@ function categorizeOfferJS(offer) {
     return 'Hushåll & Hygien';
   }
 
-  // 2. Bröd & Bageri (BEFORE meat to prevent korvbröd/hamburgerbröd becoming meat)
-  if (/korvbröd|hamburgerbröd|bröd|kaka|kakor|bulle|bullar|tårta|knäcke|knäckebröd|fralla|frallor|pita|pitabröd|tortilla|toast|croissant|limpa|pågen|pågens|fazer|skogaholm|våffl|donut|donuts|muffin|muffins|bagel|wienerbröd|kanelbulle|vaniljbulle|semla|kladdkaka|surdeg|rågbröd|lingongrova|hönökaka|vetekaka|tekaka|fullkornsbröd|småbröd|polarbröd|polarkaka|formbröd|formfranska|rostbröd|scones|bageri|pinsa|panini|mellangrova/i.test(text)) {
-    return 'Bröd & Bageri';
-  }
-
-  // 3. Frys & Färdigmat (BEFORE meat to prevent ready meals 'thaibox kyckling' becoming raw meat)
-  if (/thaibox|thaiboxar|enportionsrätter|enportionsrätt|färdigrätt|färdigrätter|matlåda|matlådor|vårrullar|pytt|pizza|pizzor|kebabpizza|pirog|gorbys|billys|dafgård|felix|findus|gooh|nuggets|pommes|glass|gb glace|triumf|paj/i.test(text)) {
-    return 'Frys & Färdigmat';
-  }
-
-  // 4. Kött & Fågel
-  if (/\b(kött|färs|kyckling|fläsk|nötkött|korv|korvar|bacon|skinka|karré|karre|kotlett|entrecote|entrecôte|biff|lövbiff|rostbiff|kalkon|lever|chark|salami|medwurst|medwurt|pulled pork|ribs|revbensspjäll|lamm|späck|charkuterier|leverpastej|falukorv|grillkorv|wienerkorv|varmkorv|ölkorv|blodpudding|sylta|oxfilé|fläskfilé|högrev|fransyska|schnitzel|kassler|fläskytterfilé|kebab|grytbitar|chorizo|cabanoss|prinskorv|smörgåspålägg|prosciutto|jamon|mortadella|pasteta|paté|pate|fläskbog|fläsklägg|grillkarré|flapsteak|spickekött|fuet|nöt|ox|bog|lägg|bringa|grillskiva|grillskivor|grillkött)\b/i.test(text)) {
-    return 'Kött & Fågel';
-  }
-
-  // 5. Fisk & Skaldjur
-  if (/\b(fisk|lax|torsk|räkor|räka|sill|makrill|tunnfisk|tuna|tonfisk|kräftor|kräfta|sej|spätta|musslor|skaldjur|lutfisk|rom|fiskpinnar|fiskkaka|fiskgratäng|surströmming|hummer|krabba|fiskfilé|panerad fisk|bläckfisk|scampi|laxfilé|torskfilé|sejfilé|röding|öring|caviar|kaviar|tångcaviar)\b/i.test(text)) {
-    return 'Fisk & Skaldjur';
-  }
-
-  // 6. Mejeri & Ägg
-  if (/mjölk|grädde|smör|ost|ostar|margarin|yoggi|yoghurt|fil|filmjölk|kvarg|ägg|crème fraiche|creme fraiche|fraiche|keso|halloumi|norrloumi|mozzarella|vispgrädde|matlagningsgrädde|bregott|flora|lätta|kesella|gräddfil|ricotta|feta|vitost|brie|camembert|parmesan|parmigiano|gouda|hushållsost|prästost|herrgård|grevé|svecia|västerbottensost|gräddost|havredryck|mandeldryck|sojadryck|oatly|yalla|actimel|danonino|skyr|hamburgerost|smältost|mjukost|skivost|rivost|proteinshake/i.test(text)) {
-    return 'Mejeri & Ägg';
-  }
-
-  // 7. Frukt & Grönt
+  // 2. Frukt & Grönt (BEFORE meat to prevent färskpotatis / färsk majskolv becoming meat)
   if (/frukt|grönsak|grönsaker|grönt|bär|äpple|äpplen|banan|bananer|potatis|färskpotatis|tomat|tomater|gurka|gurkor|sallad|lök|morot|morötter|majs|majskolv|avokado|melon|citron|citroner|apelsin|apelsiner|druvor|jordgubb|hallon|blåbär|paprika|vitlök|champinjon|svamp|clementin|satsumas|nektarin|persika|plommon|kiwi|kolv|broccoli|blomkål|spenat|rotfrukter|sparris|purjolök|ruccola|basilika|persilja|dill|krasse|selleri|palsternacka|rödbetor|kål|vitkål|rödkål|grönkål|lime|ingefära|chili|mango|ananas|päron|vindruvor|grapefrukt|småbladsmix|kronärtskocka|sharon|kaki|granatäpple|solrosor|blommor|bukett|krysantemum|växt|krukväxt/i.test(text)) {
     return 'Frukt & Grönt';
   }
 
-  // 8. Snacks & Godis
-  if (/chips|dipp|godis|choklad|popcorn|nötter|nötblandning|nötmix|kex|ostbågar|ostkrokar|lakrits|tuggummi|marabou|estrella|olw|cloetta|haribo|cheez|snacks|wafer|proteinbar|\bbar\b|\bbars\b|corny|cashew|mandel|pistage|valnöt|jordnötter|solroskärnor|chiafrön|lösgodis|kexchoklad|daim|twix|snickers|mars|bounty|dumle|geisha|alesto|nutella|halva|delicatoboll|läkerol|halstabletter|fisherman|mentos|gott & blandat|gott och blandat|gott&blandat|malaco/i.test(text)) {
-    return 'Snacks & Godis';
+  // 3. Skafferi / Snacks (BEFORE mejeri/kött to catch jordnötssmör/nötter)
+  if (/jordnötssmör|nötssmör|pasta|ris|basmati|jasminris|risotto|mjöl|socker|olja|vinäger|kaffe|te|sås|ketchup|senap|konserv|linser|bönor|krydda|kryddor|buljong|müsli|musli|granola|cheerios|frosties|cornflakes|havreringar|cereal|flingor|havregryn|pesto|taco|tacos|spaghetti|macaroni|makaroner|matolja|rapsolja|olivolja|majonnäs|mayo|sylt|marmelad|honung|gevalia|zoegas|arvid nordquist|löfbergs|nescafé|nesquik|nudlar|couscous|bulgur|dressing|marinad|salsa|tomatkross|passerade tomater|kokosmjölk|cornichons|oliver|kapris|barnmat|välling|gröt|sirap|ströbröd|tofu|hummus|\bfond\b|\bsoja\b|lasagne|grytbas/i.test(text)) {
+    if (/chips|godis|choklad|popcorn|kex|ostbågar|ostkrokar|lakrits|tuggummi|marabou|estrella|olw|cloetta|haribo|cheez|snacks|wafer|proteinbar|corny|lösgodis|kexchoklad|daim|twix|snickers|mars|bounty|dumle|geisha|alesto|nutella|halva|delicatoboll|läkerol|halstabletter|fisherman|mentos|gott & blandat|gott och blandat|gott&blandat|malaco/i.test(text)) {
+      return 'Snacks & Godis';
+    }
+    return 'Skafferi';
+  }
+
+  // 4. Bröd & Bageri (BEFORE meat to prevent korvbröd/hamburgerbröd becoming meat)
+  if (/korvbröd|hamburgerbröd|bröd|kaka|kakor|bulle|bullar|tårta|knäcke|knäckebröd|fralla|frallor|pita|pitabröd|tortilla|toast|croissant|limpa|pågen|pågens|fazer|skogaholm|våffl|donut|donuts|muffin|muffins|bagel|wienerbröd|kanelbulle|vaniljbulle|semla|kladdkaka|surdeg|rågbröd|lingongrova|hönökaka|vetekaka|tekaka|fullkornsbröd|småbröd|polarbröd|polarkaka|formbröd|formfranska|rostbröd|scones|bageri|pinsa|panini|mellangrova/i.test(text)) {
+    return 'Bröd & Bageri';
+  }
+
+  // 5. Frys & Färdigmat (BEFORE meat to prevent ready meals 'thaibox kyckling' becoming raw meat)
+  if (/thaibox|thaiboxar|enportionsrätter|enportionsrätt|färdigrätt|färdigrätter|matlåda|matlådor|vårrullar|pytt|pizza|pizzor|kebabpizza|pirog|gorbys|billys|dafgård|felix|findus|gooh|nuggets|pommes|glass|gb glace|triumf|paj/i.test(text)) {
+    return 'Frys & Färdigmat';
+  }
+
+  // 6. Kött & Fågel
+  if (/\b(kött|färs|kyckling|fläsk|nötkött|korv|korvar|bacon|skinka|karré|karre|kotlett|entrecote|entrecôte|biff|lövbiff|rostbiff|kalkon|lever|chark|salami|medwurst|medwurt|pulled pork|ribs|revbensspjäll|lamm|späck|charkuterier|leverpastej|falukorv|grillkorv|wienerkorv|varmkorv|ölkorv|blodpudding|sylta|oxfilé|fläskfilé|högrev|fransyska|schnitzel|kassler|fläskytterfilé|kebab|grytbitar|chorizo|cabanoss|prinskorv|smörgåspålägg|prosciutto|jamon|mortadella|pasteta|paté|pate|fläskbog|fläsklägg|grillkarré|flapsteak|spickekött|fuet|nöt|ox|bog|lägg|bringa|grillskiva|grillskivor|grillkött)\b/i.test(text)) {
+    return 'Kött & Fågel';
+  }
+
+  // 7. Fisk & Skaldjur
+  if (/\b(fisk|lax|torsk|räkor|räka|sill|makrill|tunnfisk|tuna|tonfisk|kräftor|kräfta|sej|spätta|musslor|skaldjur|lutfisk|rom|fiskpinnar|fiskkaka|fiskgratäng|surströmming|hummer|krabba|fiskfilé|panerad fisk|bläckfisk|scampi|laxfilé|torskfilé|sejfilé|röding|öring|caviar|kaviar|tångcaviar)\b/i.test(text)) {
+    return 'Fisk & Skaldjur';
+  }
+
+  // 8. Mejeri & Ägg
+  if (/mjölk|grädde|smör|ost|ostar|margarin|yoggi|yoghurt|fil|filmjölk|kvarg|ägg|crème fraiche|creme fraiche|fraiche|keso|halloumi|norrloumi|mozzarella|vispgrädde|matlagningsgrädde|bregott|flora|lätta|kesella|gräddfil|ricotta|feta|vitost|brie|camembert|parmesan|parmigiano|gouda|hushållsost|prästost|herrgård|grevé|svecia|västerbottensost|gräddost|havredryck|mandeldryck|sojadryck|oatly|yalla|actimel|danonino|skyr|hamburgerost|smältost|mjukost|skivost|rivost|proteinshake/i.test(text)) {
+    return 'Mejeri & Ägg';
   }
 
   // 9. Dryck
