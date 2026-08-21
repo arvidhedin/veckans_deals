@@ -136,19 +136,26 @@ def get_offers() -> list[dict]:
                 base_price_info = price_dict.get("basePrice", {}) if isinstance(price_dict, dict) else {}
                 base_price_text = base_price_info.get("text", "") if isinstance(base_price_info, dict) else ""
                 
+                pkg_clean = pkg_text.strip().lower()
+                base_clean = base_price_text.strip().lower()
+
                 unit_suffix = ""
                 description = pkg_text
 
-                combined_pkg_check = f"{pkg_text} {base_price_text}".lower()
-                
-                if "/kg" in combined_pkg_check or "kr/kg" in combined_pkg_check:
+                # Ett erbjudande är per-kg ENDAST om packaging eller basePrice startar med '/kg'
+                if pkg_clean.startswith("/kg") or base_clean.startswith("/kg"):
                     unit_suffix = "/kg"
-                    clean_pkg = re.sub(r'/kg\s*', '', pkg_text, flags=re.IGNORECASE).strip(' ()')
-                    description = clean_pkg
-                elif "/st" in combined_pkg_check or "kr/st" in combined_pkg_check:
+                    raw = pkg_text if pkg_clean.startswith("/kg") else base_price_text
+                    clean_desc = re.sub(r'^/kg\s*', '', raw, flags=re.IGNORECASE).strip(' ()')
+                    description = clean_desc
+                elif pkg_clean.startswith("/st") or base_clean.startswith("/st"):
                     unit_suffix = "/st"
-                    clean_pkg = re.sub(r'/st\s*', '', pkg_text, flags=re.IGNORECASE).strip(' ()')
-                    description = clean_pkg
+                    raw = pkg_text if pkg_clean.startswith("/st") else base_price_text
+                    clean_desc = re.sub(r'^/st\s*', '', raw, flags=re.IGNORECASE).strip(' ()')
+                    description = clean_desc
+                else:
+                    unit_suffix = ""
+                    description = pkg_text
 
                 if normal_price_num is not None and discount == "Lidl Plus":
                     try:
