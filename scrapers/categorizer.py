@@ -115,7 +115,7 @@ def categorize_offer(offer: dict) -> str:
 
     if "frukt" in raw_cat or "grönt" in raw_cat:
         return "Frukt & Grönt"
-    if "mejeri" in raw_cat:
+    if "mejeri" in raw_cat or "ost" in raw_cat:
         return "Mejeri & Ägg"
     if "bröd" in raw_cat or "bageri" in raw_cat:
         return "Bröd & Bageri"
@@ -129,7 +129,5 @@ def categorize_offer(offer: dict) -> str:
         return "Snacks & Godis"
     if "djupfryst" in raw_cat or "fryst" in raw_cat:
         return "Frys & Färdigmat"
-    if "färskvaror" in raw_cat:
-        return "Kött & Fågel"
 
     return "Övrigt"

@@ -99,10 +99,6 @@ const DEFAULT_IMG = "https://images.unsplash.com/photo-1542838132-92c53300491e?a
 
 // Categorization helper for frontend
 function categorizeOfferJS(offer) {
-  if (offer.category && ALL_CATEGORIES.includes(offer.category) && offer.category !== 'Övrigt') {
-    return offer.category;
-  }
-
   const text = `${offer.product || ''} ${offer.brand || ''} ${offer.description || ''}`.toLowerCase();
   const rawCat = (offer.category || '').toLowerCase();
   
