@@ -550,10 +550,32 @@ function sortOffers(offers, sortBy) {
 const willysSearchCache = new Map();
 let currentWillysSearchToken = 0;
 
+// Common Swedish grocery descriptors / stopwords that shouldn't trigger standalone matches
+const SWEDISH_GROCERY_STOPWORDS = new Set([
+  'färsk', 'färska', 'fryst', 'frysta', 'djupfryst', 'djupfrysta',
+  'ekologisk', 'ekologiska', 'eko', 'svensk', 'svenska', 'lokal', 'lokala',
+  'klass', 'delikatess', 'premium', 'gammaldags', 'traditionell', 'klassisk',
+  'stor', 'stora', 'liten', 'små', 'mellan', 'extra', 'fin', 'fina',
+  'röd', 'röda', 'grön', 'gröna', 'vit', 'vita', 'gul', 'gula',
+  'i', 'på', 'med', 'och', 'eller', 'utan', 'av', 'för',
+  'påse', 'ask', 'burk', 'flask', 'flaska', 'tub', 'bägare', 'kartong', 'pkt', 'pack', 'styck', 'st', 'ca', 'g', 'kg', 'ml', 'cl', 'l', 'dl'
+]);
+
+function extractCoreKeywords(text) {
+  if (!text) return [];
+  const clean = String(text).toLowerCase().replace(/[^a-zåäö0-9\s]/gi, ' ');
+  const tokens = clean.split(/\s+/).filter(Boolean);
+  const core = tokens.filter(t => t.length >= 2 && !SWEDISH_GROCERY_STOPWORDS.has(t));
+  return core.length > 0 ? core : tokens;
+}
+
 function getLocalWillysMatches(query) {
   if (!query) return [];
-  const q = query.toLowerCase();
-  const queryTokens = q.split(/\s+/).filter(Boolean);
+  const q = String(query).trim().toLowerCase();
+  if (q.length < 2) return [];
+
+  const coreTokens = extractCoreKeywords(q);
+  if (coreTokens.length === 0) return [];
 
   const pool = [
     ...state.allOffers.filter(o => (o.store || '').toLowerCase().includes('willys')),
@@ -562,6 +584,7 @@ function getLocalWillysMatches(query) {
 
   const scoredMatches = [];
   const seenKeys = new Set();
+  const MIN_SCORE = 20;
 
   for (const item of pool) {
     const prod = (item.product || '').toLowerCase();
@@ -570,14 +593,36 @@ function getLocalWillysMatches(query) {
     const fullText = `${prod} ${brand} ${desc}`;
 
     let score = 0;
-    if (prod === q) score = 10;
-    else if (prod.startsWith(q)) score = 8;
-    else if (prod.includes(q)) score = 6;
-    else if (fullText.includes(q)) score = 4;
-    else if (queryTokens.length > 0 && queryTokens.every(t => fullText.includes(t))) score = 3;
-    else if (queryTokens.some(t => t.length >= 3 && (prod.includes(t) || fullText.includes(t)))) score = 1;
 
-    if (score > 0) {
+    if (prod === q) {
+      score = 100;
+    } else if (prod.startsWith(q)) {
+      score = 80;
+    } else if (prod.includes(q)) {
+      score = 60;
+    } else {
+      // Core token matching
+      const matchingCoreInProd = coreTokens.filter(t => prod.includes(t));
+      const matchingCoreInFull = coreTokens.filter(t => fullText.includes(t));
+
+      if (matchingCoreInProd.length === coreTokens.length) {
+        score = 50;
+      } else if (matchingCoreInFull.length === coreTokens.length) {
+        score = 40;
+      } else if (matchingCoreInProd.length > 0) {
+        const matchRatio = matchingCoreInProd.length / coreTokens.length;
+        if (matchRatio >= 0.5 || matchingCoreInProd.some(t => t.length >= 4)) {
+          score = 25 + (matchingCoreInProd.length * 5);
+        }
+      } else if (matchingCoreInFull.length > 0) {
+        const matchRatio = matchingCoreInFull.length / coreTokens.length;
+        if (matchRatio >= 0.5) {
+          score = 20;
+        }
+      }
+    }
+
+    if (score >= MIN_SCORE) {
       const key = `${(item.product || '').trim()}_${(item.brand || '').trim()}`.toLowerCase();
       if (!seenKeys.has(key)) {
         seenKeys.add(key);
@@ -975,6 +1020,82 @@ function toggleDesktopSidebar(forceState) {
 }
 
 // --- Product Detail Modal Logic ---
+async function renderModalWillysReference(productName) {
+  const refBox = document.getElementById('modal-willys-ref-box');
+  const refItemsContainer = document.getElementById('modal-willys-ref-items');
+  if (!refBox || !refItemsContainer) return;
+
+  refBox.classList.add('hidden');
+  refItemsContainer.innerHTML = '';
+
+  if (!productName) return;
+
+  // 1. Check local dataset with strict relevance score
+  let matches = getLocalWillysMatches(productName);
+
+  // 2. If no local match, query Willys API using core keywords (e.g. "majskolv")
+  if (matches.length === 0) {
+    const coreTokens = extractCoreKeywords(productName);
+    const searchPhrase = coreTokens.join(' ');
+
+    if (searchPhrase && searchPhrase.length >= 2) {
+      try {
+        const apiResults = await fetchWillysReferenceItems(searchPhrase);
+        if (apiResults && apiResults.length > 0) {
+          const scored = [];
+          const seen = new Set();
+
+          for (const item of apiResults) {
+            const itemProd = (item.product || '').toLowerCase();
+            let score = 0;
+
+            if (itemProd === productName.toLowerCase()) {
+              score = 100;
+            } else if (itemProd.includes(searchPhrase)) {
+              score = 60;
+            } else if (coreTokens.every(t => itemProd.includes(t))) {
+              score = 50;
+            } else if (coreTokens.some(t => t.length >= 4 && itemProd.includes(t))) {
+              score = 25;
+            }
+
+            if (score >= 20) {
+              const key = item.product.toLowerCase();
+              if (!seen.has(key)) {
+                seen.add(key);
+                scored.push({ item, score });
+              }
+            }
+          }
+
+          scored.sort((a, b) => b.score - a.score);
+          matches = scored.map(s => s.item);
+        }
+      } catch (err) {
+        console.warn('Modal Willys API reference search error:', err);
+      }
+    }
+  }
+
+  // 3. Render only if relevant matches exist
+  if (matches && matches.length > 0) {
+    refItemsContainer.innerHTML = matches.slice(0, 3).map(ref => `
+      <div class="flex items-center justify-between gap-2 border-b border-emerald-200/50 pb-1.5 last:border-0 text-emerald-950">
+        <div class="truncate font-medium text-xs">
+          <span>${escapeHtml(ref.product || '')}</span>
+          ${ref.brand ? `<span class="text-emerald-800 font-normal text-[11px]"> (${escapeHtml(ref.brand)})</span>` : ''}
+          ${ref.description ? `<span class="text-emerald-700/80 text-[11px]"> · ${escapeHtml(ref.description)}</span>` : ''}
+        </div>
+        <span class="font-bold text-emerald-900 bg-emerald-100/90 px-2 py-0.5 rounded text-[11px] whitespace-nowrap ml-2">${escapeHtml(ref.price || ref.original_price || '')}</span>
+      </div>
+    `).join('');
+    refBox.classList.remove('hidden');
+  } else {
+    refBox.classList.add('hidden');
+    refItemsContainer.innerHTML = '';
+  }
+}
+
 function openProductModal(offer) {
   const backdrop = document.getElementById('product-modal-backdrop');
   const modal = document.getElementById('product-modal');
@@ -1097,24 +1218,8 @@ function openProductModal(offer) {
     }
   }
 
-  // Willys Reference Price Box inside Modal
-  const refBox = document.getElementById('modal-willys-ref-box');
-  const refItemsContainer = document.getElementById('modal-willys-ref-items');
-  if (refBox && refItemsContainer) {
-    const matches = getLocalWillysMatches(productName);
-    if (matches && matches.length > 0) {
-      refItemsContainer.innerHTML = matches.slice(0, 3).map(ref => `
-        <div class="flex items-center justify-between gap-2 border-b border-emerald-200/50 pb-1.5 last:border-0 text-emerald-950">
-          <span class="font-medium truncate">${escapeHtml(ref.product || '')} ${ref.brand ? '(' + escapeHtml(ref.brand) + ')' : ''}</span>
-          <span class="font-bold text-emerald-900 bg-emerald-100/90 px-2 py-0.5 rounded text-[11px] whitespace-nowrap">${escapeHtml(ref.price || ref.original_price || '')}</span>
-        </div>
-      `).join('');
-      refBox.classList.remove('hidden');
-    } else {
-      refBox.classList.add('hidden');
-      refItemsContainer.innerHTML = '';
-    }
-  }
+  // Willys Reference Price Box inside Modal (Async & strict score matching)
+  renderModalWillysReference(productName);
 
   // Show Modal with Animation
   backdrop.classList.remove('hidden');
