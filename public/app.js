@@ -278,35 +278,51 @@ function isMeatUnder80PerKg(offer) {
 
   const priceStr = (offer.price || '').toLowerCase();
   const descStr = (offer.description || '').toLowerCase();
-  const origStr = (offer.original_price || '').toLowerCase();
-  const fullText = `${priceStr} ${descStr} ${origStr}`;
 
-  // 1. Direct per kg price in offer.price (e.g. "69,90/kg", "74,90 kr/kg", "46,90:-/kg")
+  // Extract deal price per unit (handles "2 för 40:-" -> 20 kr)
+  let unitPrice = 0;
+  const xForY = priceStr.match(/(\d+)\s*fölr?\s*(\d+(?:[.,]\d+)?)/i);
+  if (xForY) {
+    const qty = parseFloat(xForY[1]);
+    const totalPrice = parseFloat(xForY[2].replace(',', '.'));
+    if (qty > 0) unitPrice = totalPrice / qty;
+  } else {
+    unitPrice = parsePriceNumeric(priceStr);
+  }
+
+  if (unitPrice <= 0) return false;
+
+  // Case 1: Explicit per-kg price string (e.g. "64,90/kg", "79,90 kr/kg")
   if (priceStr.includes('/kg') || priceStr.includes('kr/kg')) {
-    const val = parsePriceNumeric(priceStr);
-    if (val > 0 && val <= 80) return true;
+    return unitPrice <= 80.0;
   }
 
-  // 2. Compare price in description or text (e.g. "Jmf: 65,00 kr/kg", "Jfr 71,43 kr/kg")
-  const mJmf = fullText.match(/(?:jmf|jfr|jämförpris)?\s*:?\s*(\d+(?:[.,]\d+)?)\s*kr?\s*\/\s*kg/i);
-  if (mJmf) {
-    const val = parseFloat(mJmf[1].replace(',', '.'));
-    if (val > 0 && val <= 80) return true;
+  // Case 2: Fixed-weight package (e.g. 500g for 35 kr -> 70 kr/kg)
+  const textForWeight = `${offer.product || ''} ${descStr}`.toLowerCase();
+  
+  // Weight range like "80-100 g"
+  const mRange = textForWeight.match(/(\d+(?:[.,]\d+)?)\s*-\s*(\d+(?:[.,]\d+)?)\s*(g|kg)\b/i);
+  if (mRange) {
+    const w1 = parseFloat(mRange[1].replace(',', '.'));
+    const w2 = parseFloat(mRange[2].replace(',', '.'));
+    const unit = mRange[3].toLowerCase();
+    const wAvg = (w1 + w2) / 2.0;
+    const wKg = unit === 'kg' ? wAvg : wAvg / 1000.0;
+    if (wKg > 0) {
+      const calcPerKg = unitPrice / wKg;
+      return calcPerKg <= 80.0;
+    }
   }
 
-  // 3. Package weight calculation (e.g. 500g for 35 kr -> 70 kr/kg)
-  const priceVal = parsePriceNumeric(priceStr);
-  if (priceVal > 0) {
-    const textForWeight = `${offer.product || ''} ${descStr}`.toLowerCase();
-    const mW = textForWeight.match(/(\d+(?:[.,]\d+)?)\s*(g|kg)\b/i);
-    if (mW) {
-      const wNum = parseFloat(mW[1].replace(',', '.'));
-      const unit = mW[2].toLowerCase();
-      const wKg = unit === 'kg' ? wNum : wNum / 1000.0;
-      if (wKg > 0) {
-        const calcPerKg = priceVal / wKg;
-        if (calcPerKg > 0 && calcPerKg <= 80) return true;
-      }
+  // Single weight like "500 g" or "1 kg"
+  const mW = textForWeight.match(/(\d+(?:[.,]\d+)?)\s*(g|kg)\b/i);
+  if (mW) {
+    const wNum = parseFloat(mW[1].replace(',', '.'));
+    const unit = mW[2].toLowerCase();
+    const wKg = unit === 'kg' ? wNum : wNum / 1000.0;
+    if (wKg > 0) {
+      const calcPerKg = unitPrice / wKg;
+      return calcPerKg <= 80.0;
     }
   }
 
