@@ -343,6 +343,19 @@ function saveCartToStorage() {
   }
 }
 
+function getMaxAllowedQty(offer) {
+  if (!offer || !offer.restriction) return 99;
+  const r = String(offer.restriction).toLowerCase();
+  const m = r.match(/max\s*(\d+)/i);
+  if (m) {
+    const limit = parseInt(m[1], 10);
+    if (!isNaN(limit) && limit > 0) {
+      return limit;
+    }
+  }
+  return 99;
+}
+
 function generateCartItemId(offer) {
   const store = String(offer.store || '').trim();
   const prod = String(offer.product || '').trim();
@@ -356,9 +369,16 @@ function getOfferCartQty(offer) {
   return item ? item.qty : 0;
 }
 
-function addToCart(offer, qtyDelta = 1, autoOpenDrawer = true) {
+function addToCart(offer, qtyDelta = 1, autoOpenDrawer = false) {
   const id = generateCartItemId(offer);
   const existing = state.cart.find(item => item.id === id);
+  const maxQty = existing ? (existing.maxQty || getMaxAllowedQty(offer)) : getMaxAllowedQty(offer);
+  const currentQty = existing ? existing.qty : 0;
+
+  if (qtyDelta > 0 && currentQty + qtyDelta > maxQty) {
+    showCopyToast(`Max ${maxQty} st per hushåll för denna vara.`);
+    return;
+  }
 
   if (existing) {
     existing.qty += qtyDelta;
@@ -385,6 +405,7 @@ function addToCart(offer, qtyDelta = 1, autoOpenDrawer = true) {
       baseRegularPrice: baseRegularPrice,
       image_url: offer.image_url || DEFAULT_IMG,
       qty: qtyDelta,
+      maxQty: maxQty,
       checked: false
     });
   }
@@ -406,6 +427,13 @@ function removeFromCart(cartItemId) {
 function updateCartItemQty(cartItemId, delta) {
   const item = state.cart.find(i => i.id === cartItemId);
   if (!item) return;
+
+  const maxQty = item.maxQty || 99;
+  if (delta > 0 && item.qty + delta > maxQty) {
+    showCopyToast(`Max ${maxQty} st per hushåll för denna vara.`);
+    return;
+  }
+
   item.qty += delta;
   if (item.qty <= 0) {
     removeFromCart(cartItemId);
@@ -537,7 +565,9 @@ function renderCartDrawer() {
             const isChecked = item.checked;
             const itemTotalCost = (item.pricePerUnit * item.qty).toFixed(2).replace('.', ',');
             const itemSavings = Math.max(0, (item.baseRegularPrice - item.pricePerUnit) * item.qty);
-            
+            const maxQty = item.maxQty || 99;
+            const isMaxItem = item.qty >= maxQty;
+
             return `
               <div class="p-3 sm:p-4 flex items-start gap-3 transition-colors ${isChecked ? 'bg-zinc-50/70' : 'hover:bg-zinc-50/40'}">
                 <!-- Checkbox -->
@@ -580,7 +610,8 @@ function renderCartDrawer() {
                       <button 
                         data-action="inc-qty" 
                         data-cart-id="${item.id}"
-                        class="w-5 h-5 bg-white hover:bg-zinc-50 text-zinc-800 font-bold rounded flex items-center justify-center text-xs shadow-sm cursor-pointer active:scale-90"
+                        ${isMaxItem ? 'disabled class="w-5 h-5 bg-zinc-200 text-zinc-400 font-bold rounded flex items-center justify-center text-xs cursor-not-allowed"' : 'class="w-5 h-5 bg-white hover:bg-zinc-50 text-zinc-800 font-bold rounded flex items-center justify-center text-xs shadow-sm cursor-pointer active:scale-90"'}
+                        title="${isMaxItem ? `Max ${maxQty} st per hushåll` : 'Öka antal'}"
                       >+</button>
                     </div>
 
@@ -644,7 +675,7 @@ function copyCartToClipboard() {
 
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(textToCopy).then(() => {
-      showCopyToast();
+      showCopyToast('Inköpslistan har kopierats till urklipp!');
     }).catch(err => {
       console.error('Copy failed', err);
     });
@@ -655,13 +686,16 @@ function copyCartToClipboard() {
     textarea.select();
     document.execCommand('copy');
     document.body.removeChild(textarea);
-    showCopyToast();
+    showCopyToast('Inköpslistan har kopierats till urklipp!');
   }
 }
 
-function showCopyToast() {
+function showCopyToast(msg = 'Inköpslistan har kopierats till urklipp!') {
   const toast = document.getElementById('cart-copy-toast');
   if (!toast) return;
+  const textEl = toast.querySelector('span');
+  if (textEl) textEl.textContent = msg;
+
   toast.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-2');
   toast.classList.add('opacity-100', 'translate-y-0');
 
@@ -679,16 +713,24 @@ function toggleCartDrawer(open) {
   if (open) {
     renderCartDrawer();
     backdrop.classList.remove('hidden');
+    backdrop.style.display = 'block';
     setTimeout(() => {
       backdrop.classList.remove('opacity-0');
+      backdrop.classList.add('opacity-100');
       drawer.classList.remove('translate-x-full');
+      drawer.classList.add('translate-x-0');
+      drawer.style.transform = 'translateX(0)';
     }, 10);
     document.body.classList.add('overflow-hidden');
   } else {
+    drawer.classList.remove('translate-x-0');
     drawer.classList.add('translate-x-full');
+    drawer.style.transform = 'translateX(100%)';
+    backdrop.classList.remove('opacity-100');
     backdrop.classList.add('opacity-0');
     setTimeout(() => {
       backdrop.classList.add('hidden');
+      backdrop.style.display = 'none';
       document.body.classList.remove('overflow-hidden');
     }, 300);
   }
@@ -696,15 +738,31 @@ function toggleCartDrawer(open) {
 
 function updateActiveModalCartButton() {
   if (!state.activeModalOffer) return;
+  const container = document.getElementById('modal-cart-button-container');
+  if (!container) return;
 
-  const btnText = document.getElementById('btn-modal-add-cart-text');
-  if (!btnText) return;
+  const offer = state.activeModalOffer;
+  const cartQty = getOfferCartQty(offer);
+  const maxQty = getMaxAllowedQty(offer);
+  const isMaxReached = cartQty >= maxQty;
 
-  const qty = getOfferCartQty(state.activeModalOffer);
-  if (qty > 0) {
-    btnText.textContent = `I listan (${qty} st) - Lägg till fler`;
+  if (cartQty === 0) {
+    container.innerHTML = `
+      <button id="btn-modal-add-cart" type="button" class="w-full sm:w-auto px-5 py-2.5 bg-zinc-900 hover:bg-zinc-800 text-white rounded-xl text-xs sm:text-sm font-bold transition active:scale-95 cursor-pointer shadow-sm flex items-center justify-center gap-2">
+        <svg class="w-4 h-4 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+        </svg>
+        <span>Lägg i inköpslista</span>
+      </button>
+    `;
   } else {
-    btnText.textContent = 'Lägg i inköpslista';
+    container.innerHTML = `
+      <div class="w-full sm:w-auto flex items-center justify-between sm:justify-start gap-3 bg-emerald-600 border border-emerald-700 rounded-xl p-1.5 px-3 text-white shadow-sm font-bold text-xs sm:text-sm">
+        <button id="btn-modal-dec-cart" type="button" class="w-8 h-8 bg-emerald-700 hover:bg-emerald-800 active:scale-90 rounded-lg text-white font-black flex items-center justify-center cursor-pointer transition-transform text-sm">-</button>
+        <span class="px-3 font-black text-white text-xs sm:text-sm whitespace-nowrap">${cartQty} i listan</span>
+        <button id="btn-modal-inc-cart" type="button" ${isMaxReached ? 'disabled class="w-8 h-8 bg-emerald-800/40 text-emerald-200/50 cursor-not-allowed rounded-lg font-black flex items-center justify-center text-sm"' : 'class="w-8 h-8 bg-emerald-700 hover:bg-emerald-800 active:scale-90 rounded-lg text-white font-black flex items-center justify-center cursor-pointer transition-transform text-sm"'} title="${isMaxReached ? `Max ${maxQty} per hushåll` : 'Öka antal'}">+</button>
+      </div>
+    `;
   }
 }
 
@@ -1363,17 +1421,20 @@ function createDealCardHtml(offer, index) {
     : (offer.restriction ? `<div class="text-[8px] sm:text-[10px] md:text-[11px] font-medium text-amber-600 mt-1 truncate">${escapeHtml(offer.restriction)}</div>` : '');
 
   const cartQty = getOfferCartQty(offer);
+  const maxQty = getMaxAllowedQty(offer);
+  const isMaxReached = cartQty >= maxQty;
+
   const cartButtonHtml = cartQty === 0
-    ? `<button data-action="card-add-cart" data-deal-index="${index}" class="mt-2.5 w-full py-1.5 px-2 bg-zinc-900 hover:bg-zinc-800 text-white rounded-xl text-[10px] sm:text-xs font-bold transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer shadow-sm">
-        <svg class="w-3.5 h-3.5 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    ? `<button data-action="card-add-cart" data-deal-index="${index}" class="mt-2.5 w-full py-2 px-3 bg-zinc-900 hover:bg-zinc-800 text-white rounded-xl text-xs font-bold transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer shadow-sm">
+        <svg class="w-4 h-4 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
         </svg>
         <span>Inköpslista</span>
        </button>`
-    : `<div class="mt-2.5 w-full flex items-center justify-between bg-rose-50 border border-rose-200/80 rounded-xl p-1 text-[10px] sm:text-xs font-bold text-rose-900">
-        <button data-action="card-dec-cart" data-deal-index="${index}" class="w-6 h-6 bg-white hover:bg-rose-100 rounded-lg text-rose-900 font-extrabold flex items-center justify-center border border-rose-200 shadow-sm active:scale-90 cursor-pointer">-</button>
-        <span class="px-1 font-black text-rose-700">${cartQty} i listan</span>
-        <button data-action="card-inc-cart" data-deal-index="${index}" class="w-6 h-6 bg-white hover:bg-rose-100 rounded-lg text-rose-900 font-extrabold flex items-center justify-center border border-rose-200 shadow-sm active:scale-90 cursor-pointer">+</button>
+    : `<div class="mt-2.5 w-full flex items-center justify-between bg-emerald-600 border border-emerald-700 rounded-xl p-1 text-white shadow-sm font-bold text-xs">
+        <button data-action="card-dec-cart" data-deal-index="${index}" class="w-7 h-7 bg-emerald-700 hover:bg-emerald-800 active:scale-90 rounded-lg text-white font-black flex items-center justify-center cursor-pointer transition-transform" title="Minska antal">-</button>
+        <span class="px-2 font-black text-white text-xs text-center flex-1">${cartQty} i listan</span>
+        <button data-action="card-inc-cart" data-deal-index="${index}" ${isMaxReached ? 'disabled class="w-7 h-7 bg-emerald-800/40 text-emerald-200/50 cursor-not-allowed rounded-lg font-black flex items-center justify-center"' : 'class="w-7 h-7 bg-emerald-700 hover:bg-emerald-800 active:scale-90 rounded-lg text-white font-black flex items-center justify-center cursor-pointer transition-transform"'} title="${isMaxReached ? `Max ${maxQty} st/hushåll` : 'Öka antal'}">+</button>
        </div>`;
 
   return `
@@ -1838,10 +1899,20 @@ function setupEventListeners() {
   if (btnCopyCart) btnCopyCart.addEventListener('click', copyCartToClipboard);
   if (btnClearCart) btnClearCart.addEventListener('click', clearCart);
 
-  if (btnModalAddCart) {
-    btnModalAddCart.addEventListener('click', () => {
-      if (state.activeModalOffer) {
-        addToCart(state.activeModalOffer, 1);
+  const modalCartContainer = document.getElementById('modal-cart-button-container');
+  if (modalCartContainer) {
+    modalCartContainer.addEventListener('click', (e) => {
+      if (!state.activeModalOffer) return;
+      const offer = state.activeModalOffer;
+
+      const btnAdd = e.target.closest('#btn-modal-add-cart');
+      const btnInc = e.target.closest('#btn-modal-inc-cart');
+      const btnDec = e.target.closest('#btn-modal-dec-cart');
+
+      if (btnAdd || btnInc) {
+        addToCart(offer, 1, false);
+      } else if (btnDec) {
+        addToCart(offer, -1, false);
       }
     });
   }
