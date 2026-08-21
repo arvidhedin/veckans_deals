@@ -771,7 +771,7 @@ function updateActiveModalCartButton() {
     container.innerHTML = `
       <div class="w-full sm:w-auto flex items-center justify-between sm:justify-start gap-3 bg-emerald-600 border border-emerald-700 rounded-xl p-1.5 px-3 text-white shadow-sm font-bold text-xs sm:text-sm">
         <button id="btn-modal-dec-cart" type="button" class="w-8 h-8 bg-emerald-700 hover:bg-emerald-800 active:scale-90 rounded-lg text-white font-black flex items-center justify-center cursor-pointer transition-transform text-sm">-</button>
-        <span class="px-3 font-black text-white text-xs sm:text-sm whitespace-nowrap">${cartQty} i listan</span>
+        <span class="px-3 font-black text-white text-xs sm:text-sm whitespace-nowrap">${cartQty}</span>
         <button id="btn-modal-inc-cart" type="button" ${isMaxReached ? 'disabled class="w-8 h-8 bg-emerald-800/40 text-emerald-200/50 cursor-not-allowed rounded-lg font-black flex items-center justify-center text-sm"' : 'class="w-8 h-8 bg-emerald-700 hover:bg-emerald-800 active:scale-90 rounded-lg text-white font-black flex items-center justify-center cursor-pointer transition-transform text-sm"'} title="${isMaxReached ? `Max ${maxQty} per hushåll` : 'Öka antal'}">+</button>
       </div>
     `;
@@ -1445,7 +1445,7 @@ function createDealCardHtml(offer, index) {
        </button>`
     : `<div class="mt-2.5 w-full flex items-center justify-between bg-emerald-600 border border-emerald-700 rounded-xl p-1 text-white shadow-sm font-bold text-xs">
         <button data-action="card-dec-cart" data-deal-index="${index}" class="w-7 h-7 bg-emerald-700 hover:bg-emerald-800 active:scale-90 rounded-lg text-white font-black flex items-center justify-center cursor-pointer transition-transform" title="Minska antal">-</button>
-        <span class="px-2 font-black text-white text-xs text-center flex-1">${cartQty} i listan</span>
+        <span class="px-2 font-black text-white text-xs text-center flex-1">${cartQty}</span>
         <button data-action="card-inc-cart" data-deal-index="${index}" ${isMaxReached ? 'disabled class="w-7 h-7 bg-emerald-800/40 text-emerald-200/50 cursor-not-allowed rounded-lg font-black flex items-center justify-center"' : 'class="w-7 h-7 bg-emerald-700 hover:bg-emerald-800 active:scale-90 rounded-lg text-white font-black flex items-center justify-center cursor-pointer transition-transform"'} title="${isMaxReached ? `Max ${maxQty} st/hushåll` : 'Öka antal'}">+</button>
        </div>`;
 
