@@ -768,7 +768,7 @@ function getShortStoreName(store) {
 }
 
 // --- Deal Card Template Generator ---
-function createDealCardHtml(offer) {
+function createDealCardHtml(offer, index) {
   const store = (offer.store || 'Okänd butik').trim();
   const shortStore = getShortStoreName(store);
   const storeBadgeColor = STORE_COLORS[store]?.bg || (store.toLowerCase().includes('ica') ? '#E21936' : (store.toLowerCase().includes('hemköp') ? '#D31115' : '#4B5563'));
@@ -804,7 +804,7 @@ function createDealCardHtml(offer) {
     : (offer.restriction ? `<div class="text-[8px] sm:text-[10px] md:text-[11px] font-medium text-amber-600 mt-1 truncate">${escapeHtml(offer.restriction)}</div>` : '');
 
   return `
-    <div class="deal-card group bg-white rounded-xl sm:rounded-2xl border border-zinc-200/80 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-200 flex flex-col h-[290px] sm:h-[360px] md:h-[400px] relative overflow-hidden">
+    <div data-deal-index="${index}" class="deal-card cursor-pointer group bg-white rounded-xl sm:rounded-2xl border border-zinc-200/80 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-200 flex flex-col h-[290px] sm:h-[360px] md:h-[400px] relative overflow-hidden">
       <!-- Store Badge Overlay -->
       <span class="absolute top-1.5 left-1.5 sm:top-2.5 sm:left-2.5 px-1.5 py-0.5 sm:px-2 sm:py-0.75 rounded text-[7.5px] leading-[1.1] sm:text-[10px] md:text-[11px] font-bold tracking-wide uppercase text-white shadow-sm z-10 max-w-[calc(100%-42px)] sm:max-w-none line-clamp-2 break-words text-left" style="background-color: ${storeBadgeColor};" title="${escapeHtml(store)}">
         ${escapeHtml(shortStore)}
@@ -875,7 +875,7 @@ function renderDeals() {
   }
 
   emptyState.classList.add('hidden');
-  grid.innerHTML = state.filteredOffers.map(createDealCardHtml).join('');
+  grid.innerHTML = state.filteredOffers.map((offer, index) => createDealCardHtml(offer, index)).join('');
 }
 
 function renderResultsCount() {
@@ -974,6 +974,177 @@ function toggleDesktopSidebar(forceState) {
   }
 }
 
+// --- Product Detail Modal Logic ---
+function openProductModal(offer) {
+  const backdrop = document.getElementById('product-modal-backdrop');
+  const modal = document.getElementById('product-modal');
+  if (!backdrop || !modal) return;
+
+  const store = (offer.store || 'Okänd butik').trim();
+  const storeBadgeColor = STORE_COLORS[store]?.bg || (store.toLowerCase().includes('ica') ? '#E21936' : (store.toLowerCase().includes('hemköp') ? '#D31115' : '#4B5563'));
+  const cat = offer.category || categorizeOfferJS(offer);
+  const discountPct = parseFloat(offer.discount_percentage) || 0;
+  const productName = offer.product || 'Okänd produkt';
+  const brandName = offer.brand || '';
+  const descText = offer.description || '';
+  const priceText = offer.price || 'Se pris i butik';
+  const origPriceText = offer.original_price || '';
+  const discountType = (offer.discount && offer.discount !== 'GENERAL') ? offer.discount : '';
+  const restriction = offer.restriction || '';
+
+  // Store Badge & Category Badge
+  const storeBadge = document.getElementById('modal-store-badge');
+  if (storeBadge) {
+    storeBadge.textContent = store;
+    storeBadge.style.backgroundColor = storeBadgeColor;
+  }
+
+  const catBadge = document.getElementById('modal-category-badge');
+  if (catBadge) {
+    catBadge.textContent = cat;
+  }
+
+  // Image & Discount Pct Badge
+  const imgEl = document.getElementById('modal-product-image');
+  if (imgEl) {
+    imgEl.src = offer.image_url || DEFAULT_IMG;
+    imgEl.onerror = () => { imgEl.src = DEFAULT_IMG; };
+  }
+
+  const pctBadge = document.getElementById('modal-discount-pct-badge');
+  if (pctBadge) {
+    if (discountPct > 0) {
+      pctBadge.textContent = `-${Math.round(discountPct)}%`;
+      pctBadge.classList.remove('hidden');
+    } else {
+      pctBadge.classList.add('hidden');
+    }
+  }
+
+  // Title, Brand & Description
+  const brandTag = document.getElementById('modal-brand-tag');
+  if (brandTag) {
+    if (brandName) {
+      brandTag.textContent = brandName;
+      brandTag.classList.remove('hidden');
+    } else {
+      brandTag.classList.add('hidden');
+    }
+  }
+
+  const titleEl = document.getElementById('modal-product-title');
+  if (titleEl) titleEl.textContent = productName;
+
+  const descEl = document.getElementById('modal-product-desc');
+  if (descEl) {
+    if (descText) {
+      descEl.textContent = descText;
+      descEl.classList.remove('hidden');
+    } else {
+      descEl.classList.add('hidden');
+    }
+  }
+
+  // Price & Savings
+  const priceEl = document.getElementById('modal-product-price');
+  if (priceEl) priceEl.textContent = priceText;
+
+  const discountTagEl = document.getElementById('modal-discount-tag');
+  if (discountTagEl) {
+    if (discountType) {
+      discountTagEl.textContent = discountType;
+      discountTagEl.classList.remove('hidden');
+    } else {
+      discountTagEl.classList.add('hidden');
+    }
+  }
+
+  const origPriceContainer = document.getElementById('modal-original-price-container');
+  const origPriceEl = document.getElementById('modal-original-price');
+  const savingsEl = document.getElementById('modal-savings-amount');
+
+  const parsedDealPrice = parsePriceNumeric(priceText);
+  const parsedOrigPrice = parsePriceNumeric(origPriceText);
+  let savingsSek = 0;
+
+  if (parsedOrigPrice > 0 && parsedDealPrice > 0 && parsedOrigPrice > parsedDealPrice) {
+    savingsSek = Math.round((parsedOrigPrice - parsedDealPrice) * 100) / 100;
+  }
+
+  if (origPriceText && origPriceContainer && origPriceEl) {
+    origPriceEl.textContent = origPriceText;
+    origPriceContainer.classList.remove('hidden');
+  } else if (origPriceContainer) {
+    origPriceContainer.classList.add('hidden');
+  }
+
+  if (savingsSek > 0 && savingsEl) {
+    savingsEl.textContent = `Du sparar ${savingsSek.toString().replace('.', ',')} kr!`;
+    savingsEl.classList.remove('hidden');
+  } else if (savingsEl) {
+    savingsEl.classList.add('hidden');
+  }
+
+  // Restrictions / Terms Box
+  const restrictionBox = document.getElementById('modal-restriction-box');
+  const restrictionText = document.getElementById('modal-restriction-text');
+  if (restrictionBox && restrictionText) {
+    if (restriction) {
+      restrictionText.textContent = restriction;
+      restrictionBox.classList.remove('hidden');
+    } else {
+      restrictionBox.classList.add('hidden');
+    }
+  }
+
+  // Willys Reference Price Box inside Modal
+  const refBox = document.getElementById('modal-willys-ref-box');
+  const refItemsContainer = document.getElementById('modal-willys-ref-items');
+  if (refBox && refItemsContainer) {
+    const matches = getLocalWillysMatches(productName);
+    if (matches && matches.length > 0) {
+      refItemsContainer.innerHTML = matches.slice(0, 3).map(ref => `
+        <div class="flex items-center justify-between gap-2 border-b border-emerald-200/50 pb-1.5 last:border-0 text-emerald-950">
+          <span class="font-medium truncate">${escapeHtml(ref.product || '')} ${ref.brand ? '(' + escapeHtml(ref.brand) + ')' : ''}</span>
+          <span class="font-bold text-emerald-900 bg-emerald-100/90 px-2 py-0.5 rounded text-[11px] whitespace-nowrap">${escapeHtml(ref.price || ref.original_price || '')}</span>
+        </div>
+      `).join('');
+      refBox.classList.remove('hidden');
+    } else {
+      refBox.classList.add('hidden');
+      refItemsContainer.innerHTML = '';
+    }
+  }
+
+  // Show Modal with Animation
+  backdrop.classList.remove('hidden');
+  void backdrop.offsetWidth;
+  backdrop.classList.remove('opacity-0');
+  backdrop.classList.add('opacity-100');
+
+  modal.classList.remove('scale-95', 'opacity-0');
+  modal.classList.add('scale-100', 'opacity-100');
+
+  document.body.classList.add('overflow-hidden');
+}
+
+function closeProductModal() {
+  const backdrop = document.getElementById('product-modal-backdrop');
+  const modal = document.getElementById('product-modal');
+  if (!backdrop || !modal) return;
+
+  modal.classList.remove('scale-100', 'opacity-100');
+  modal.classList.add('scale-95', 'opacity-0');
+
+  backdrop.classList.remove('opacity-100');
+  backdrop.classList.add('opacity-0');
+
+  setTimeout(() => {
+    backdrop.classList.add('hidden');
+    document.body.classList.remove('overflow-hidden');
+  }, 300);
+}
+
 // --- Helper Functions ---
 function escapeHtml(str) {
   if (!str) return '';
@@ -1006,8 +1177,39 @@ function setupEventListeners() {
   if (backdrop) backdrop.addEventListener('click', closeMobileFilterDrawer);
 
   window.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') closeMobileFilterDrawer();
+    if (e.key === 'Escape') {
+      closeMobileFilterDrawer();
+      closeProductModal();
+    }
   });
+
+  // Product Modal Event Listeners
+  const btnCloseProductModal = document.getElementById('btn-close-product-modal');
+  const btnCloseModalFooter = document.getElementById('btn-close-modal-footer');
+  const productModalBackdrop = document.getElementById('product-modal-backdrop');
+  const dealsGrid = document.getElementById('deals-grid');
+
+  if (btnCloseProductModal) btnCloseProductModal.addEventListener('click', closeProductModal);
+  if (btnCloseModalFooter) btnCloseModalFooter.addEventListener('click', closeProductModal);
+  
+  if (productModalBackdrop) {
+    productModalBackdrop.addEventListener('click', (e) => {
+      if (e.target === productModalBackdrop) {
+        closeProductModal();
+      }
+    });
+  }
+
+  if (dealsGrid) {
+    dealsGrid.addEventListener('click', (e) => {
+      const card = e.target.closest('[data-deal-index]');
+      if (!card) return;
+      const index = parseInt(card.dataset.dealIndex, 10);
+      if (!isNaN(index) && state.filteredOffers[index]) {
+        openProductModal(state.filteredOffers[index]);
+      }
+    });
+  }
 
   // Category select all / deselect all in sidebar
   const btnSelectAllCats = document.getElementById('btn-select-all-cats');
