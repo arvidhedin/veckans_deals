@@ -29,6 +29,8 @@ const state = {
   allOffers: [],
   filteredOffers: [],
   willysAssortment: [],
+  cart: [],
+  activeModalOffer: null,
   sidebarCollapsed: localStorage.getItem('sidebarCollapsed') === 'true',
   selectedStores: new Set([
     // ICA
@@ -318,6 +320,390 @@ function extractPackageWeightInKgJS(text) {
   }
 
   return 0;
+}
+
+}
+
+// --- Shopping List (Inköpslista) & Savings Calculator Engine ---
+const CART_STORAGE_KEY = 'veckans_deals_cart_v1';
+
+function loadCartFromStorage() {
+  try {
+    const raw = localStorage.getItem(CART_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch (e) {
+    console.error('Failed to load cart from localStorage', e);
+    return [];
+  }
+}
+
+function saveCartToStorage() {
+  try {
+    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(state.cart));
+  } catch (e) {
+    console.error('Failed to save cart to localStorage', e);
+  }
+}
+
+function generateCartItemId(offer) {
+  const store = String(offer.store || '').trim();
+  const prod = String(offer.product || '').trim();
+  const price = String(offer.price || '').trim();
+  return `${store}_${prod}_${price}`.replace(/[^a-zA-Z0-9_]/g, '_');
+}
+
+function getOfferCartQty(offer) {
+  const id = generateCartItemId(offer);
+  const item = state.cart.find(i => i.id === id);
+  return item ? item.qty : 0;
+}
+
+function addToCart(offer, qtyDelta = 1) {
+  const id = generateCartItemId(offer);
+  const existing = state.cart.find(item => item.id === id);
+
+  if (existing) {
+    existing.qty += qtyDelta;
+    if (existing.qty <= 0) {
+      removeFromCart(id);
+      return;
+    }
+  } else if (qtyDelta > 0) {
+    const { pricePerUnit } = extractPerUnitDealPriceJS(offer.price);
+    const origPriceVal = parsePriceNumeric(offer.original_price);
+    
+    // Estimate regular baseline price (fallback to 1.35x deal price if original_price is missing)
+    const baseRegularPrice = origPriceVal > pricePerUnit ? origPriceVal : (pricePerUnit > 0 ? Math.round(pricePerUnit * 1.35 * 100) / 100 : pricePerUnit);
+
+    state.cart.push({
+      id: id,
+      store: offer.store || 'Butik',
+      product: offer.product || '',
+      brand: offer.brand || '',
+      description: offer.description || '',
+      price: offer.price || '',
+      pricePerUnit: pricePerUnit,
+      origPrice: offer.original_price || '',
+      baseRegularPrice: baseRegularPrice,
+      image_url: offer.image_url || DEFAULT_IMG,
+      qty: qtyDelta,
+      checked: false
+    });
+  }
+
+  saveCartToStorage();
+  updateCartUI();
+}
+
+function removeFromCart(cartItemId) {
+  state.cart = state.cart.filter(item => item.id !== cartItemId);
+  saveCartToStorage();
+  updateCartUI();
+}
+
+function updateCartItemQty(cartItemId, delta) {
+  const item = state.cart.find(i => i.id === cartItemId);
+  if (!item) return;
+  item.qty += delta;
+  if (item.qty <= 0) {
+    removeFromCart(cartItemId);
+    return;
+  }
+  saveCartToStorage();
+  updateCartUI();
+}
+
+function toggleCartItemChecked(cartItemId) {
+  const item = state.cart.find(i => i.id === cartItemId);
+  if (!item) return;
+  item.checked = !item.checked;
+  saveCartToStorage();
+  updateCartUI();
+}
+
+function clearCart() {
+  if (state.cart.length === 0) return;
+  state.cart = [];
+  saveCartToStorage();
+  updateCartUI();
+}
+
+function calculateCartTotals() {
+  let totalItems = 0;
+  let totalDealCost = 0;
+  let totalRegularCost = 0;
+
+  state.cart.forEach(item => {
+    const q = item.qty || 1;
+    totalItems += q;
+    const dealPrice = item.pricePerUnit || parsePriceNumeric(item.price);
+    const regPrice = item.baseRegularPrice || dealPrice;
+
+    totalDealCost += dealPrice * q;
+    totalRegularCost += (regPrice > dealPrice ? regPrice : dealPrice) * q;
+  });
+
+  const totalSavings = Math.max(0, totalRegularCost - totalDealCost);
+  const savingsPercent = totalRegularCost > 0 ? Math.round((totalSavings / totalRegularCost) * 100) : 0;
+
+  return {
+    totalItems,
+    totalDealCost: Math.round(totalDealCost * 100) / 100,
+    totalSavings: Math.round(totalSavings * 100) / 100,
+    savingsPercent
+  };
+}
+
+function updateCartUI() {
+  const totals = calculateCartTotals();
+
+  // Badges & Counters
+  const headerCount = document.getElementById('cart-header-count');
+  if (headerCount) headerCount.textContent = totals.totalItems;
+
+  const floatBadge = document.getElementById('cart-floating-badge');
+  if (floatBadge) floatBadge.textContent = totals.totalItems;
+
+  const floatText = document.getElementById('cart-floating-items-text');
+  if (floatText) floatText.textContent = `(${totals.totalItems} varor)`;
+
+  const floatSavings = document.getElementById('cart-floating-savings');
+  if (floatSavings) floatSavings.textContent = `Sparat: ${totals.totalSavings.toString().replace('.', ',')} kr`;
+
+  const drawerSubtitle = document.getElementById('cart-drawer-subtitle');
+  if (drawerSubtitle) drawerSubtitle.textContent = `${totals.totalItems} varor i listan`;
+
+  const totalSavingsEl = document.getElementById('cart-total-savings');
+  if (totalSavingsEl) totalSavingsEl.textContent = `${totals.totalSavings.toString().replace('.', ',')} kr`;
+
+  const savingsPctEl = document.getElementById('cart-savings-percent');
+  if (savingsPctEl) savingsPctEl.textContent = `-${totals.savingsPercent}%`;
+
+  const totalPriceEl = document.getElementById('cart-total-price');
+  if (totalPriceEl) totalPriceEl.textContent = `${totals.totalDealCost.toString().replace('.', ',')} kr`;
+
+  renderCartDrawer();
+  renderDeals(); // Re-render grid cards to update buttons
+  updateActiveModalCartButton();
+}
+
+function renderCartDrawer() {
+  const container = document.getElementById('cart-items-container');
+  if (!container) return;
+
+  if (state.cart.length === 0) {
+    container.innerHTML = `
+      <div class="py-12 text-center text-zinc-400 space-y-3">
+        <svg class="w-12 h-12 mx-auto text-zinc-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z"></path>
+        </svg>
+        <div class="text-sm font-semibold text-zinc-600">Din inköpslista är tom</div>
+        <p class="text-xs text-zinc-400 max-w-xs mx-auto">Klicka på "Inköpslista" eller "+"-knappen på valfritt erbjudande för att börja planera dina köp.</p>
+      </div>
+    `;
+    return;
+  }
+
+  // Group items by store
+  const storeGroups = {};
+  state.cart.forEach(item => {
+    const s = item.store || 'Övrigt';
+    if (!storeGroups[s]) storeGroups[s] = [];
+    storeGroups[s].push(item);
+  });
+
+  let html = '';
+  Object.keys(storeGroups).forEach(storeName => {
+    const items = storeGroups[storeName];
+    const storeBadgeColor = getStoreColor(storeName);
+    const storeItemCount = items.reduce((sum, i) => sum + i.qty, 0);
+
+    html += `
+      <div class="bg-white rounded-2xl border border-zinc-200/90 shadow-sm overflow-hidden">
+        <!-- Store Group Header -->
+        <div class="px-4 py-3 bg-zinc-50/80 border-b border-zinc-100 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full" style="background-color: ${storeBadgeColor};"></span>
+            <span class="text-xs font-extrabold uppercase tracking-wide text-zinc-900">${escapeHtml(storeName)}</span>
+          </div>
+          <span class="text-[11px] font-semibold text-zinc-500 bg-zinc-200/60 px-2 py-0.5 rounded-full">${storeItemCount} varor</span>
+        </div>
+
+        <!-- Store Group Items -->
+        <div class="divide-y divide-zinc-100">
+          ${items.map(item => {
+            const isChecked = item.checked;
+            const itemTotalCost = (item.pricePerUnit * item.qty).toFixed(2).replace('.', ',');
+            const itemSavings = Math.max(0, (item.baseRegularPrice - item.pricePerUnit) * item.qty);
+            
+            return `
+              <div class="p-3 sm:p-4 flex items-start gap-3 transition-colors ${isChecked ? 'bg-zinc-50/70' : 'hover:bg-zinc-50/40'}">
+                <!-- Checkbox -->
+                <input 
+                  type="checkbox" 
+                  data-action="toggle-check" 
+                  data-cart-id="${item.id}"
+                  ${isChecked ? 'checked' : ''}
+                  class="mt-1 w-4 h-4 text-rose-600 rounded border-zinc-300 focus:ring-rose-500 cursor-pointer"
+                />
+
+                <!-- Image -->
+                <img 
+                  src="${item.image_url}" 
+                  alt="${escapeHtml(item.product)}" 
+                  class="w-12 h-12 object-contain bg-zinc-50 rounded-lg p-1 border border-zinc-100 shrink-0 ${isChecked ? 'opacity-40' : ''}"
+                  onerror="this.onerror=null; this.src='${DEFAULT_IMG}';"
+                />
+
+                <!-- Info -->
+                <div class="flex-1 min-w-0">
+                  <h4 class="text-xs sm:text-sm font-bold text-zinc-900 leading-tight ${isChecked ? 'line-through text-zinc-400' : ''}">
+                    ${escapeHtml(item.product)}
+                  </h4>
+                  ${item.brand ? `<span class="text-[10px] text-zinc-400 font-semibold uppercase block truncate ${isChecked ? 'line-through' : ''}">${escapeHtml(item.brand)}</span>` : ''}
+                  <div class="flex items-baseline gap-2 mt-1">
+                    <span class="text-xs font-black text-rose-600">${escapeHtml(item.price)}</span>
+                    ${itemSavings > 0 ? `<span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200/60">Sparat ${itemSavings.toFixed(2).replace('.', ',')} kr</span>` : ''}
+                  </div>
+
+                  <!-- Qty Modifier Bar -->
+                  <div class="flex items-center justify-between mt-2 pt-2 border-t border-zinc-100">
+                    <div class="flex items-center gap-1.5 bg-zinc-100 rounded-lg p-0.5 border border-zinc-200/80">
+                      <button 
+                        data-action="dec-qty" 
+                        data-cart-id="${item.id}"
+                        class="w-5 h-5 bg-white hover:bg-zinc-50 text-zinc-800 font-bold rounded flex items-center justify-center text-xs shadow-sm cursor-pointer active:scale-90"
+                      >-</button>
+                      <span class="text-xs font-black text-zinc-900 px-1.5">${item.qty}</span>
+                      <button 
+                        data-action="inc-qty" 
+                        data-cart-id="${item.id}"
+                        class="w-5 h-5 bg-white hover:bg-zinc-50 text-zinc-800 font-bold rounded flex items-center justify-center text-xs shadow-sm cursor-pointer active:scale-90"
+                      >+</button>
+                    </div>
+
+                    <div class="flex items-center gap-3">
+                      <span class="text-xs font-extrabold text-zinc-900">${itemTotalCost} kr</span>
+                      <button 
+                        data-action="remove-item" 
+                        data-cart-id="${item.id}"
+                        class="text-zinc-400 hover:text-rose-600 p-1 rounded hover:bg-rose-50 transition cursor-pointer"
+                        title="Ta bort vara"
+                      >
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      </div>
+    `;
+  });
+
+  container.innerHTML = html;
+}
+
+function copyCartToClipboard() {
+  if (state.cart.length === 0) return;
+
+  const totals = calculateCartTotals();
+  const storeGroups = {};
+  state.cart.forEach(item => {
+    const s = item.store || 'Övrigt';
+    if (!storeGroups[s]) storeGroups[s] = [];
+    storeGroups[s].push(item);
+  });
+
+  let lines = [];
+  lines.push('MIN INKÖPSLISTA - VECKANS DEALS');
+  lines.push('----------------------------------------');
+
+  Object.keys(storeGroups).forEach(storeName => {
+    const items = storeGroups[storeName];
+    const storeCount = items.reduce((s, i) => s + i.qty, 0);
+    lines.push(`\n[ ${storeName.toUpperCase()} ] (${storeCount} varor)`);
+    
+    items.forEach(i => {
+      const checkMark = i.checked ? '[x]' : '[ ]';
+      lines.push(`${checkMark} ${i.qty}x ${i.product} - ${i.price}`);
+    });
+  });
+
+  lines.push('\n----------------------------------------');
+  lines.push(`Totalt erbjudandepris: ${totals.totalDealCost.toString().replace('.', ',')} kr`);
+  lines.push(`Beräknad besparing: ${totals.totalSavings.toString().replace('.', ',')} kr (-${totals.savingsPercent}%)`);
+
+  const textToCopy = lines.join('\n');
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(textToCopy).then(() => {
+      showCopyToast();
+    }).catch(err => {
+      console.error('Copy failed', err);
+    });
+  } else {
+    const textarea = document.createElement('textarea');
+    textarea.value = textToCopy;
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textarea);
+    showCopyToast();
+  }
+}
+
+function showCopyToast() {
+  const toast = document.getElementById('cart-copy-toast');
+  if (!toast) return;
+  toast.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-2');
+  toast.classList.add('opacity-100', 'translate-y-0');
+
+  setTimeout(() => {
+    toast.classList.remove('opacity-100', 'translate-y-0');
+    toast.classList.add('opacity-0', 'pointer-events-none', 'translate-y-2');
+  }, 2500);
+}
+
+function toggleCartDrawer(open) {
+  const drawer = document.getElementById('cart-drawer');
+  const backdrop = document.getElementById('cart-backdrop');
+  if (!drawer || !backdrop) return;
+
+  if (open) {
+    renderCartDrawer();
+    backdrop.classList.remove('hidden');
+    setTimeout(() => {
+      backdrop.classList.remove('opacity-0');
+      drawer.classList.remove('translate-x-full');
+    }, 10);
+    document.body.classList.add('overflow-hidden');
+  } else {
+    drawer.classList.add('translate-x-full');
+    backdrop.classList.add('opacity-0');
+    setTimeout(() => {
+      backdrop.classList.add('hidden');
+      document.body.classList.remove('overflow-hidden');
+    }, 300);
+  }
+}
+
+function updateActiveModalCartButton() {
+  if (!state.activeModalOffer) return;
+
+  const btnText = document.getElementById('btn-modal-add-cart-text');
+  if (!btnText) return;
+
+  const qty = getOfferCartQty(state.activeModalOffer);
+  if (qty > 0) {
+    btnText.textContent = `I listan (${qty} st) - Lägg till fler`;
+  } else {
+    btnText.textContent = 'Lägg i inköpslista';
+  }
 }
 
 // --- Helper for Kött & Fågel < 80 kr/kg Filter ---
@@ -974,8 +1360,22 @@ function createDealCardHtml(offer, index) {
     ? `<div class="text-[8px] sm:text-[10px] md:text-[11px] font-bold uppercase tracking-wider bg-amber-50 text-amber-700 border border-amber-200 px-1 sm:px-2 py-0.5 rounded w-fit mt-1 truncate max-w-full">Endast Tor-Sön</div>`
     : (offer.restriction ? `<div class="text-[8px] sm:text-[10px] md:text-[11px] font-medium text-amber-600 mt-1 truncate">${escapeHtml(offer.restriction)}</div>` : '');
 
+  const cartQty = getOfferCartQty(offer);
+  const cartButtonHtml = cartQty === 0
+    ? `<button data-action="card-add-cart" data-deal-index="${index}" class="mt-2.5 w-full py-1.5 px-2 bg-zinc-900 hover:bg-zinc-800 text-white rounded-xl text-[10px] sm:text-xs font-bold transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer shadow-sm">
+        <svg class="w-3.5 h-3.5 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+        </svg>
+        <span>Inköpslista</span>
+       </button>`
+    : `<div class="mt-2.5 w-full flex items-center justify-between bg-rose-50 border border-rose-200/80 rounded-xl p-1 text-[10px] sm:text-xs font-bold text-rose-900">
+        <button data-action="card-dec-cart" data-deal-index="${index}" class="w-6 h-6 bg-white hover:bg-rose-100 rounded-lg text-rose-900 font-extrabold flex items-center justify-center border border-rose-200 shadow-sm active:scale-90 cursor-pointer">-</button>
+        <span class="px-1 font-black text-rose-700">${cartQty} i listan</span>
+        <button data-action="card-inc-cart" data-deal-index="${index}" class="w-6 h-6 bg-white hover:bg-rose-100 rounded-lg text-rose-900 font-extrabold flex items-center justify-center border border-rose-200 shadow-sm active:scale-90 cursor-pointer">+</button>
+       </div>`;
+
   return `
-    <div data-deal-index="${index}" class="deal-card cursor-pointer group bg-white rounded-xl sm:rounded-2xl border border-zinc-200/80 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-200 flex flex-col h-[290px] sm:h-[360px] md:h-[400px] relative overflow-hidden">
+    <div data-deal-index="${index}" class="deal-card cursor-pointer group bg-white rounded-xl sm:rounded-2xl border border-zinc-200/80 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-200 flex flex-col h-[320px] sm:h-[390px] md:h-[430px] relative overflow-hidden">
       <!-- Store Badge Overlay -->
       <span class="absolute top-1.5 left-1.5 sm:top-2.5 sm:left-2.5 px-1.5 py-0.5 sm:px-2 sm:py-0.75 rounded text-[7.5px] leading-[1.1] sm:text-[10px] md:text-[11px] font-bold tracking-wide uppercase text-white shadow-sm z-10 max-w-[calc(100%-42px)] sm:max-w-none line-clamp-2 break-words text-left" style="background-color: ${storeBadgeColor};" title="${escapeHtml(store)}">
         ${escapeHtml(shortStore)}
@@ -1019,6 +1419,7 @@ function createDealCardHtml(offer, index) {
           </div>
           ${discountTagHtml}
           ${restrictionBadgeHtml}
+          ${cartButtonHtml}
         </div>
       </div>
     </div>
@@ -1223,6 +1624,7 @@ async function renderModalWillysReference(productName) {
 }
 
 function openProductModal(offer) {
+  state.activeModalOffer = offer;
   const backdrop = document.getElementById('product-modal-backdrop');
   const modal = document.getElementById('product-modal');
   if (!backdrop || !modal) return;
@@ -1347,6 +1749,9 @@ function openProductModal(offer) {
   // Willys Reference Price Box inside Modal (Async & strict score matching)
   renderModalWillysReference(productName);
 
+  // Update modal cart button state
+  updateActiveModalCartButton();
+
   // Show Modal with Animation
   backdrop.classList.remove('hidden');
   void backdrop.offsetWidth;
@@ -1414,6 +1819,58 @@ function setupEventListeners() {
     }
   });
 
+  // Shopping List Event Listeners
+  const btnOpenCart = document.getElementById('btn-open-cart');
+  const btnFloatingCart = document.getElementById('btn-floating-cart');
+  const btnCloseCart = document.getElementById('btn-close-cart');
+  const cartBackdrop = document.getElementById('cart-backdrop');
+  const btnCopyCart = document.getElementById('btn-copy-cart');
+  const btnClearCart = document.getElementById('btn-clear-cart');
+  const btnModalAddCart = document.getElementById('btn-modal-add-cart');
+
+  if (btnOpenCart) btnOpenCart.addEventListener('click', () => toggleCartDrawer(true));
+  if (btnFloatingCart) btnFloatingCart.addEventListener('click', () => toggleCartDrawer(true));
+  if (btnCloseCart) btnCloseCart.addEventListener('click', () => toggleCartDrawer(false));
+  if (cartBackdrop) cartBackdrop.addEventListener('click', () => toggleCartDrawer(false));
+
+  if (btnCopyCart) btnCopyCart.addEventListener('click', copyCartToClipboard);
+  if (btnClearCart) btnClearCart.addEventListener('click', clearCart);
+
+  if (btnModalAddCart) {
+    btnModalAddCart.addEventListener('click', () => {
+      if (state.activeModalOffer) {
+        addToCart(state.activeModalOffer, 1);
+      }
+    });
+  }
+
+  // Cart Drawer Items Delegation
+  const cartContainer = document.getElementById('cart-items-container');
+  if (cartContainer) {
+    cartContainer.addEventListener('click', (e) => {
+      const btnAction = e.target.closest('[data-action]');
+      if (!btnAction) return;
+
+      const action = btnAction.dataset.action;
+      const cartId = btnAction.dataset.cartId;
+
+      if (action === 'inc-qty') {
+        updateCartItemQty(cartId, 1);
+      } else if (action === 'dec-qty') {
+        updateCartItemQty(cartId, -1);
+      } else if (action === 'remove-item') {
+        removeFromCart(cartId);
+      }
+    });
+
+    cartContainer.addEventListener('change', (e) => {
+      if (e.target.dataset.action === 'toggle-check') {
+        const cartId = e.target.dataset.cartId;
+        toggleCartItemChecked(cartId);
+      }
+    });
+  }
+
   // Product Modal Event Listeners
   const btnCloseProductModal = document.getElementById('btn-close-product-modal');
   const btnCloseModalFooter = document.getElementById('btn-close-modal-footer');
@@ -1433,6 +1890,22 @@ function setupEventListeners() {
 
   if (dealsGrid) {
     dealsGrid.addEventListener('click', (e) => {
+      const actionBtn = e.target.closest('[data-action]');
+      if (actionBtn) {
+        e.stopPropagation();
+        const action = actionBtn.dataset.action;
+        const index = parseInt(actionBtn.dataset.dealIndex, 10);
+        if (!isNaN(index) && state.filteredOffers[index]) {
+          const offer = state.filteredOffers[index];
+          if (action === 'card-add-cart' || action === 'card-inc-cart') {
+            addToCart(offer, 1);
+          } else if (action === 'card-dec-cart') {
+            addToCart(offer, -1);
+          }
+        }
+        return;
+      }
+
       const card = e.target.closest('[data-deal-index]');
       if (!card) return;
       const index = parseInt(card.dataset.dealIndex, 10);
@@ -1599,6 +2072,8 @@ function setupEventListeners() {
 
 // --- Initialization on DOM Load ---
 document.addEventListener('DOMContentLoaded', () => {
+  state.cart = loadCartFromStorage();
   setupEventListeners();
   fetchDealsData();
+  updateCartUI();
 });
