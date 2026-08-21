@@ -517,6 +517,18 @@ function updateCartUI() {
   updateActiveModalCartButton();
 }
 
+function getStoreColor(storeName) {
+  const s = String(storeName || '').trim();
+  if (STORE_COLORS[s]) return STORE_COLORS[s].bg;
+  const lower = s.toLowerCase();
+  if (lower.includes('ica')) return '#E21936';
+  if (lower.includes('willys')) return '#009345';
+  if (lower.includes('hemköp')) return '#D31115';
+  if (lower.includes('coop')) return '#007A33';
+  if (lower.includes('lidl')) return '#00509E';
+  return '#4B5563';
+}
+
 function renderCartDrawer() {
   const container = document.getElementById('cart-items-container');
   if (!container) return;
