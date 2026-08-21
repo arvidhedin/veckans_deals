@@ -379,7 +379,7 @@ function renderCategoryPills() {
                 : 'bg-rose-50 text-rose-900 border-rose-200/90 hover:bg-rose-100 hover:border-rose-300'
             }"
           >
-            <span>🥩 Kött <80 kr/kg</span>
+            <span>Kött <80 kr/kg</span>
             <span class="px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
               isMeatUnder80Active ? 'bg-rose-900 text-rose-100' : 'bg-rose-200/80 text-rose-900'
             }">${meatUnder80Count}</span>
