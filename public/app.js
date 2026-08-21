@@ -106,8 +106,7 @@ function categorizeOfferJS(offer) {
   const rawCat = (offer.category || '').toLowerCase();
   if (rawCat.includes('frukt') || rawCat.includes('grönt')) return 'Frukt & Grönt';
   if (rawCat.includes('mejeri')) return 'Mejeri & Ägg';
-  if (rawCat.includes('bröd') || rawCat.includes('bageri') || rawCat.includes('kex')) return 'Bröd & Bageri';
-  if (rawCat.includes('skafferi')) return 'Skafferi';
+  if (rawCat.includes('bröd') || rawCat.includes('bageri')) return 'Bröd & Bageri';
   if (rawCat.includes('kött') || rawCat.includes('chark')) return 'Kött & Fågel';
   if (rawCat.includes('fisk') || rawCat.includes('skaldjur')) return 'Fisk & Skaldjur';
   if (rawCat.includes('dryck')) return 'Dryck';
@@ -115,34 +114,34 @@ function categorizeOfferJS(offer) {
 
   const text = `${offer.product || ''} ${offer.brand || ''} ${offer.description || ''}`.toLowerCase();
   
-  if (/kött|färs|kyckling|fläsk|nötkött|korv|bacon|skinka|karré|kotlett|entrecote|biff|kalkon|lever|chark|salami|medwurst|falukorv|grillkorv|blodpudding|rostbiff|kebab/i.test(text)) {
+  if (/kött|färs|kyckling|fläsk|nötkött|korv|bacon|skinka|karré|karre|kotlett|entrecote|entrecôte|biff|lövbiff|rostbiff|kalkon|lever|chark|salami|medwurst|medwurt|pulled pork|ribs|revbensspjäll|lamm|späck|charkuterier|leverpastej|falukorv|grillkorv|wienerkorv|varmkorv|ölkorv|blodpudding|sylta|oxfilé|fläskfilé|högrev|fransyska|schnitzel|kassler|fläskytterfilé|kebab|grytbitar|chorizo|cabanoss|prinskorv|smörgåspålägg|prosciutto|jamon|mortadella|pasteta|paté|pate|fläskbog|fläsklägg|grillkarré|flapsteak|spickekött|fuet|\bnöt\b|\box\b|\bbog\b|\blägg\b|bringa/i.test(text)) {
     return 'Kött & Fågel';
   }
-  if (/fisk|lax|torsk|räkor|räka|sill|makrill|tunnfisk|tuna|kräftor|sej|spätta|musslor|skaldjur|rom|fiskpinnar/i.test(text)) {
+  if (/fisk|lax|torsk|räkor|räka|sill|makrill|tunnfisk|tuna|tonfisk|kräftor|kräfta|sej|spätta|musslor|skaldjur|lutfisk|\brom\b|fiskpinnar|fiskkaka|fiskgratäng|surströmming|hummer|krabba|fiskfilé|panerad fisk|bläckfisk|scampi|laxfilé|torskfilé|sejfilé|röding|öring|caviar|kaviar|tångcaviar/i.test(text)) {
     return 'Fisk & Skaldjur';
   }
-  if (/mjölk|grädde|smör|ost|ostar|margarin|yoggi|yoghurt|fil|filmjölk|kvarg|ägg|crème fraiche|creme fraiche|keso|halloumi|mozzarella|vispgrädde|bregott|flora|lätta|kesella|gräddfil|ricotta|feta|vitost|brie|gouda|hushållsost|prästost|herrgård|grevé|västerbottensost/i.test(text)) {
+  if (/mjölk|grädde|smör|ost|ostar|margarin|yoggi|yoghurt|fil|filmjölk|kvarg|ägg|crème fraiche|creme fraiche|fraiche|keso|halloumi|norrloumi|mozzarella|vispgrädde|matlagningsgrädde|bregott|flora|lätta|kesella|gräddfil|ricotta|feta|vitost|brie|camembert|parmesan|parmigiano|gouda|hushållsost|prästost|herrgård|grevé|svecia|västerbottensost|gräddost|havredryck|mandeldryck|sojadryck|oatly|yalla|actimel|danonino|skyr|hamburgerost|smältost|mjukost|skivost|rivost|proteinshake/i.test(text)) {
     return 'Mejeri & Ägg';
   }
-  if (/frukt|grönsak|bär|äpple|äpplen|banan|bananer|potatis|tomat|tomater|gurka|gurkor|sallad|lök|morot|morötter|majs|avokado|melon|citron|citroner|apelsin|apelsiner|druvor|jordgubb|hallon|blåbär|paprika|vitlök|champinjon|svamp|clementin|nektarin|persika|plommon|kiwi|kolv|broccoli|blomkål|spenat|rotfrukter|purjolök|ruccola|basilika|persilja|dill|kål|lime|ingefära|chili|mango|ananas|päron/i.test(text)) {
+  if (/frukt|grönsak|grönsaker|grönt|bär|äpple|äpplen|banan|bananer|potatis|färskpotatis|tomat|tomater|gurka|gurkor|sallad|lök|morot|morötter|majs|majskolv|avokado|melon|citron|citroner|apelsin|apelsiner|druvor|jordgubb|hallon|blåbär|paprika|vitlök|champinjon|svamp|clementin|satsumas|nektarin|persika|plommon|kiwi|kolv|broccoli|blomkål|spenat|rotfrukter|sparris|purjolök|ruccola|basilika|persilja|dill|krasse|selleri|palsternacka|rödbetor|kål|vitkål|rödkål|grönkål|lime|ingefära|chili|mango|ananas|päron|vindruvor|grapefrukt|småbladsmix|kronärtskocka|sharon|kaki|granatäpple|solrosor|blommor|bukett|krysantemum|växt|krukväxt/i.test(text)) {
     return 'Frukt & Grönt';
   }
-  if (/bröd|kaka|kakor|bulle|bullar|tårta|knäcke|knäckebröd|fralla|frallor|pita|tortilla|toast|croissant|korvbröd|hamburgerbröd|limpa|pågen|fazer|skogaholm|våffl|donut|muffin|kanelbulle|vaniljbulle|semla/i.test(text)) {
+  if (/bröd|kaka|kakor|bulle|bullar|tårta|knäcke|knäckebröd|fralla|frallor|pita|tortilla|toast|croissant|korvbröd|hamburgerbröd|limpa|pågen|pågens|fazer|skogaholm|våffl|donut|muffin|bagel|wienerbröd|kanelbulle|vaniljbulle|semla|kladdkaka|surdeg|rågbröd|lingongrova|hönökaka|vetekaka|tekaka|fullkornsbröd|småbröd|polarbröd|polarkaka|formbröd|formfranska|rostbröd|scones|bageri|pinsa|panini|mellangrova/i.test(text)) {
     return 'Bröd & Bageri';
   }
-  if (/chips|dipp|godis|choklad|popcorn|nötter|kex|ostbågar|lakrits|tuggummi|marabou|estrella|olw|cloetta|haribo|cheez|snacks|cashew|mandel|pistage|valnöt|jordnötter|kexchoklad|daim|twix|snickers|dumle/i.test(text)) {
+  if (/chips|dipp|godis|choklad|popcorn|nötter|nötblandning|nötmix|kex|ostbågar|ostkrokar|lakrits|tuggummi|marabou|estrella|olw|cloetta|haribo|cheez|snacks|wafer|proteinbar|\bbar\b|\bbars\b|corny|cashew|mandel|pistage|valnöt|jordnötter|solroskärnor|chiafrön|lösgodis|kexchoklad|daim|twix|snickers|mars|bounty|dumle|geisha|alesto|nutella|halva|delicatoboll|läkerol|halstabletter|fisherman/i.test(text)) {
     return 'Snacks & Godis';
   }
-  if (/läsk|saft|vatten|juice|energidryck|öl|cider|alkoholfri|must|coca-cola|cola|pepsi|fanta|sprite|nocco|celsius|red bull|ramlösa|loka|monster|tonic|iskaffe|smoothie|dricka/i.test(text)) {
+  if (/läsk|saft|vatten|juice|energidryck|öl|cider|alkoholfri|must|coca-cola|coca cola|cola|pepsi|fanta|sprite|nocco|celsius|red bull|ramlösa|loka|monster|tonic|iskaffe|smoothie|kombucha|dricka|måltidsdryck|lättöl|festis|tropicana|god morgon|brämhults|trocadero|pucko|zingo|7up|powerade|gainomax|proteindryck|fun light|nyponsoppa|fruktdryck|matlagningsvin|peroni/i.test(text)) {
     return 'Dryck';
   }
-  if (/pasta|ris|mjöl|socker|olja|vinäger|kaffe|te|sås|ketchup|senap|konserv|linser|bönor|krydda|kryddor|buljong|müsli|musli|flingor|havregryn|pesto|taco|tacos|spaghetti|makaroner|matolja|rapsolja|olivolja|majonnäs|sylt|marmelad|honung|gevalia|zoegas|arvid nordquist|löfbergs|nudlar|couscous|dressing|tomatkross/i.test(text)) {
+  if (/pasta|ris|basmati|jasminris|risotto|mjöl|socker|olja|vinäger|kaffe|te|sås|ketchup|senap|konserv|linser|bönor|krydda|kryddor|buljong|müsli|musli|granola|cheerios|frosties|cornflakes|havreringar|cereal|flingor|havregryn|pesto|taco|tacos|spaghetti|macaroni|makaroner|matolja|rapsolja|olivolja|majonnäs|mayo|sylt|marmelad|honung|gevalia|zoegas|arvid nordquist|löfbergs|nescafé|nesquik|nudlar|couscous|bulgur|dressing|marinad|salsa|tomatkross|passerade tomater|kokosmjölk|cornichons|oliver|kapris|barnmat|välling|gröt|sirap|ströbröd|tofu|hummus|\bfond\b|\bsoja\b|lasagne|grytbas/i.test(text)) {
     return 'Skafferi';
   }
-  if (/fryst|djupfryst|pizza|pizzor|pytt|färdigrätt|glass|paj|nuggets|pommes|gb glace|dafgård|findus|felix|pirog|gorbys|billys/i.test(text)) {
+  if (/fryst|djupfryst|pizza|pizzor|pytt|färdigrätt|enportionsrätter|thaibox|vårrullar|glass|paj|nuggets|pommes|gb glace|triumf|dafgård|findus|felix|pirog|gorbys|billys|hamburgare|matlåda/i.test(text)) {
     return 'Frys & Färdigmat';
   }
-  if (/tvättmedel|sköljmedel|rengöring|schampo|tvål|blöjor|toalettpapper|hushållspapper|tandkräm|diskmedel|fryspåsar|plastpåsar|avfallspåsar|deodorant|balsam|duschgel|lotion|kattmat|hundmat|multivitamin|omega 3|listerine|munskölj|städservetter/i.test(text)) {
+  if (/tvättmedel|tvättkapslar|sköljmedel|rengöring|schampo|shampoo|tvål|handtvål|duschtvål|duschgel|duschcreme|blöjor|blöjpåse|toalettpapper|hushållspapper|tandkräm|diskmedel|fryspåsar|plastpåsar|avfallspåsar|sopsäck|hundbajspåse|deodorant|deo|balsam|lotion|hudkräm|hårfärg|kattmat|kattsand|hundmat|dentasticks|multivitamin|omega 3|vitamin|vitam|magnesium|kreatin|creatine|gummies|listerine|munskölj|städservetter|diskborste|disksvamp|diskduk|servetter|hälsa & skönhet|tandborste|tandborsthuvud|värmeljus|ljus|rakhyvel|ansiktsmask|bindor|trosskydd|intimtvätt|libresse|alunrot|batterier|batteri|plastfolie|folie|pappmugg|hink|mopp|tvättlappar|maskindisktabletter/i.test(text)) {
     return 'Hushåll & Hygien';
   }
 

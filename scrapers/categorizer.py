@@ -7,82 +7,101 @@ import re
 
 CATEGORIES = [
     ("Kött & Fågel", [
-        r"kött", r"färs", r"kyckling", r"fläsk", r"nötkött", r"korv", r"bacon", r"skinka",
-        r"karré", r"kotlett", r"entrecote", r"biff", r"kalkon", r"lever", r"chark", r"salami",
-        r"medwurst", r"medwurt", r"pulled pork", r"ribs", r"rebensspjäll", r"lamm", r"späck",
-        r"charkuterier", r"leverpastej", r"falukorv", r"grillkorv", r"wienerkorv", r"blodpudding",
-        r"sylta", r"rostbiff", r"oxfilé", r"fläskfilé", r"högrev", r"fransyska", r"schnitzel",
-        r"kassler", r"fläskytterfilé", r"kebab", r"grytbitar", r"chorizo", r"cabanoss", r"prinskorv"
+        "kött", "färs", "kyckling", "fläsk", "nötkött", "korv", "bacon", "skinka",
+        "karré", "karre", "kotlett", "entrecote", "entrecôte", "biff", "lövbiff", "rostbiff",
+        "kalkon", "lever", "chark", "salami", "medwurst", "medwurt", "pulled pork", "ribs",
+        "revbensspjäll", "lamm", "späck", "charkuterier", "leverpastej", "falukorv", "grillkorv",
+        "wienerkorv", "varmkorv", "ölkorv", "blodpudding", "sylta", "oxfilé", "fläskfilé",
+        "högrev", "fransyska", "schnitzel", "kassler", "fläskytterfilé", "kebab", "grytbitar",
+        "chorizo", "cabanoss", "prinskorv", "smörgåspålägg", "prosciutto", "jamon", "mortadella",
+        "pasteta", "paté", "pate", "fläskbog", "fläsklägg", "grillkarré", "flapsteak", "spickekött",
+        "fuet", "nöt", "ox", "bog", "lägg", "bringa"
     ]),
     ("Fisk & Skaldjur", [
-        r"fisk", r"lax", r"torsk", r"räkor", r"räka", r"sill", r"makrill", r"tunnfisk", r"tuna",
-        r"kräftor", r"kräfta", r"sej", r"spätta", r"musslor", r"skaldjur", r"lutfisk", r"rogn",
-        r"rom\b", r"fiskpinnar", r"fiskkaka", r"fiskgratäng", r"surströmming", r"hummer", r"krabba",
-        r"fiskfilé", r"panerad fisk"
+        "fisk", "lax", "torsk", "räkor", "räka", "sill", "makrill", "tunnfisk", "tuna",
+        "tonfisk", "kräftor", "kräfta", "sej", "spätta", "musslor", "skaldjur", "lutfisk",
+        "rom", "fiskpinnar", "fiskkaka", "fiskgratäng", "surströmming", "hummer", "krabba",
+        "fiskfilé", "panerad fisk", "bläckfisk", "scampi", "laxfilé", "torskfilé", "sejfilé",
+        "röding", "öring", "caviar", "kaviar", "tångcaviar"
     ]),
     ("Mejeri & Ägg", [
-        r"mjölk", r"grädde", r"smör", r"ost\b", r"ostar\b", r"margarin", r"yoggi", r"yoghurt",
-        r"fil\b", r"filmjölk", r"kvarg", r"ägg", r"crème fraiche", r"creme fraiche", r"keso",
-        r"halloumi", r"mozzarella", r"vispgrädde", r"matlagningsgrädde", r"bregott", r"flora",
-        r"lätta", r"kesella", r"gräddfil", r"riposta", r"ricotta", r"feta", r"vitost", r"brie",
-        r"camembert", r"parmesan", r"goudabron", r"gouda", r"hushållsost", r"prästost", r"herrgård",
-        r"grevé", r"svecia", r"västerbottensost", r"havredryck", r"mandeldryck", r"sojadryck", r"oatly"
+        "mjölk", "grädde", "smör", "ost", "ostar", "margarin", "yoggi", "yoghurt",
+        "fil", "filmjölk", "kvarg", "ägg", "crème fraiche", "creme fraiche", "fraiche", "keso",
+        "halloumi", "norrloumi", "mozzarella", "vispgrädde", "matlagningsgrädde", "bregott", "flora",
+        "lätta", "kesella", "gräddfil", "ricotta", "feta", "vitost", "brie", "camembert",
+        "parmesan", "parmigiano", "gouda", "hushållsost", "prästost", "herrgård", "grevé", "svecia",
+        "västerbottensost", "gräddost", "havredryck", "mandeldryck", "sojadryck", "oatly", "yalla",
+        "actimel", "danonino", "skyr", "hamburgerost", "smältost", "mjukost", "skivost", "rivost",
+        "proteinshake"
     ]),
     ("Frukt & Grönt", [
-        r"frukt", r"grönsak", r"bär", r"äpple", r"äpplen", r"banan", r"bananer", r"potatis",
-        r"tomat", r"tomater", r"gurka", r"gurkor", r"sallad", r"lök", r"morot", r"morötter",
-        r"majs", r"avokado", r"melon", r"citron", r"citroner", r"apelsin", r"apelsiner", r"druvor",
-        r"jordgubb", r"hallon", r"blåbär", r"paprika", r"vitlök", r"champinjon", r"svamp",
-        r"clementin", r"satsumas", r"nektarin", r"persika", r"plommon", r"kiwi", r"kolv", r"broccoli",
-        r"blomkål", r"spenat", r"rotfrukter", r"sparris", r"purjolök", r"ruccola", r"basilika",
-        r"persilja", r"dill", r"krasse", r"selleri", r"palsternacka", r"rödbetor", r"kål",
-        r"salladskål", r"vitkål", r"rödkål", r"grönkål", r"lime", r"ingefära", r"chili",
-        r"mango", r"ananas", r"päron", r"vindruvor", r"grapefrukt", r"småbladsmix"
+        "frukt", "grönsak", "grönsaker", "grönt", "bär", "äpple", "äpplen", "banan", "bananer",
+        "potatis", "färskpotatis", "tomat", "tomater", "gurka", "gurkor", "sallad", "lök",
+        "morot", "morötter", "majs", "majskolv", "avokado", "melon", "citron", "citroner",
+        "apelsin", "apelsiner", "druvor", "jordgubb", "hallon", "blåbär", "paprika", "vitlök",
+        "champinjon", "svamp", "clementin", "satsumas", "nektarin", "persika", "plommon", "kiwi",
+        "kolv", "broccoli", "blomkål", "spenat", "rotfrukter", "sparris", "purjolök", "ruccola",
+        "basilika", "persilja", "dill", "krasse", "selleri", "palsternacka", "rödbetor", "kål",
+        "vitkål", "rödkål", "grönkål", "lime", "ingefära", "chili", "mango", "ananas",
+        "päron", "vindruvor", "grapefrukt", "småbladsmix", "kronärtskocka", "sharon", "kaki",
+        "granatäpple", "solrosor", "blommor", "bukett", "krysantemum", "växt", "krukväxt"
     ]),
     ("Bröd & Bageri", [
-        r"bröd", r"kaka", r"kakor", r"bulle", r"bullar", r"tårta", r"knäcke", r"knäckebröd",
-        r"fralla", r"frallor", r"pita", r"tortilla", r"toast", r"croissant", r"korvbröd",
-        r"hamburgerbröd", r"limpa", r"pågen", r"fazer", r"skogaholm", r"våffl", r"donut",
-        r"muffin", r"bagel", r"wienerbröd", r"kanelbulle", r"vaniljbulle", r"semla", r"kladdkaka",
-        r"surdeg", r"ljust bröd", r"mörkt bröd", r"rågbröd", r"lingongrova", r"hönökaka"
+        "bröd", "kaka", "kakor", "bulle", "bullar", "tårta", "knäcke", "knäckebröd",
+        "fralla", "frallor", "pita", "tortilla", "toast", "croissant", "korvbröd",
+        "hamburgerbröd", "limpa", "pågen", "pågens", "fazer", "skogaholm", "våffl", "donut",
+        "muffin", "bagel", "wienerbröd", "kanelbulle", "vaniljbulle", "semla", "kladdkaka",
+        "surdeg", "rågbröd", "lingongrova", "hönökaka", "vetekaka", "tekaka", "fullkornsbröd",
+        "småbröd", "polarbröd", "polarkaka", "formbröd", "formfranska", "rostbröd", "scones",
+        "bageri", "pinsa", "panini", "mellangrova"
     ]),
     ("Snacks & Godis", [
-        r"chips", r"dipp?\b", r"godis", r"choklad", r"popcorn", r"nötter", r"kex", r"ostbågar",
-        r"lakrits", r"tuggummi", r"marabou", r"estrella", r"olw", r"cloetta", r"haribo",
-        r"cheez", r"snacks", r"wafer", r"proteinbar", r"cashew", r"mandel", r"pistage",
-        r"valnöt", r"jordnötter", r"lösgodis", r"palle kuling", r"mentos", r"aladdin", r"paradise",
-        r"kexchoklad", r"daim", r"twix", r"snickers", r"mars", r"bounty", r"dumle", r"geisha"
+        "chips", "dipp", "godis", "choklad", "popcorn", "nötter", "nötblandning", "nötmix",
+        "kex", "ostbågar", "ostkrokar", "lakrits", "tuggummi", "marabou", "estrella", "olw",
+        "cloetta", "haribo", "cheez", "snacks", "wafer", "proteinbar", "bar", "bars",
+        "corny", "cashew", "mandel", "pistage", "valnöt", "jordnötter", "solroskärnor",
+        "chiafrön", "lösgodis", "kexchoklad", "daim", "twix", "snickers", "mars", "bounty",
+        "dumle", "geisha", "alesto", "nutella", "halva", "delicatoboll", "läkerol",
+        "halstabletter", "fisherman"
     ]),
     ("Dryck", [
-        r"läsk", r"saft", r"vatten", r"juice", r"energidryck", r"öl", r"cider", r"alkoholfri",
-        r"must", r"coca-cola", r"coca cola", r"cola", r"pepsi", r"fanta", r"sprite", r"nocco",
-        r"celsius", r"red bull", r"ramlösa", r"loka", r"monster", r"tonic", r"iskaffe",
-        r"smoothie", r"kombucha", r"dricka", r"måltidsdryck", r"lättöl", r"festis", r"mer\b",
-        r"tropicana", r"god morgon", r"brämhults", r"funktion dryck"
+        "läsk", "saft", "vatten", "juice", "energidryck", "öl", "cider", "alkoholfri",
+        "must", "coca-cola", "coca cola", "cola", "pepsi", "fanta", "sprite", "nocco",
+        "celsius", "red bull", "ramlösa", "loka", "monster", "tonic", "iskaffe",
+        "smoothie", "kombucha", "dricka", "måltidsdryck", "lättöl", "festis", "tropicana",
+        "god morgon", "brämhults", "trocadero", "pucko", "zingo", "7up", "powerade",
+        "gainomax", "proteindryck", "fun light", "nyponsoppa", "fruktdryck", "matlagningsvin",
+        "peroni"
     ]),
     ("Skafferi", [
-        r"pasta", r"ris\b", r"mjöl", r"socker", r"olja", r"vinäger", r"kaffe", r"te\b",
-        r"sås", r"ketchup", r"senap", r"konserv", r"linser", r"bönor", r"krydda", r"kryddor",
-        r"buljong", r"müsli", r"musli", r"flingor", r"havregryn", r"pesto", r"taco", r"tacos",
-        r"spaghetti", r"macaroni", r"makaroner", r"matolja", r"rapsolja", r"olivolja",
-        r"majonnäs", r"mayo", r"sylt", r"marmelad", r"honung", r"gevalia", r"zoegas",
-        r"arvid nordquist", r"löfbergs", r"nescafé", r"nudlar", r"couscous", r"bulgur",
-        r"havrefras", r"kallpressad", r"dressing", r"marinad", r"salsa", r"tomatkross",
-        r"passerade tomater", r"kokosmjölk", r"tonfisk", r"majsstärkelse", r"ströbröd",
-        r"bakpulver", r"vaniljsocker", r"jäst"
+        "pasta", "ris", "basmati", "jasminris", "risotto", "mjöl", "socker", "olja",
+        "vinäger", "kaffe", "te", "sås", "ketchup", "senap", "konserv", "linser",
+        "bönor", "krydda", "kryddor", "buljong", "müsli", "musli", "granola", "cheerios",
+        "frosties", "cornflakes", "havreringar", "cereal", "flingor", "havregryn", "pesto",
+        "taco", "tacos", "spaghetti", "macaroni", "makaroner", "matolja", "rapsolja",
+        "olivolja", "majonnäs", "mayo", "sylt", "marmelad", "honung", "gevalia", "zoegas",
+        "arvid nordquist", "löfbergs", "nescafé", "nesquik", "nudlar", "couscous", "bulgur",
+        "dressing", "marinad", "salsa", "tomatkross", "passerade tomater", "kokosmjölk",
+        "cornichons", "oliver", "kapris", "barnmat", "välling", "gröt", "sirap", "ströbröd",
+        "tofu", "hummus", "fond", "soja", "lasagne", "grytbas"
     ]),
     ("Frys & Färdigmat", [
-        r"fryst", r"djupfryst", r"apfelstrudel", r"pizza", r"pizzor", r"pytt", r"färdigrätt",
-        r"glass", r"paj", r"nuggets", r"pommes", r"gb glace", r"triumf", r"dafgård",
-        r"findus", r"felix", r"pirog", r"gorbys", r"billys", r"hamburgare", r"kebabtallrik"
+        "fryst", "djupfryst", "pizza", "pizzor", "pytt", "färdigrätt", "enportionsrätter",
+        "thaibox", "vårrullar", "glass", "paj", "nuggets", "pommes", "gb glace", "triumf",
+        "dafgård", "findus", "felix", "pirog", "gorbys", "billys", "hamburgare", "matlåda"
     ]),
     ("Hushåll & Hygien", [
-        r"tvättmedel", r"sköljmedel", r"rengöring", r"schampo", r"tvål", r"blöjor",
-        r"toalettpapper", r"hushållspapper", r"tandkräm", r"diskmedel", r"fryspåsar",
-        r"plastpåsar", r"avfallspåsar", r"deodorant", r"deo", r"balsam", r"duschcreme",
-        r"duschgel", r"lotion", r"kattmat", r"hundmat", r"multivitamin", r"omega 3",
-        r"vitam", r"listerine", r"munskölj", r"städservetter", r"diskborste", r"disksvamp",
-        r"servetter", r"hälsa & skönhet", r"tandborste", r"tandsmörj", r"hudkräm"
+        "tvättmedel", "tvättkapslar", "sköljmedel", "rengöring", "schampo", "shampoo",
+        "tvål", "handtvål", "duschtvål", "duschgel", "duschcreme", "blöjor", "blöjpåse",
+        "toalettpapper", "hushållspapper", "tandkräm", "diskmedel", "fryspåsar", "plastpåsar",
+        "avfallspåsar", "sopsäck", "hundbajspåse", "deodorant", "deo", "balsam", "lotion",
+        "hudkräm", "hårfärg", "kattmat", "kattsand", "hundmat", "dentasticks", "multivitamin",
+        "omega 3", "vitamin", "vitam", "magnesium", "kreatin", "creatine", "gummies",
+        "listerine", "munskölj", "städservetter", "diskborste", "disksvamp", "diskduk",
+        "servetter", "hälsa & skönhet", "tandborste", "tandborsthuvud", "värmeljus",
+        "ljus", "rakhyvel", "ansiktsmask", "bindor", "trosskydd", "intimtvätt", "libresse",
+        "alunrot", "batterier", "batteri", "plastfolie", "folie", "pappmugg", "hink",
+        "mopp", "tvättlappar", "maskindisktabletter"
     ])
 ]
 
@@ -95,13 +114,8 @@ def categorize_offer(offer: dict) -> str:
         return "Frukt & Grönt"
     if "mejeri" in raw_cat:
         return "Mejeri & Ägg"
-    if "bröd" in raw_cat or "bageri" in raw_cat or "kex" in raw_cat:
+    if "bröd" in raw_cat or "bageri" in raw_cat:
         return "Bröd & Bageri"
-    if "skafferi" in raw_cat:
-        prod_desc = f"{offer.get('product', '')} {offer.get('description', '')}".lower()
-        if any(w in prod_desc for w in ["städ", "tvätt", "påse", "fryspåse", "servett", "disk"]):
-            return "Hushåll & Hygien"
-        return "Skafferi"
     if "kött" in raw_cat or "chark" in raw_cat:
         return "Kött & Fågel"
     if "fisk" in raw_cat or "skaldjur" in raw_cat:
@@ -112,9 +126,9 @@ def categorize_offer(offer: dict) -> str:
         return "Snacks & Godis"
 
     text = f"{offer.get('product', '')} {offer.get('brand', '')} {offer.get('description', '')}".lower()
-    for cat_name, patterns in CATEGORIES:
-        for pat in patterns:
-            if re.search(r"\b" + pat + r"\b", text) or (len(pat) > 4 and pat in text):
+    for cat_name, keywords in CATEGORIES:
+        for kw in keywords:
+            if kw in text:
                 return cat_name
 
     if "djupfryst" in raw_cat or "fryst" in raw_cat:
