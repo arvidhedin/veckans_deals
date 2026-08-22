@@ -783,6 +783,13 @@ function isMeatUnder80PerKg(offer) {
   const cat = offer.category || categorizeOfferJS(offer);
   if (cat !== 'Kött & Fågel') return false;
 
+  // Exclude Korv & Blodpudding from <80 kr/kg filter
+  const text = `${offer.product || ''} ${offer.brand || ''} ${offer.description || ''}`.toLowerCase();
+  const excludedKeywords = ['korv', 'blodpudding', 'chorizo', 'cabanoss', 'salsiccia', 'hotdog', 'hot dog'];
+  if (excludedKeywords.some(kw => text.includes(kw))) {
+    return false;
+  }
+
   const { pricePerUnit, isExplicitPerKg } = extractPerUnitDealPriceJS(offer.price);
   if (pricePerUnit <= 0) return false;
 
