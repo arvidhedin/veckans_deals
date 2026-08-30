@@ -3,7 +3,10 @@
  * https://uppsaladeals.se/mida
  */
 
-// Dynamic Supabase Configuration
+// Supabase Configuration
+const DEFAULT_SUPABASE_URL = 'https://jxcrcskgrotcxkxhoyuq.supabase.co';
+const DEFAULT_SUPABASE_KEY = 'sb_publishable_T68Zi9lPvBSq9ME4vMAsFg_lg_aAV9g';
+
 function getSupabaseConfig() {
   try {
     const hash = window.location.hash;
@@ -21,8 +24,8 @@ function getSupabaseConfig() {
   }
 
   const windowConfig = window.MIDA_CONFIG || {};
-  const url = windowConfig.SUPABASE_URL || localStorage.getItem('mida_supabase_url') || '';
-  const key = windowConfig.SUPABASE_KEY || localStorage.getItem('mida_supabase_key') || '';
+  const url = windowConfig.SUPABASE_URL || localStorage.getItem('mida_supabase_url') || DEFAULT_SUPABASE_URL;
+  const key = windowConfig.SUPABASE_KEY || localStorage.getItem('mida_supabase_key') || DEFAULT_SUPABASE_KEY;
 
   return { url, key };
 }
@@ -33,6 +36,7 @@ let supabaseClient = null;
 if (SUPABASE_URL && SUPABASE_KEY && window.supabase) {
   try {
     supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    console.log('Connected to Supabase:', SUPABASE_URL);
   } catch (err) {
     console.warn('Supabase initialization warning:', err);
   }
