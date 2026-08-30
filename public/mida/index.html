@@ -263,7 +263,7 @@
       </div>
 
       <!-- Host status for this day -->
-      <div id="day-modal-host-box" class="bg-slate-950 p-3.5 rounded-2xl border border-slate-800 flex items-center justify-between">
+      <div id="day-modal-host-box" class="bg-slate-950 p-3.5 rounded-2xl border border-slate-800 flex items-center justify-between gap-3">
         <div class="flex items-center gap-3">
           <div class="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-sm">👑</div>
           <div>
@@ -271,7 +271,19 @@
             <div id="day-modal-host-name" class="text-xs font-bold text-white">Sten</div>
           </div>
         </div>
-        <div id="day-modal-time-badge" class="px-2.5 py-1 rounded-lg bg-slate-800 text-amber-300 font-mono text-xs font-bold">kl. 18:30</div>
+
+        <div class="flex items-center gap-2">
+          <!-- Host time editor (shown if host) -->
+          <div id="day-modal-host-time-edit" class="hidden flex items-center gap-1.5 bg-slate-900 border border-slate-800 rounded-xl px-2 py-1">
+            <span class="text-[11px] text-slate-400">Tid:</span>
+            <input type="time" id="day-modal-input-time" class="bg-transparent text-xs text-amber-300 font-mono font-bold focus:outline-none w-16" value="18:30">
+            <button id="btn-day-modal-save-time" class="px-2 py-0.5 bg-amber-500 hover:bg-amber-400 text-slate-950 text-[10px] font-extrabold rounded-md cursor-pointer transition">
+              Spara
+            </button>
+          </div>
+          <!-- Regular time badge (shown if not host) -->
+          <div id="day-modal-time-badge" class="px-2.5 py-1 rounded-lg bg-slate-800 text-amber-300 font-mono text-xs font-bold">kl. 18:30</div>
+        </div>
       </div>
 
       <!-- Voting Section with 3 distinct levels -->
@@ -313,10 +325,14 @@
         </div>
       </div>
 
-      <!-- Host Action: Finalize this date -->
-      <div id="day-modal-host-actions" class="hidden pt-3 border-t border-slate-800">
-        <button id="btn-day-modal-confirm" class="w-full py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs transition cursor-pointer">
-          ✓ Spika detta som officiellt datum
+      <!-- Host Actions: Finalize or Delete this proposal -->
+      <div id="day-modal-host-actions" class="hidden pt-3 border-t border-slate-800 space-y-2">
+        <button id="btn-day-modal-confirm" class="w-full py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs transition cursor-pointer shadow-md shadow-emerald-500/10 flex items-center justify-center gap-1.5">
+          <span>✓ Spika detta som officiellt datum</span>
+        </button>
+        <button id="btn-day-modal-delete-proposal" class="w-full py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 font-semibold text-xs transition cursor-pointer flex items-center justify-center gap-1.5">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+          <span>Ta bort detta förslag</span>
         </button>
       </div>
 

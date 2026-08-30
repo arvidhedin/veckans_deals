@@ -493,13 +493,14 @@ window.handleDayCellClick = function(dateStr, year, weekNumber, dayId) {
     const d = new Date(dateStr + 'T12:00:00');
     const weekday = weekdayNames[d.getDay()];
 
-    const confirmAdd = confirm(`Vill du föreslå ${weekday} (${dateStr}) kl. 18:30 för middagen?`);
-    if (confirmAdd) {
+    const timeChoice = prompt(`Vill du föreslå ${weekday} (${dateStr}) för middagen? Ange tid:`, '18:30');
+    if (timeChoice !== null && timeChoice.trim() !== '') {
+      const chosenTime = timeChoice.trim();
       const newDay = {
         id: 'd_' + Date.now(),
         day: weekday,
         date: dateStr,
-        time: '18:30'
+        time: chosenTime
       };
       const updatedDays = [...(weekData?.proposed_days || []), newDay];
       const updatedWeek = {
@@ -513,6 +514,7 @@ window.handleDayCellClick = function(dateStr, year, weekNumber, dayId) {
       };
       saveWeekData(weekId, updatedWeek);
       dayObj = newDay;
+      renderApp();
     } else {
       return;
     }
@@ -564,7 +566,70 @@ function renderDayVoteModalContent() {
   if (weekdayLabel) weekdayLabel.textContent = `${weekdayNames[d.getDay()]} ${d.getDate()} ${months[d.getMonth()]}`;
   if (titleEl) titleEl.textContent = dayInfo.dayObj ? `Middag: ${dayInfo.dayObj.day}` : 'Middagsdatum';
   if (hostNameEl) hostNameEl.textContent = host ? host.name : 'Värd';
-  if (timeBadge) timeBadge.textContent = `kl. ${dayInfo.dayObj?.time || '18:30'}`;
+  // Host time editing & actions
+  const hostTimeEditBox = document.getElementById('day-modal-host-time-edit');
+  const timeInput = document.getElementById('day-modal-input-time');
+  const saveTimeBtn = document.getElementById('btn-day-modal-save-time');
+  const deleteProposalBtn = document.getElementById('btn-day-modal-delete-proposal');
+
+  if (isHost && dayInfo.dayObj) {
+    if (hostTimeEditBox) hostTimeEditBox.classList.remove('hidden');
+    if (timeBadge) timeBadge.classList.add('hidden');
+    if (timeInput) timeInput.value = dayInfo.dayObj.time || '18:30';
+
+    if (saveTimeBtn) {
+      saveTimeBtn.onclick = () => {
+        const newTime = timeInput?.value || '18:30';
+        dayInfo.dayObj.time = newTime;
+        
+        // If confirmed date is active, update time there too
+        if (weekData?.confirmed_day && weekData.confirmed_day.includes(dayInfo.dateStr)) {
+          weekData.confirmed_day = `${dayInfo.dayObj.day} ${dayInfo.dateStr} kl. ${newTime}`;
+        }
+        
+        weekData.updated_at = new Date().toISOString();
+        saveWeekData(weekId, weekData);
+        alert(`Tid uppdaterad till kl. ${newTime}!`);
+        renderDayVoteModalContent();
+        renderCalendarGrid();
+        renderActiveWeekDetail();
+      };
+    }
+
+    if (deleteProposalBtn) {
+      deleteProposalBtn.onclick = () => {
+        const confirmDelete = confirm(`Vill du ta bort förslaget för ${dayInfo.dayObj.day} (${dayInfo.dateStr})?`);
+        if (!confirmDelete) return;
+
+        // Filter out this day from proposed_days
+        weekData.proposed_days = weekData.proposed_days.filter(p => p.id !== dayInfo.dayObj.id);
+        
+        // If confirmed date was this day, reset it
+        if (weekData.confirmed_day && (weekData.confirmed_day.includes(dayInfo.dateStr) || weekData.confirmed_day.includes(dayInfo.dayObj.day))) {
+          weekData.confirmed_day = '';
+        }
+
+        // Clean up votes for this day
+        if (state.allVotesCache[weekId]) {
+          state.allVotesCache[weekId] = state.allVotesCache[weekId].filter(v => v.day_id !== dayInfo.dayObj.id);
+        }
+
+        weekData.updated_at = new Date().toISOString();
+        saveWeekData(weekId, weekData);
+
+        if (supabaseClient) {
+          supabaseClient.from('mida_votes').delete().match({ week_id: weekId, day_id: dayInfo.dayObj.id }).then();
+        }
+
+        closeDayVoteModal();
+        renderApp();
+      };
+    }
+
+  } else {
+    if (hostTimeEditBox) hostTimeEditBox.classList.add('hidden');
+    if (timeBadge) timeBadge.classList.remove('hidden');
+  }
 
   // Highlight my current vote button
   const dayId = dayInfo.dayId;
