@@ -1036,6 +1036,23 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Day modal close
   document.getElementById('btn-close-day-modal')?.addEventListener('click', closeDayVoteModal);
 
+  // Close modals when clicking on the dark backdrop
+  const modalBackdrops = [
+    { id: 'modal-day-vote', closeFn: closeDayVoteModal },
+    { id: 'modal-login', closeFn: closeLoginModal },
+    { id: 'modal-swap', closeFn: closeSwapModal },
+    { id: 'modal-manage', closeFn: closeManageModal },
+  ];
+
+  modalBackdrops.forEach(({ id, closeFn }) => {
+    const modalEl = document.getElementById(id);
+    modalEl?.addEventListener('click', (e) => {
+      if (e.target === modalEl) {
+        closeFn();
+      }
+    });
+  });
+
   // Pause week toggle
   document.getElementById('btn-toggle-pause-week')?.addEventListener('click', () => {
     const weekId = getWeekId(state.activeWeekYear, state.activeWeekNumber);
