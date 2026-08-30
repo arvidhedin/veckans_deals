@@ -845,25 +845,47 @@ function openSwapModal() {
     return;
   }
   const modal = document.getElementById('modal-swap');
-  const myWeekText = document.getElementById('swap-my-week-text');
+  const myWeekSelect = document.getElementById('swap-my-week-select');
   const targetSelect = document.getElementById('swap-target-select');
 
+  // 1. Populate all weeks where current user is scheduled as host (from current week to +20 weeks)
+  const myWeeksOptions = [];
+  const targetOptions = [];
   const currentWeekId = getWeekId(state.activeWeekYear, state.activeWeekNumber);
-  if (myWeekText) myWeekText.textContent = `${currentWeekId} (${getWeekDateRange(state.activeWeekYear, state.activeWeekNumber)})`;
 
-  if (targetSelect) {
-    const options = [];
-    for (let i = 1; i <= 8; i++) {
-      let w = state.activeWeekNumber + i;
-      let y = state.activeWeekYear;
-      if (w > 52) { w -= 52; y += 1; }
-      const host = getHostForWeek(y, w);
-      if (host && host.id !== state.currentUser.id) {
-        options.push(`<option value="${host.id}|${getWeekId(y, w)}">V.${w} (${host.name}) - ${getWeekDateRange(y, w).split('–')[0].trim()}</option>`);
+  // Scan range: from currentRealWeek - 1 up to +20 weeks
+  const startW = Math.max(1, state.currentRealWeek - 1);
+  const endW = state.currentRealWeek + 20;
+
+  for (let i = 0; i <= (endW - startW); i++) {
+    let w = startW + i;
+    let y = state.currentRealYear;
+    while (w > 52) {
+      w -= 52;
+      y += 1;
+    }
+
+    const weekId = getWeekId(y, w);
+    const host = getHostForWeek(y, w);
+    const dateRange = getWeekDateRange(y, w).split('–')[0].trim();
+
+    if (host) {
+      if (host.id === state.currentUser.id) {
+        const isSelected = weekId === currentWeekId;
+        myWeeksOptions.push(`<option value="${weekId}" ${isSelected ? 'selected' : ''}>${weekId} (Din vecka) - start ${dateRange}</option>`);
+      } else {
+        targetOptions.push(`<option value="${host.id}|${weekId}">V.${w} (${host.name}) - start ${dateRange}</option>`);
       }
     }
-    targetSelect.innerHTML = options.join('') || '<option value="">Inga andra veckor tillgängliga</option>';
   }
+
+  // If no host weeks found for me in the loop, add current active week as fallback
+  if (myWeeksOptions.length === 0) {
+    myWeeksOptions.push(`<option value="${currentWeekId}" selected>${currentWeekId} (Vald vecka)</option>`);
+  }
+
+  if (myWeekSelect) myWeekSelect.innerHTML = myWeeksOptions.join('');
+  if (targetSelect) targetSelect.innerHTML = targetOptions.join('') || '<option value="">Inga andra veckor tillgängliga</option>';
 
   modal?.classList.remove('hidden');
 }
@@ -1074,18 +1096,31 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('btn-open-swap-modal')?.addEventListener('click', openSwapModal);
   document.getElementById('btn-close-swap-modal')?.addEventListener('click', closeSwapModal);
   document.getElementById('btn-submit-swap-request')?.addEventListener('click', () => {
-    const select = document.getElementById('swap-target-select');
-    if (!select || !select.value) return;
-    const [targetId, targetWeek] = select.value.split('|');
+    const myWeekSelect = document.getElementById('swap-my-week-select');
+    const targetSelect = document.getElementById('swap-target-select');
+
+    if (!myWeekSelect || !myWeekSelect.value) {
+      alert('Välj vilken av dina veckor du vill byta.');
+      return;
+    }
+    if (!targetSelect || !targetSelect.value) {
+      alert('Välj vilken vecka du vill byta till.');
+      return;
+    }
+
+    const myWeekId = myWeekSelect.value;
+    const [targetId, targetWeek] = targetSelect.value.split('|');
+
     const swapObj = {
       id: 'swap_' + Date.now(),
       requester_id: state.currentUser.id,
-      requester_week: getWeekId(state.activeWeekYear, state.activeWeekNumber),
+      requester_week: myWeekId,
       target_id: targetId,
       target_week: targetWeek,
       status: 'pending',
       created_at: new Date().toISOString()
     };
+
     state.swaps.push(swapObj);
     localStorage.setItem('mida_all_swaps', JSON.stringify(state.swaps));
     if (supabaseClient) supabaseClient.from('mida_swaps').insert([swapObj]).then();
