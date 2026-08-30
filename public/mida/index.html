@@ -101,182 +101,221 @@
     <!-- Active Swap Notifications Alert (if any pending swaps for current user) -->
     <div id="swap-alert-container" class="hidden"></div>
 
-    <!-- Week Navigator Bar -->
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-4">
-      <div class="flex items-center gap-3 w-full sm:w-auto justify-between">
-        <button id="btn-prev-week" class="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition cursor-pointer active:scale-95" title="Föregående vecka">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-          </svg>
-        </button>
-        
-        <div class="text-center">
-          <div class="flex items-center justify-center gap-2">
-            <span id="current-week-label" class="text-xl sm:text-2xl font-black text-white">Vecka --</span>
-            <span id="current-week-is-now-badge" class="hidden px-2 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 text-[10px] font-bold uppercase tracking-wider">Denna vecka</span>
-          </div>
-          <p id="current-week-dates" class="text-xs text-slate-400 font-medium">Laddar datum...</p>
-        </div>
-
-        <button id="btn-next-week" class="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition cursor-pointer active:scale-95" title="Nästa vecka">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-          </svg>
-        </button>
-      </div>
-
-      <!-- Quick jump / Reset button -->
-      <div class="flex items-center gap-2 w-full sm:w-auto justify-center">
-        <button id="btn-jump-current-week" class="px-3.5 py-2 text-xs font-semibold rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition cursor-pointer">
-          Hoppa till aktuell vecka
-        </button>
-      </div>
+    <!-- View Mode Switcher (Month Overview vs Week Detail) -->
+    <div class="flex items-center justify-center p-1 bg-slate-900 border border-slate-800 rounded-2xl max-w-sm mx-auto shadow-lg">
+      <button id="tab-btn-month" class="flex-1 py-2 px-4 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-2 bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20">
+        <span>📅 Månadsöversikt</span>
+      </button>
+      <button id="tab-btn-week" class="flex-1 py-2 px-4 rounded-xl text-xs sm:text-sm font-semibold text-slate-400 hover:text-slate-200 transition flex items-center justify-center gap-2">
+        <span>🍽️ Veckovy & Röstning</span>
+      </button>
     </div>
 
-    <!-- Host Card & Week Status -->
-    <div id="host-banner-card" class="bg-gradient-to-br from-slate-900 via-slate-900 to-amber-950/30 border border-slate-800 rounded-3xl p-6 sm:p-7 shadow-2xl relative overflow-hidden">
-      <!-- Glow decoration -->
-      <div class="absolute -top-12 -right-12 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+    <!-- ================= 1. MONTH OVERVIEW VIEW ================= -->
+    <section id="view-month-section" class="space-y-5">
+      
+      <!-- Month Navigator Header -->
+      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 sm:p-6 shadow-xl flex items-center justify-between">
+        <button id="btn-prev-month" class="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition cursor-pointer active:scale-95">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+        </button>
 
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-800/80">
-        <div class="flex items-center gap-4">
-          <div id="host-avatar-badge" class="w-14 h-14 rounded-2xl bg-amber-500/20 border-2 border-amber-400/40 text-amber-400 flex items-center justify-center text-2xl font-black shadow-inner">
-            👑
-          </div>
-          <div>
-            <div class="text-xs uppercase font-bold tracking-wider text-amber-400 flex items-center gap-1.5">
-              <span>Veckans Värd</span>
-            </div>
-            <h2 id="host-name-display" class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-              Laddar...
-            </h2>
-            <p id="host-status-subtitle" class="text-xs text-slate-400 mt-0.5">
-              Ansvarar för att föreslå datum och bjuda in.
-            </p>
-          </div>
+        <div class="text-center">
+          <h2 id="month-title-label" class="text-xl sm:text-2xl font-black text-white capitalize">September 2026</h2>
+          <p class="text-xs text-slate-400 font-medium">Månadsöversikt över roterande värdskap</p>
         </div>
 
-        <!-- Swap button (Always visible to request a swap) -->
-        <div class="flex items-center gap-2">
-          <button id="btn-open-swap-modal" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 hover:text-white text-xs font-semibold transition flex items-center gap-1.5 cursor-pointer shadow-sm">
-            <svg class="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
-            </svg>
-            <span>Byt vecka</span>
+        <button id="btn-next-month" class="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition cursor-pointer active:scale-95">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+        </button>
+      </div>
+
+      <!-- Month Weeks Grid / Cards -->
+      <div id="month-weeks-grid" class="space-y-3">
+        <!-- Rendered dynamically via JS -->
+      </div>
+
+    </section>
+
+    <!-- ================= 2. WEEK DETAIL & VOTING VIEW ================= -->
+    <section id="view-week-section" class="space-y-6 hidden">
+
+      <!-- Week Navigator Bar -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-3 w-full sm:w-auto justify-between">
+          <button id="btn-prev-week" class="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition cursor-pointer active:scale-95" title="Föregående vecka">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+          </button>
+          
+          <div class="text-center">
+            <div class="flex items-center justify-center gap-2">
+              <span id="current-week-label" class="text-xl sm:text-2xl font-black text-white">Vecka --</span>
+              <span id="current-week-is-now-badge" class="hidden px-2 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 text-[10px] font-bold uppercase tracking-wider">Denna vecka</span>
+            </div>
+            <p id="current-week-dates" class="text-xs text-slate-400 font-medium">Laddar datum...</p>
+          </div>
+
+          <button id="btn-next-week" class="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition cursor-pointer active:scale-95" title="Nästa vecka">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+          </button>
+        </div>
+
+        <!-- Quick jump button -->
+        <div class="flex items-center gap-2 w-full sm:w-auto justify-center">
+          <button id="btn-jump-current-week" class="px-3.5 py-2 text-xs font-semibold rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition cursor-pointer">
+            Hoppa till aktuell vecka
           </button>
         </div>
       </div>
 
-      <!-- Host Confirmed Date Badge (if finalized) -->
-      <div id="confirmed-date-banner" class="hidden mt-5 p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-between gap-3">
-        <div class="flex items-center gap-3">
-          <div class="w-8 h-8 rounded-full bg-emerald-500 text-slate-950 flex items-center justify-center font-bold text-sm">✓</div>
+      <!-- Paused Week Banner (Shown if this week is paused) -->
+      <div id="paused-week-banner" class="hidden bg-slate-900 border-2 border-slate-700 rounded-3xl p-6 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-3 text-center sm:text-left">
+          <span class="text-3xl">⏸️</span>
           <div>
-            <div class="text-xs font-bold text-emerald-400 uppercase tracking-wide">Middag fastställd!</div>
-            <div id="confirmed-date-text" class="text-sm font-extrabold text-white">Torsdag 18:30</div>
+            <h3 class="text-base font-bold text-white">Denna vecka är pausad</h3>
+            <p class="text-xs text-slate-400 mt-0.5">Ingen middag arrangeras denna vecka. Värdrotationen har flyttats framåt.</p>
           </div>
+        </div>
+        <button id="btn-unpause-week" class="px-4 py-2 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 rounded-xl text-xs font-bold transition cursor-pointer">
+          ▶️ Återaktivera vecka
+        </button>
+      </div>
+
+      <!-- Host Card & Week Status -->
+      <div id="host-banner-card" class="bg-gradient-to-br from-slate-900 via-slate-900 to-amber-950/30 border border-slate-800 rounded-3xl p-6 sm:p-7 shadow-2xl relative overflow-hidden">
+        <!-- Glow decoration -->
+        <div class="absolute -top-12 -right-12 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-800/80">
+          <div class="flex items-center gap-4">
+            <div id="host-avatar-badge" class="w-14 h-14 rounded-2xl bg-amber-500/20 border-2 border-amber-400/40 text-amber-400 flex items-center justify-center text-2xl font-black shadow-inner">
+              👑
+            </div>
+            <div>
+              <div class="text-xs uppercase font-bold tracking-wider text-amber-400 flex items-center gap-1.5">
+                <span>Veckans Värd</span>
+              </div>
+              <h2 id="host-name-display" class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+                Laddar...
+              </h2>
+              <p id="host-status-subtitle" class="text-xs text-slate-400 mt-0.5">
+                Ansvarar för att föreslå datum och bjuda in.
+              </p>
+            </div>
+          </div>
+
+          <!-- Actions (Swap & Pause) -->
+          <div class="flex items-center gap-2 flex-wrap">
+            <button id="btn-open-swap-modal" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 hover:text-white text-xs font-semibold transition flex items-center gap-1.5 cursor-pointer shadow-sm">
+              <svg class="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
+              <span>Byt vecka</span>
+            </button>
+            <button id="btn-toggle-pause-week" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-400 hover:text-slate-200 text-xs font-semibold transition cursor-pointer" title="Pausa middagen denna vecka">
+              <span>⏸️ Pausa</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Host Confirmed Date Badge (if finalized) -->
+        <div id="confirmed-date-banner" class="hidden mt-5 p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-between gap-3">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full bg-emerald-500 text-slate-950 flex items-center justify-center font-bold text-sm">✓</div>
+            <div>
+              <div class="text-xs font-bold text-emerald-400 uppercase tracking-wide">Middag fastställd!</div>
+              <div id="confirmed-date-text" class="text-sm font-extrabold text-white">Torsdag 18:30</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Host Note/Menu Section -->
+        <div id="host-note-display-wrapper" class="hidden mt-4 pt-4 border-t border-slate-800/60 text-xs text-slate-300">
+          <span class="text-slate-500 font-semibold uppercase tracking-wider text-[10px] block mb-1">Meddelande från värden:</span>
+          <p id="host-note-text" class="italic bg-slate-950/40 p-3 rounded-xl border border-slate-800/60 text-slate-300"></p>
+        </div>
+
+      </div>
+
+      <!-- Host Management Box (Only visible if currently logged-in user is the HOST for this week) -->
+      <div id="host-controls-section" class="hidden bg-slate-900 border-2 border-amber-500/40 rounded-3xl p-6 shadow-2xl space-y-4">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+          <div class="flex items-center gap-2">
+            <span class="text-xl">🛠️</span>
+            <div>
+              <h3 class="text-base font-bold text-white">Värdens kontrollpanel (Det är din vecka!)</h3>
+              <p class="text-xs text-amber-300/80">Välj vilka dagar du kan ha middag så dina kompisar kan rösta.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Days Input Row -->
+        <div class="space-y-3">
+          <label class="block text-xs font-semibold text-slate-300">Föreslå datum & tider för middagen:</label>
+          
+          <div id="proposed-days-inputs" class="space-y-2">
+            <!-- Dynamic day rows injected here -->
+          </div>
+
+          <button id="btn-add-day-option" type="button" class="w-full py-2.5 rounded-xl border border-dashed border-slate-700 hover:border-amber-500/50 text-slate-400 hover:text-amber-400 text-xs font-semibold flex items-center justify-center gap-2 transition cursor-pointer">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+            <span>Lägg till ytterligare ett datumalternativ</span>
+          </button>
+        </div>
+
+        <!-- Host Note / Message Input -->
+        <div class="space-y-1.5 pt-2">
+          <label for="input-host-note" class="block text-xs font-semibold text-slate-300">Meddelande / Mat / Info till gänget (valfritt):</label>
+          <textarea id="input-host-note" rows="2" placeholder="T.ex. Jag bjuder på hemmagjord pizza! Några allergier?" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-500 transition"></textarea>
+        </div>
+
+        <!-- Save proposed days button -->
+        <div class="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div class="text-[11px] text-slate-400">
+            När du sparar kan alla direkt se förslagen och rösta.
+          </div>
+          <button id="btn-save-proposals" class="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs sm:text-sm transition active:scale-95 shadow-lg shadow-amber-500/20 cursor-pointer flex items-center justify-center gap-2">
+            <span>Spara & Publicera förslag</span>
+          </button>
         </div>
       </div>
 
-      <!-- Host Note/Menu Section -->
-      <div id="host-note-display-wrapper" class="hidden mt-4 pt-4 border-t border-slate-800/60 text-xs text-slate-300">
-        <span class="text-slate-500 font-semibold uppercase tracking-wider text-[10px] block mb-1">Meddelande från värden:</span>
-        <p id="host-note-text" class="italic bg-slate-950/40 p-3 rounded-xl border border-slate-800/60 text-slate-300"></p>
-      </div>
-
-    </div>
-
-    <!-- Host Management Box (Only visible if currently logged-in user is the HOST for this week) -->
-    <div id="host-controls-section" class="hidden bg-slate-900 border-2 border-amber-500/40 rounded-3xl p-6 shadow-2xl space-y-4">
-      <div class="flex items-center justify-between pb-3 border-b border-slate-800">
-        <div class="flex items-center gap-2">
-          <span class="text-xl">🛠️</span>
-          <div>
-            <h3 class="text-base font-bold text-white">Värdens kontrollpanel (Det är din vecka!)</h3>
-            <p class="text-xs text-amber-300/80">Välj vilka dagar du kan ha middag så dina kompisar kan rösta.</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Days Input Row -->
-      <div class="space-y-3">
-        <label class="block text-xs font-semibold text-slate-300">Föreslå datum & tider för middagen:</label>
+      <!-- Voting & Schedule Matrix Section -->
+      <div id="voting-matrix-wrapper" class="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl space-y-6">
         
-        <div id="proposed-days-inputs" class="space-y-2">
-          <!-- Dynamic day rows injected here -->
+        <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+          <div>
+            <h3 class="text-lg font-extrabold text-white flex items-center gap-2">
+              <span>Röstning & Tillgänglighet</span>
+            </h3>
+            <p class="text-xs text-slate-400 mt-0.5">Klicka på dina val för varje föreslagen dag.</p>
+          </div>
+
+          <div id="voting-status-tag" class="text-xs font-semibold px-3 py-1 rounded-full bg-slate-800 text-slate-400">
+            Laddar...
+          </div>
         </div>
 
-        <button id="btn-add-day-option" type="button" class="w-full py-2.5 rounded-xl border border-dashed border-slate-700 hover:border-amber-500/50 text-slate-400 hover:text-amber-400 text-xs font-semibold flex items-center justify-center gap-2 transition cursor-pointer">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-          <span>Lägg till ytterligare ett datumalternativ</span>
-        </button>
-      </div>
-
-      <!-- Host Note / Message Input -->
-      <div class="space-y-1.5 pt-2">
-        <label for="input-host-note" class="block text-xs font-semibold text-slate-300">Meddelande / Mat / Info till gänget (valfritt):</label>
-        <textarea id="input-host-note" rows="2" placeholder="T.ex. Jag bjuder på hemmagjord pizza! Några allergier?" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-500 transition"></textarea>
-      </div>
-
-      <!-- Save proposed days button -->
-      <div class="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3">
-        <div class="text-[11px] text-slate-400">
-          När du sparar kan alla direkt se förslagen och rösta.
-        </div>
-        <button id="btn-save-proposals" class="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs sm:text-sm transition active:scale-95 shadow-lg shadow-amber-500/20 cursor-pointer flex items-center justify-center gap-2">
-          <span>Spara & Publicera förslag</span>
-        </button>
-      </div>
-    </div>
-
-    <!-- Voting & Schedule Matrix Section -->
-    <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl space-y-6">
-      
-      <div class="flex items-center justify-between pb-3 border-b border-slate-800">
-        <div>
-          <h3 class="text-lg font-extrabold text-white flex items-center gap-2">
-            <span>Röstning & Tillgänglighet</span>
-          </h3>
-          <p class="text-xs text-slate-400 mt-0.5">Klicka på dina val för varje föreslagen dag.</p>
+        <!-- Proposed Days List with Interactive Voting -->
+        <div id="voting-days-container" class="space-y-4">
+          <!-- Rendered dynamically -->
         </div>
 
-        <div id="voting-status-tag" class="text-xs font-semibold px-3 py-1 rounded-full bg-slate-800 text-slate-400">
-          Laddar...
+        <!-- Live Participant Summary Table -->
+        <div class="pt-4 border-t border-slate-800/80">
+          <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">
+            Översikt & Röststatus (Vem kan när)
+          </h4>
+
+          <div class="overflow-x-auto custom-scroll pb-2">
+            <table id="votes-matrix-table" class="w-full text-left text-xs border-collapse">
+              <!-- Rendered dynamically -->
+            </table>
+          </div>
         </div>
+
       </div>
 
-      <!-- Proposed Days List with Interactive Voting -->
-      <div id="voting-days-container" class="space-y-4">
-        <!-- Rendered dynamically -->
-      </div>
-
-      <!-- Live Participant Summary Table -->
-      <div class="pt-4 border-t border-slate-800/80">
-        <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">
-          Översikt & Röststatus (Vem kan när)
-        </h4>
-
-        <div class="overflow-x-auto custom-scroll pb-2">
-          <table id="votes-matrix-table" class="w-full text-left text-xs border-collapse">
-            <!-- Rendered dynamically -->
-          </table>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- Upcoming Rotation Schedule Preview -->
-    <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4">
-      <div class="flex items-center justify-between pb-2 border-b border-slate-800">
-        <h3 class="text-base font-bold text-white flex items-center gap-2">
-          <span>📅 Kommande veckors värdschema</span>
-        </h3>
-      </div>
-
-      <div id="rotation-schedule-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-        <!-- Dynamically rendered -->
-      </div>
-    </div>
+    </section>
 
   </main>
 
@@ -287,7 +326,7 @@
         <span>&copy; MIDA &bull; uppsaladeals.se/mida</span>
       </div>
       <div class="flex items-center gap-4 text-slate-400">
-        <button id="btn-admin-manage" class="hover:text-amber-400 transition cursor-pointer text-xs">Hantera kompisar / PIN-kod</button>
+        <button id="btn-admin-manage" class="hover:text-amber-400 transition cursor-pointer text-xs">Inställningar & Kompisar</button>
       </div>
     </div>
   </footer>
@@ -303,7 +342,7 @@
           👋
         </div>
         <h3 class="text-xl font-extrabold text-white">Vem är du?</h3>
-        <p class="text-xs text-slate-400">Välj din profil och skriv in din 4-siffriga PIN.</p>
+        <p class="text-xs text-slate-400">Välj din profil för att rösta och se schemat.</p>
       </div>
 
       <div class="space-y-3">
@@ -315,7 +354,7 @@
         </div>
 
         <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1.5">PIN-kod (4 siffror, standard är 1234):</label>
+          <label class="block text-xs font-semibold text-slate-300 mb-1.5">PIN-kod:</label>
           <input type="password" id="login-input-pin" maxlength="6" placeholder="••••" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-center text-lg tracking-widest text-white focus:outline-none focus:border-amber-500">
         </div>
 
@@ -384,7 +423,7 @@
     <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-5 max-h-[90vh] overflow-y-auto custom-scroll">
       
       <div class="flex items-center justify-between pb-3 border-b border-slate-800">
-        <h3 class="text-lg font-bold text-white">Hantera profil & PIN-kod</h3>
+        <h3 class="text-lg font-bold text-white">Inställningar & Kompisar</h3>
         <button id="btn-close-manage-modal" class="text-slate-400 hover:text-white p-1">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
         </button>
@@ -394,9 +433,9 @@
       <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-3">
         <h4 class="text-xs font-bold text-amber-400 uppercase tracking-wider">Ändra din PIN-kod</h4>
         <div>
-          <label class="block text-xs text-slate-400 mb-1">Ny fyrsiffrig PIN:</label>
+          <label class="block text-xs text-slate-400 mb-1">Ny PIN-kod:</label>
           <div class="flex gap-2">
-            <input type="password" id="input-new-pin" maxlength="6" placeholder="Ny PIN (t.ex. 5678)" class="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white">
+            <input type="password" id="input-new-pin" maxlength="6" placeholder="Ny PIN" class="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white">
             <button id="btn-save-new-pin" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-xs font-semibold cursor-pointer">Spara</button>
           </div>
         </div>
@@ -404,24 +443,24 @@
 
       <!-- Friends in rotation -->
       <div class="space-y-3">
-        <h4 class="text-xs font-bold text-slate-300 uppercase tracking-wider">Kompisar i middagsgruppen:</h4>
+        <h4 class="text-xs font-bold text-slate-300 uppercase tracking-wider">Rotationsordning i gänget:</h4>
         <div id="manage-members-list" class="space-y-2">
           <!-- Member items rendered here -->
         </div>
 
         <!-- Add member -->
         <div class="pt-2 flex gap-2">
-          <input type="text" id="input-new-member-name" placeholder="Lägg till kompis (t.ex. Emma)" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
+          <input type="text" id="input-new-member-name" placeholder="Lägg till kompis" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
           <button id="btn-add-new-member" class="px-3.5 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-xl text-xs font-bold transition cursor-pointer">Lägg till</button>
         </div>
       </div>
 
       <!-- Supabase Connection / Sharing -->
       <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-3 pt-3">
-        <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Databas / Molnsynk (Supabase)</h4>
-        <p class="text-[11px] text-slate-500">Om du vill bjuda in kompisar med automatisk databaskoppling utan att spara API-nycklar på GitHub:</p>
+        <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Dela till kompisarna</h4>
+        <p class="text-[11px] text-slate-500">Skicka denna länk till gänget så kopplas databasen in automatiskt på deras mobiler:</p>
         <button id="btn-copy-invite-link" class="w-full py-2.5 bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer">
-          <span>📋 Kopiera kompis-länk med autokonfig</span>
+          <span>📋 Kopiera kompis-länk</span>
         </button>
       </div>
 
