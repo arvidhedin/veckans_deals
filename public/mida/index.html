@@ -30,9 +30,10 @@
             brand: {
               gold: '#F59E0B',
               amber: '#D97706',
-              dark: '#0F172A',
-              card: '#1E293B',
-              border: '#334155',
+              dark: '#0B0F19',
+              card: '#161F30',
+              cell: '#131B2B',
+              border: '#232F46',
             }
           }
         }
@@ -56,6 +57,15 @@
       background: rgba(148, 163, 184, 0.2);
       border-radius: 4px;
     }
+    .cal-grid-row {
+      display: grid;
+      grid-template-columns: 50px repeat(7, minmax(0, 1fr));
+    }
+    @media (max-width: 640px) {
+      .cal-grid-row {
+        grid-template-columns: 36px repeat(7, minmax(0, 1fr));
+      }
+    }
   </style>
 </head>
 
@@ -63,7 +73,7 @@
 
   <!-- Top Header Navigation -->
   <header class="border-b border-slate-800/80 bg-slate-900/80 backdrop-blur-lg sticky top-0 z-40">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between">
       
       <!-- Brand & Title -->
       <div class="flex items-center gap-3">
@@ -81,7 +91,7 @@
         </div>
       </div>
 
-      <!-- User Profile & Switcher Button -->
+      <!-- User Profile Button -->
       <div class="flex items-center gap-2">
         <button id="btn-user-profile" class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs sm:text-sm font-semibold transition active:scale-95 text-slate-200 cursor-pointer">
           <span id="header-user-avatar" class="w-6 h-6 rounded-full bg-amber-500 text-slate-950 font-bold flex items-center justify-center text-xs">?</span>
@@ -96,33 +106,24 @@
   </header>
 
   <!-- Main Content Container -->
-  <main class="max-w-4xl w-full mx-auto px-4 sm:px-6 py-6 flex-grow space-y-6">
+  <main class="max-w-6xl w-full mx-auto px-3 sm:px-6 py-6 flex-grow space-y-6">
 
     <!-- Active Swap Notifications Alert (if any pending swaps for current user) -->
     <div id="swap-alert-container" class="hidden"></div>
 
-    <!-- View Mode Switcher (Month Overview vs Week Detail) -->
-    <div class="flex items-center justify-center p-1 bg-slate-900 border border-slate-800 rounded-2xl max-w-sm mx-auto shadow-lg">
-      <button id="tab-btn-month" class="flex-1 py-2 px-4 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-2 bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20">
-        <span>📅 Månadsöversikt</span>
-      </button>
-      <button id="tab-btn-week" class="flex-1 py-2 px-4 rounded-xl text-xs sm:text-sm font-semibold text-slate-400 hover:text-slate-200 transition flex items-center justify-center gap-2">
-        <span>🍽️ Veckovy & Röstning</span>
-      </button>
-    </div>
-
-    <!-- ================= 1. MONTH OVERVIEW VIEW ================= -->
-    <section id="view-month-section" class="space-y-5">
-      
-      <!-- Month Navigator Header -->
-      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 sm:p-6 shadow-xl flex items-center justify-between">
+    <!-- Calendar Month Header & Controls -->
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 sm:p-6 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
         <button id="btn-prev-month" class="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition cursor-pointer active:scale-95">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
         </button>
 
-        <div class="text-center">
+        <div>
           <h2 id="month-title-label" class="text-xl sm:text-2xl font-black text-white capitalize">September 2026</h2>
-          <p class="text-xs text-slate-400 font-medium">Månadsöversikt över roterande värdskap</p>
+          <p class="text-xs text-slate-400 font-medium flex items-center gap-2">
+            <span class="inline-block w-2 h-2 rounded-full bg-amber-400"></span>
+            <span>Klicka på ett datum för att rösta eller föreslå dag</span>
+          </p>
         </div>
 
         <button id="btn-next-month" class="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition cursor-pointer active:scale-95">
@@ -130,198 +131,112 @@
         </button>
       </div>
 
-      <!-- Month Weeks Grid / Cards -->
-      <div id="month-weeks-grid" class="space-y-3">
-        <!-- Rendered dynamically via JS -->
-      </div>
-
-    </section>
-
-    <!-- ================= 2. WEEK DETAIL & VOTING VIEW ================= -->
-    <section id="view-week-section" class="space-y-6 hidden">
-
-      <!-- Week Navigator Bar -->
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div class="flex items-center gap-3 w-full sm:w-auto justify-between">
-          <button id="btn-prev-week" class="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition cursor-pointer active:scale-95" title="Föregående vecka">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
-          </button>
-          
-          <div class="text-center">
-            <div class="flex items-center justify-center gap-2">
-              <span id="current-week-label" class="text-xl sm:text-2xl font-black text-white">Vecka --</span>
-              <span id="current-week-is-now-badge" class="hidden px-2 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 text-[10px] font-bold uppercase tracking-wider">Denna vecka</span>
-            </div>
-            <p id="current-week-dates" class="text-xs text-slate-400 font-medium">Laddar datum...</p>
-          </div>
-
-          <button id="btn-next-week" class="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition cursor-pointer active:scale-95" title="Nästa vecka">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-          </button>
+      <!-- Quick Legend & Action -->
+      <div class="flex items-center gap-3 text-xs flex-wrap justify-center">
+        <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-300">
+          <span>👑</span>
+          <span>Förslag från värd</span>
         </div>
-
-        <!-- Quick jump button -->
-        <div class="flex items-center gap-2 w-full sm:w-auto justify-center">
-          <button id="btn-jump-current-week" class="px-3.5 py-2 text-xs font-semibold rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition cursor-pointer">
-            Hoppa till aktuell vecka
-          </button>
+        <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-300">
+          <span>✓</span>
+          <span>Spikad middag</span>
         </div>
-      </div>
-
-      <!-- Paused Week Banner (Shown if this week is paused) -->
-      <div id="paused-week-banner" class="hidden bg-slate-900 border-2 border-slate-700 rounded-3xl p-6 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div class="flex items-center gap-3 text-center sm:text-left">
-          <span class="text-3xl">⏸️</span>
-          <div>
-            <h3 class="text-base font-bold text-white">Denna vecka är pausad</h3>
-            <p class="text-xs text-slate-400 mt-0.5">Ingen middag arrangeras denna vecka. Värdrotationen har flyttats framåt.</p>
-          </div>
-        </div>
-        <button id="btn-unpause-week" class="px-4 py-2 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 rounded-xl text-xs font-bold transition cursor-pointer">
-          ▶️ Återaktivera vecka
+        <button id="btn-today-jump" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 font-semibold cursor-pointer">
+          Idag
         </button>
       </div>
+    </div>
 
-      <!-- Host Card & Week Status -->
-      <div id="host-banner-card" class="bg-gradient-to-br from-slate-900 via-slate-900 to-amber-950/30 border border-slate-800 rounded-3xl p-6 sm:p-7 shadow-2xl relative overflow-hidden">
-        <!-- Glow decoration -->
-        <div class="absolute -top-12 -right-12 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
-
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-800/80">
-          <div class="flex items-center gap-4">
-            <div id="host-avatar-badge" class="w-14 h-14 rounded-2xl bg-amber-500/20 border-2 border-amber-400/40 text-amber-400 flex items-center justify-center text-2xl font-black shadow-inner">
-              👑
-            </div>
-            <div>
-              <div class="text-xs uppercase font-bold tracking-wider text-amber-400 flex items-center gap-1.5">
-                <span>Veckans Värd</span>
-              </div>
-              <h2 id="host-name-display" class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-                Laddar...
-              </h2>
-              <p id="host-status-subtitle" class="text-xs text-slate-400 mt-0.5">
-                Ansvarar för att föreslå datum och bjuda in.
-              </p>
-            </div>
-          </div>
-
-          <!-- Actions (Swap & Pause) -->
-          <div class="flex items-center gap-2 flex-wrap">
-            <button id="btn-open-swap-modal" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 hover:text-white text-xs font-semibold transition flex items-center gap-1.5 cursor-pointer shadow-sm">
-              <svg class="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
-              <span>Byt vecka</span>
-            </button>
-            <button id="btn-toggle-pause-week" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-400 hover:text-slate-200 text-xs font-semibold transition cursor-pointer" title="Pausa middagen denna vecka">
-              <span>⏸️ Pausa</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- Host Confirmed Date Badge (if finalized) -->
-        <div id="confirmed-date-banner" class="hidden mt-5 p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-between gap-3">
-          <div class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded-full bg-emerald-500 text-slate-950 flex items-center justify-center font-bold text-sm">✓</div>
-            <div>
-              <div class="text-xs font-bold text-emerald-400 uppercase tracking-wide">Middag fastställd!</div>
-              <div id="confirmed-date-text" class="text-sm font-extrabold text-white">Torsdag 18:30</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Host Note/Menu Section -->
-        <div id="host-note-display-wrapper" class="hidden mt-4 pt-4 border-t border-slate-800/60 text-xs text-slate-300">
-          <span class="text-slate-500 font-semibold uppercase tracking-wider text-[10px] block mb-1">Meddelande från värden:</span>
-          <p id="host-note-text" class="italic bg-slate-950/40 p-3 rounded-xl border border-slate-800/60 text-slate-300"></p>
-        </div>
-
+    <!-- Month Grid Calendar -->
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl overflow-hidden">
+      
+      <!-- Weekday Headers -->
+      <div class="cal-grid-row border-b border-slate-800 bg-slate-950/60 text-xs font-bold text-slate-400 py-3 text-center">
+        <div class="text-[11px] text-slate-600 uppercase font-mono">V.</div>
+        <div>Mån</div>
+        <div>Tis</div>
+        <div>Ons</div>
+        <div>Tor</div>
+        <div>Fre</div>
+        <div class="text-amber-400/90">Lör</div>
+        <div class="text-amber-400/90">Sön</div>
       </div>
 
-      <!-- Host Management Box (Only visible if currently logged-in user is the HOST for this week) -->
-      <div id="host-controls-section" class="hidden bg-slate-900 border-2 border-amber-500/40 rounded-3xl p-6 shadow-2xl space-y-4">
-        <div class="flex items-center justify-between pb-3 border-b border-slate-800">
-          <div class="flex items-center gap-2">
-            <span class="text-xl">🛠️</span>
-            <div>
-              <h3 class="text-base font-bold text-white">Värdens kontrollpanel (Det är din vecka!)</h3>
-              <p class="text-xs text-amber-300/80">Välj vilka dagar du kan ha middag så dina kompisar kan rösta.</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Days Input Row -->
-        <div class="space-y-3">
-          <label class="block text-xs font-semibold text-slate-300">Föreslå datum & tider för middagen:</label>
-          
-          <div id="proposed-days-inputs" class="space-y-2">
-            <!-- Dynamic day rows injected here -->
-          </div>
-
-          <button id="btn-add-day-option" type="button" class="w-full py-2.5 rounded-xl border border-dashed border-slate-700 hover:border-amber-500/50 text-slate-400 hover:text-amber-400 text-xs font-semibold flex items-center justify-center gap-2 transition cursor-pointer">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-            <span>Lägg till ytterligare ett datumalternativ</span>
-          </button>
-        </div>
-
-        <!-- Host Note / Message Input -->
-        <div class="space-y-1.5 pt-2">
-          <label for="input-host-note" class="block text-xs font-semibold text-slate-300">Meddelande / Mat / Info till gänget (valfritt):</label>
-          <textarea id="input-host-note" rows="2" placeholder="T.ex. Jag bjuder på hemmagjord pizza! Några allergier?" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-500 transition"></textarea>
-        </div>
-
-        <!-- Save proposed days button -->
-        <div class="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div class="text-[11px] text-slate-400">
-            När du sparar kan alla direkt se förslagen och rösta.
-          </div>
-          <button id="btn-save-proposals" class="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs sm:text-sm transition active:scale-95 shadow-lg shadow-amber-500/20 cursor-pointer flex items-center justify-center gap-2">
-            <span>Spara & Publicera förslag</span>
-          </button>
-        </div>
+      <!-- Calendar Days Container (Dynamically rendered) -->
+      <div id="calendar-grid-container" class="divide-y divide-slate-800/80">
+        <!-- Rendered dynamically -->
       </div>
 
-      <!-- Voting & Schedule Matrix Section -->
-      <div id="voting-matrix-wrapper" class="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl space-y-6">
-        
-        <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+    </div>
+
+    <!-- Active Week Summary & Detail Bar -->
+    <div id="active-week-detail-banner" class="bg-slate-900 border border-slate-800 rounded-3xl p-5 sm:p-6 shadow-xl space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+        <div class="flex items-center gap-3">
+          <div id="week-detail-avatar" class="w-12 h-12 rounded-2xl bg-amber-500/20 border border-amber-500/40 text-amber-400 flex items-center justify-center font-bold text-xl">
+            👑
+          </div>
           <div>
-            <h3 class="text-lg font-extrabold text-white flex items-center gap-2">
-              <span>Röstning & Tillgänglighet</span>
-            </h3>
-            <p class="text-xs text-slate-400 mt-0.5">Klicka på dina val för varje föreslagen dag.</p>
-          </div>
-
-          <div id="voting-status-tag" class="text-xs font-semibold px-3 py-1 rounded-full bg-slate-800 text-slate-400">
-            Laddar...
+            <div class="flex items-center gap-2">
+              <span id="week-detail-title" class="text-lg font-bold text-white">Vecka 36</span>
+              <span id="week-detail-status-badge" class="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase bg-amber-500/20 text-amber-400 border border-amber-500/30">Värd: Sten</span>
+            </div>
+            <p id="week-detail-dates" class="text-xs text-slate-400">31 aug – 6 sep 2026</p>
           </div>
         </div>
 
-        <!-- Proposed Days List with Interactive Voting -->
-        <div id="voting-days-container" class="space-y-4">
-          <!-- Rendered dynamically -->
+        <div class="flex items-center gap-2 flex-wrap">
+          <button id="btn-open-swap-modal" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-xs font-semibold transition cursor-pointer">
+            🔄 Byt vecka
+          </button>
+          <button id="btn-toggle-pause-week" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-400 text-xs font-semibold transition cursor-pointer">
+            ⏸️ Pausa vecka
+          </button>
         </div>
-
-        <!-- Live Participant Summary Table -->
-        <div class="pt-4 border-t border-slate-800/80">
-          <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">
-            Översikt & Röststatus (Vem kan när)
-          </h4>
-
-          <div class="overflow-x-auto custom-scroll pb-2">
-            <table id="votes-matrix-table" class="w-full text-left text-xs border-collapse">
-              <!-- Rendered dynamically -->
-            </table>
-          </div>
-        </div>
-
       </div>
 
-    </section>
+      <!-- If Current user is host: Quick Host Proposal Panel -->
+      <div id="quick-host-panel" class="hidden bg-amber-500/5 border border-amber-500/30 rounded-2xl p-4 space-y-3">
+        <div class="flex items-center justify-between">
+          <h4 class="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
+            <span>👑 Det är din vecka! Föreslå dagar:</span>
+          </h4>
+          <span class="text-[11px] text-slate-400">Klicka i kalendern eller lägg till nedan</span>
+        </div>
+
+        <div id="quick-host-days-list" class="space-y-2">
+          <!-- Dynamic day rows -->
+        </div>
+
+        <div class="flex gap-2">
+          <button id="btn-add-quick-day" class="py-1.5 px-3 rounded-lg border border-dashed border-slate-700 hover:border-amber-500/50 text-slate-400 hover:text-amber-400 text-xs font-semibold transition cursor-pointer">
+            + Lägg till datum
+          </button>
+          <button id="btn-save-quick-proposals" class="ml-auto py-1.5 px-4 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold transition cursor-pointer">
+            Spara & Öppna röstning
+          </button>
+        </div>
+      </div>
+
+      <!-- Voting Matrix Table for Active Week -->
+      <div class="space-y-3">
+        <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400">
+          Röstöversikt för veckan
+        </h4>
+        <div class="overflow-x-auto custom-scroll pb-2">
+          <table id="votes-matrix-table" class="w-full text-left text-xs border-collapse">
+            <!-- Rendered dynamically -->
+          </table>
+        </div>
+      </div>
+
+    </div>
 
   </main>
 
   <!-- Footer -->
   <footer class="border-t border-slate-800/60 bg-slate-950 py-6 text-center text-xs text-slate-500">
-    <div class="max-w-4xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+    <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
       <div>
         <span>&copy; MIDA &bull; uppsaladeals.se/mida</span>
       </div>
@@ -331,9 +246,84 @@
     </div>
   </footer>
 
-  <!-- ================= MODALS ================= -->
+  <!-- ================= MODALS & POPUPS ================= -->
 
-  <!-- 1. LOGIN / USER SELECTION MODAL -->
+  <!-- 1. DAY DETAIL & VOTING MODAL (Opens when clicking on a day) -->
+  <div id="modal-day-vote" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-5 animate-in fade-in zoom-in duration-200">
+      
+      <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+        <div>
+          <span id="day-modal-weekday" class="text-xs font-bold uppercase tracking-wider text-amber-400">Onsdag 2 sep</span>
+          <h3 id="day-modal-title" class="text-lg font-extrabold text-white">Middagsförslag</h3>
+        </div>
+        <button id="btn-close-day-modal" class="text-slate-400 hover:text-white p-1">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+      </div>
+
+      <!-- Host status for this day -->
+      <div id="day-modal-host-box" class="bg-slate-950 p-3.5 rounded-2xl border border-slate-800 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-sm">👑</div>
+          <div>
+            <div class="text-[11px] text-slate-400">Veckans Värd:</div>
+            <div id="day-modal-host-name" class="text-xs font-bold text-white">Sten</div>
+          </div>
+        </div>
+        <div id="day-modal-time-badge" class="px-2.5 py-1 rounded-lg bg-slate-800 text-amber-300 font-mono text-xs font-bold">kl. 18:30</div>
+      </div>
+
+      <!-- Voting Section with 3 distinct levels -->
+      <div class="space-y-3">
+        <label class="block text-xs font-bold text-slate-300">Hur passar denna dag för dig?</label>
+
+        <!-- 3 Vote buttons -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+          
+          <!-- 1. JA (Fullt ös / med alkohol) -->
+          <button id="vote-btn-yes" onclick="castVote('yes')" class="p-3 rounded-2xl border border-slate-800 bg-slate-950 hover:border-emerald-500/50 flex flex-col items-center justify-center gap-1 transition active:scale-95 cursor-pointer text-center group">
+            <span class="text-xl">🍻</span>
+            <span class="text-xs font-extrabold text-emerald-400">JA</span>
+            <span class="text-[10px] text-slate-400">Med alkohol</span>
+          </button>
+
+          <!-- 2. Ja, men utan alkohol -->
+          <button id="vote-btn-no-alc" onclick="castVote('yes_no_alcohol')" class="p-3 rounded-2xl border border-slate-800 bg-slate-950 hover:border-sky-500/50 flex flex-col items-center justify-center gap-1 transition active:scale-95 cursor-pointer text-center group">
+            <span class="text-xl">🥤</span>
+            <span class="text-xs font-extrabold text-sky-400 leading-tight">Ja, men utan alkohol</span>
+            <span class="text-[10px] text-slate-400">Nykter</span>
+          </button>
+
+          <!-- 3. Nej, kan inte -->
+          <button id="vote-btn-no" onclick="castVote('no')" class="p-3 rounded-2xl border border-slate-800 bg-slate-950 hover:border-rose-500/50 flex flex-col items-center justify-center gap-1 transition active:scale-95 cursor-pointer text-center group">
+            <span class="text-xl">❌</span>
+            <span class="text-xs font-extrabold text-rose-400 leading-tight">Nej, kan inte</span>
+            <span class="text-[10px] text-slate-400">Förhinder</span>
+          </button>
+
+        </div>
+      </div>
+
+      <!-- Who voted what on this day -->
+      <div class="pt-3 border-t border-slate-800 space-y-2">
+        <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Registrerade röster:</h4>
+        <div id="day-modal-votes-breakdown" class="space-y-1.5 text-xs">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+
+      <!-- Host Action: Finalize this date -->
+      <div id="day-modal-host-actions" class="hidden pt-3 border-t border-slate-800">
+        <button id="btn-day-modal-confirm" class="w-full py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs transition cursor-pointer">
+          ✓ Spika detta som officiellt datum
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 2. LOGIN / USER SELECTION MODAL -->
   <div id="modal-login" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
     <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-sm w-full p-6 shadow-2xl space-y-5 animate-in fade-in zoom-in duration-200">
       
@@ -375,10 +365,9 @@
     </div>
   </div>
 
-  <!-- 2. SWAP WEEK MODAL -->
+  <!-- 3. SWAP WEEK MODAL -->
   <div id="modal-swap" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
     <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-5 animate-in fade-in zoom-in duration-200">
-      
       <div class="flex items-center justify-between pb-3 border-b border-slate-800">
         <div class="flex items-center gap-2.5">
           <span class="text-xl">🔄</span>
@@ -414,11 +403,10 @@
           Skicka bytesförfrågan
         </button>
       </div>
-
     </div>
   </div>
 
-  <!-- 3. ADMIN / MANAGE FRIENDS & PIN MODAL -->
+  <!-- 4. ADMIN / MANAGE FRIENDS MODAL -->
   <div id="modal-manage" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
     <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-5 max-h-[90vh] overflow-y-auto custom-scroll">
       
@@ -448,14 +436,13 @@
           <!-- Member items rendered here -->
         </div>
 
-        <!-- Add member -->
         <div class="pt-2 flex gap-2">
           <input type="text" id="input-new-member-name" placeholder="Lägg till kompis" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
           <button id="btn-add-new-member" class="px-3.5 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-xl text-xs font-bold transition cursor-pointer">Lägg till</button>
         </div>
       </div>
 
-      <!-- Supabase Connection / Sharing -->
+      <!-- Supabase Invite link -->
       <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-3 pt-3">
         <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Dela till kompisarna</h4>
         <p class="text-[11px] text-slate-500">Skicka denna länk till gänget så kopplas databasen in automatiskt på deras mobiler:</p>

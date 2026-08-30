@@ -1,9 +1,9 @@
 /**
- * MIDA Middagskalender - Core Engine
+ * MIDA Middagskalender - Month Grid & 3-Tier Voting Engine
  * https://uppsaladeals.se/mida
  */
 
-// Dynamic Supabase Configuration (Loads from gitignored config.js, localStorage, or URL setup hash)
+// Dynamic Supabase Configuration
 function getSupabaseConfig() {
   try {
     const hash = window.location.hash;
@@ -49,29 +49,28 @@ const DEFAULT_MEMBERS = [
   { id: 'isak',    name: 'Isak',    pin: '1234', rotation_order: 7 },
 ];
 
-// Rotation Anchor: Week 35, 2026 = David (index 0), Week 36, 2026 = Sten (index 1)
+// Anchor: 2026-W35 = David, 2026-W36 = Sten
 const ANCHOR_YEAR = 2026;
 const ANCHOR_WEEK = 35;
 const ANCHOR_HOST_INDEX = 0; // David
 
-// Global App State
+// Global State
 const state = {
-  currentView: 'month', // 'month' | 'week'
   currentUser: null,
   members: [],
-  selectedYear: new Date().getFullYear(),
-  selectedWeek: getISOWeek(new Date()),
-  currentRealYear: new Date().getFullYear(),
-  currentRealWeek: getISOWeek(new Date()),
   viewMonth: new Date().getMonth(), // 0 - 11
-  viewMonthYear: new Date().getFullYear(),
+  viewYear: new Date().getFullYear(),
+  activeWeekNumber: getISOWeek(new Date()),
+  activeWeekYear: new Date().getFullYear(),
+  currentRealWeek: getISOWeek(new Date()),
+  currentRealYear: new Date().getFullYear(),
   allWeeksCache: {}, // { "2026-W36": { week_id, host_id, is_paused, proposed_days, host_notes, confirmed_day } }
-  weekData: null,
-  votes: [],
+  allVotesCache: {}, // { "2026-W36": [ { week_id, member_id, day_id, vote } ] }
   swaps: [],
+  selectedDayForModal: null, // { dateStr, weekNumber, year, dayId, dayObj }
 };
 
-// ================= DATE & WEEK HELPERS =================
+// ================= DATE HELPERS =================
 
 function getISOWeek(date) {
   const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
@@ -94,62 +93,74 @@ function getWeekStartDate(year, weekNumber) {
 }
 
 function getWeekDateRange(year, weekNumber) {
-  const ISOweekStart = getWeekStartDate(year, weekNumber);
-  const ISOweekEnd = new Date(ISOweekStart);
-  ISOweekEnd.setDate(ISOweekStart.getDate() + 6);
-
+  const start = getWeekStartDate(year, weekNumber);
+  const end = new Date(start);
+  end.setDate(start.getDate() + 6);
   const months = ['jan', 'feb', 'mar', 'apr', 'maj', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec'];
-  const startStr = `${ISOweekStart.getDate()} ${months[ISOweekStart.getMonth()]}`;
-  const endStr = `${ISOweekEnd.getDate()} ${months[ISOweekEnd.getMonth()]}`;
-  return `${startStr} – ${endStr} ${year}`;
-}
-
-function getWeekdayDate(year, weekNumber, dayOffset) {
-  const ISOweekStart = getWeekStartDate(year, weekNumber);
-  const target = new Date(ISOweekStart);
-  target.setDate(ISOweekStart.getDate() + dayOffset);
-  const y = target.getFullYear();
-  const m = String(target.getMonth() + 1).padStart(2, '0');
-  const d = String(target.getDate()).padStart(2, '0');
-  return `${y}-${m}-${d}`;
+  return `${start.getDate()} ${months[start.getMonth()]} – ${end.getDate()} ${months[end.getMonth()]} ${year}`;
 }
 
 function getWeekId(year, week) {
   return `${year}-W${String(week).padStart(2, '0')}`;
 }
 
-// Return weeks belonging to a specific month (0-indexed)
-function getWeeksInMonth(year, monthIndex) {
-  const weeks = [];
-  const firstDay = new Date(year, monthIndex, 1);
-  const lastDay = new Date(year, monthIndex + 1, 0);
+function formatDateStr(d) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
 
-  let current = new Date(firstDay);
-  while (current <= lastDay) {
-    const w = getISOWeek(current);
-    const y = (monthIndex === 11 && w === 1) ? year + 1 : (monthIndex === 0 && w > 50) ? year - 1 : year;
-    const weekId = getWeekId(y, w);
-    if (!weeks.some(item => item.weekId === weekId)) {
-      weeks.push({ weekNumber: w, year: y, weekId: weekId });
+// Get all calendar week rows that intersect this month
+function getCalendarWeeksForMonth(year, monthIndex) {
+  const weeks = [];
+  const firstDayOfMonth = new Date(year, monthIndex, 1);
+  const lastDayOfMonth = new Date(year, monthIndex + 1, 0);
+
+  // Find Monday of the first week
+  const startCal = new Date(firstDayOfMonth);
+  const dayOfWeek = (startCal.getDay() + 6) % 7; // 0 = Mon, 6 = Sun
+  startCal.setDate(startCal.getDate() - dayOfWeek);
+
+  let cur = new Date(startCal);
+  while (cur <= lastDayOfMonth || cur.getDay() !== 1) {
+    const wNum = getISOWeek(cur);
+    const wYear = (monthIndex === 11 && wNum === 1) ? year + 1 : (monthIndex === 0 && wNum > 50) ? year - 1 : year;
+    const weekId = getWeekId(wYear, wNum);
+
+    const daysInWeek = [];
+    for (let i = 0; i < 7; i++) {
+      const dCopy = new Date(cur);
+      daysInWeek.push({
+        date: new Date(dCopy),
+        dateStr: formatDateStr(dCopy),
+        dayNum: dCopy.getDate(),
+        isCurrentMonth: dCopy.getMonth() === monthIndex,
+        isToday: dCopy.toDateString() === new Date().toDateString(),
+        weekdayIndex: i, // 0 = Mon, 6 = Sun
+      });
+      cur.setDate(cur.getDate() + 1);
     }
-    current.setDate(current.getDate() + 7);
+
+    weeks.push({
+      weekNumber: wNum,
+      year: wYear,
+      weekId: weekId,
+      days: daysInWeek
+    });
+
+    if (cur > lastDayOfMonth && cur.getDay() === 1) break;
   }
+
   return weeks;
 }
 
-// ================= ROTATION & PAUSE ENGINE =================
+// ================= ROTATION ENGINE =================
 
-function isWeekPaused(year, week) {
-  const weekId = getWeekId(year, week);
-  const data = state.allWeeksCache[weekId] || (state.weekData?.week_id === weekId ? state.weekData : null);
-  return !!data?.is_paused;
-}
-
-// Calculate host considering anchor (W35 2026 = David), paused weeks, and swaps
 function getHostForWeek(year, week) {
   const weekId = getWeekId(year, week);
 
-  // 1. Check for approved Swap
+  // Check Swap
   const activeSwap = state.swaps.find(s => 
     s.status === 'accepted' && (s.requester_week === weekId || s.target_week === weekId)
   );
@@ -163,16 +174,13 @@ function getHostForWeek(year, week) {
     }
   }
 
-  // 2. Natural Rotation with Pauses
   if (!state.members || state.members.length === 0) return null;
   const sorted = [...state.members].sort((a, b) => a.rotation_order - b.rotation_order);
 
-  // Calculate difference in active weeks from anchor (2026-W35)
   const targetAbsoluteWeek = (year * 52) + week;
   const anchorAbsoluteWeek = (ANCHOR_YEAR * 52) + ANCHOR_WEEK;
   const diffWeeks = targetAbsoluteWeek - anchorAbsoluteWeek;
 
-  // Modulo wrap over members count
   let hostIdx = ((ANCHOR_HOST_INDEX + diffWeeks) % sorted.length);
   if (hostIdx < 0) hostIdx += sorted.length;
 
@@ -195,7 +203,7 @@ async function loadMembers() {
         return;
       }
     } catch (e) {
-      console.warn('Could not fetch members from Supabase, using defaults', e);
+      console.warn('Could not fetch members from Supabase', e);
     }
   }
 
@@ -203,247 +211,91 @@ async function loadMembers() {
   state.members = cached ? JSON.parse(cached) : DEFAULT_MEMBERS;
 }
 
-async function loadAllWeeksData() {
+async function loadAllWeeksAndVotes() {
   if (supabaseClient) {
     try {
-      const { data, error } = await supabaseClient
-        .from('mida_weeks')
-        .select('*');
-
-      if (!error && data) {
-        data.forEach(w => {
+      const { data: weeksData } = await supabaseClient.from('mida_weeks').select('*');
+      if (weeksData) {
+        weeksData.forEach(w => {
           state.allWeeksCache[w.week_id] = w;
         });
       }
 
-      const { data: swapsData } = await supabaseClient
-        .from('mida_swaps')
-        .select('*');
-
-      if (swapsData) state.swaps = swapsData;
-    } catch (e) {
-      console.warn('Could not fetch all weeks data', e);
-    }
-  }
-}
-
-async function loadWeekData(year, week) {
-  const weekId = getWeekId(year, week);
-
-  if (supabaseClient) {
-    try {
-      const { data: weekRes, error: weekErr } = await supabaseClient
-        .from('mida_weeks')
-        .select('*')
-        .eq('week_id', weekId)
-        .maybeSingle();
-
-      if (!weekErr && weekRes) {
-        state.weekData = weekRes;
-        state.allWeeksCache[weekId] = weekRes;
-      } else {
-        const host = getHostForWeek(year, week);
-        state.weekData = state.allWeeksCache[weekId] || {
-          week_id: weekId,
-          week_number: week,
-          year: year,
-          host_id: host ? host.id : null,
-          is_paused: false,
-          proposed_days: [],
-          host_notes: '',
-          confirmed_day: '',
-        };
+      const { data: votesData } = await supabaseClient.from('mida_votes').select('*');
+      if (votesData) {
+        state.allVotesCache = {};
+        votesData.forEach(v => {
+          if (!state.allVotesCache[v.week_id]) state.allVotesCache[v.week_id] = [];
+          state.allVotesCache[v.week_id].push(v);
+        });
       }
 
-      const { data: votesRes } = await supabaseClient
-        .from('mida_votes')
-        .select('*')
-        .eq('week_id', weekId);
-
-      state.votes = votesRes || [];
-      return;
+      const { data: swapsData } = await supabaseClient.from('mida_swaps').select('*');
+      if (swapsData) state.swaps = swapsData;
     } catch (e) {
-      console.warn('Error fetching week from Supabase:', e);
+      console.warn('Supabase fetch all error', e);
     }
   }
-
-  // Local storage fallback
-  const localWeek = localStorage.getItem(`mida_week_${weekId}`);
-  if (localWeek) {
-    state.weekData = JSON.parse(localWeek);
-  } else {
-    const host = getHostForWeek(year, week);
-    state.weekData = {
-      week_id: weekId,
-      week_number: week,
-      year: year,
-      host_id: host ? host.id : null,
-      is_paused: false,
-      proposed_days: [],
-      host_notes: '',
-      confirmed_day: '',
-    };
-  }
-
-  const localVotes = localStorage.getItem(`mida_votes_${weekId}`);
-  state.votes = localVotes ? JSON.parse(localVotes) : [];
 }
 
-async function saveProposals(proposedDays, hostNotes) {
-  const weekId = getWeekId(state.selectedYear, state.selectedWeek);
-  const host = getHostForWeek(state.selectedYear, state.selectedWeek);
-
-  const payload = {
-    week_id: weekId,
-    week_number: state.selectedWeek,
-    year: state.selectedYear,
-    host_id: host ? host.id : state.currentUser?.id,
-    is_paused: state.weekData?.is_paused || false,
-    proposed_days: proposedDays,
-    host_notes: hostNotes,
-    updated_at: new Date().toISOString()
-  };
-
-  state.weekData = { ...state.weekData, ...payload };
-  state.allWeeksCache[weekId] = state.weekData;
-  localStorage.setItem(`mida_week_${weekId}`, JSON.stringify(state.weekData));
+async function saveWeekData(weekId, data) {
+  state.allWeeksCache[weekId] = data;
+  localStorage.setItem(`mida_week_${weekId}`, JSON.stringify(data));
 
   if (supabaseClient) {
     try {
-      await supabaseClient.from('mida_weeks').upsert(payload, { onConflict: 'week_id' });
+      await supabaseClient.from('mida_weeks').upsert(data, { onConflict: 'week_id' });
     } catch (e) {
-      console.error('Failed to save to Supabase:', e);
+      console.warn('Supabase save week error', e);
     }
   }
-
-  renderApp();
 }
 
-async function togglePauseWeek() {
-  const weekId = getWeekId(state.selectedYear, state.selectedWeek);
-  const newPausedState = !state.weekData?.is_paused;
-
-  state.weekData = { ...state.weekData, is_paused: newPausedState, updated_at: new Date().toISOString() };
-  state.allWeeksCache[weekId] = state.weekData;
-  localStorage.setItem(`mida_week_${weekId}`, JSON.stringify(state.weekData));
-
-  if (supabaseClient) {
-    try {
-      await supabaseClient.from('mida_weeks').upsert(state.weekData, { onConflict: 'week_id' });
-    } catch (e) {
-      console.warn('Error saving pause state:', e);
-    }
-  }
-
-  renderApp();
-}
-
-async function submitVote(dayId, voteType) {
+async function castVote(voteType) {
   if (!state.currentUser) {
     openLoginModal();
     return;
   }
 
-  const weekId = getWeekId(state.selectedYear, state.selectedWeek);
-  const existingIdx = state.votes.findIndex(v => 
-    v.week_id === weekId && v.member_id === state.currentUser.id && v.day_id === dayId
+  const dayInfo = state.selectedDayForModal;
+  if (!dayInfo) return;
+
+  const weekId = getWeekId(dayInfo.year, dayInfo.weekNumber);
+  const dayId = dayInfo.dayId || dayInfo.dateStr;
+
+  if (!state.allVotesCache[weekId]) state.allVotesCache[weekId] = [];
+
+  const existingIdx = state.allVotesCache[weekId].findIndex(v => 
+    v.member_id === state.currentUser.id && v.day_id === dayId
   );
 
   const voteObj = {
     week_id: weekId,
     member_id: state.currentUser.id,
     day_id: dayId,
-    vote: voteType,
+    vote: voteType, // 'yes', 'yes_no_alcohol', 'no'
     updated_at: new Date().toISOString()
   };
 
   if (existingIdx >= 0) {
-    state.votes[existingIdx] = voteObj;
+    state.allVotesCache[weekId][existingIdx] = voteObj;
   } else {
-    state.votes.push(voteObj);
+    state.allVotesCache[weekId].push(voteObj);
   }
 
-  localStorage.setItem(`mida_votes_${weekId}`, JSON.stringify(state.votes));
-  renderVotingSection();
-  renderMatrixTable();
+  localStorage.setItem(`mida_votes_${weekId}`, JSON.stringify(state.allVotesCache[weekId]));
+
+  renderDayVoteModalContent();
+  renderCalendarGrid();
+  renderActiveWeekDetail();
 
   if (supabaseClient) {
     try {
       await supabaseClient.from('mida_votes').upsert(voteObj, { onConflict: 'week_id,member_id,day_id' });
     } catch (e) {
-      console.warn('Vote sync error:', e);
+      console.warn('Supabase vote error', e);
     }
   }
-}
-
-async function confirmFinalDate(dayLabel) {
-  const weekId = getWeekId(state.selectedYear, state.selectedWeek);
-  state.weekData.confirmed_day = dayLabel;
-  state.allWeeksCache[weekId] = state.weekData;
-  localStorage.setItem(`mida_week_${weekId}`, JSON.stringify(state.weekData));
-
-  if (supabaseClient) {
-    try {
-      await supabaseClient
-        .from('mida_weeks')
-        .update({ confirmed_day: dayLabel, updated_at: new Date().toISOString() })
-        .eq('week_id', weekId);
-    } catch (e) {
-      console.warn('Error confirming day in Supabase:', e);
-    }
-  }
-
-  renderApp();
-}
-
-async function requestSwap(targetMemberId, targetWeekId) {
-  const currentWeekId = getWeekId(state.selectedYear, state.selectedWeek);
-  
-  const swapObj = {
-    id: 'swap_' + Date.now(),
-    requester_id: state.currentUser.id,
-    requester_week: currentWeekId,
-    target_id: targetMemberId,
-    target_week: targetWeekId,
-    status: 'pending',
-    created_at: new Date().toISOString()
-  };
-
-  state.swaps.push(swapObj);
-  localStorage.setItem('mida_all_swaps', JSON.stringify(state.swaps));
-
-  if (supabaseClient) {
-    try {
-      await supabaseClient.from('mida_swaps').insert([swapObj]);
-    } catch (e) {
-      console.warn('Swap save error:', e);
-    }
-  }
-
-  alert('Bytesförfrågan skickad till din vän!');
-  closeSwapModal();
-  renderApp();
-}
-
-async function respondSwap(swapId, newStatus) {
-  const swap = state.swaps.find(s => s.id === swapId);
-  if (!swap) return;
-
-  swap.status = newStatus;
-  localStorage.setItem('mida_all_swaps', JSON.stringify(state.swaps));
-
-  if (supabaseClient) {
-    try {
-      await supabaseClient
-        .from('mida_swaps')
-        .update({ status: newStatus })
-        .eq('id', swapId);
-    } catch (e) {
-      console.warn('Swap update error:', e);
-    }
-  }
-
-  renderApp();
 }
 
 // ================= USER & AUTH =================
@@ -484,8 +336,7 @@ function openLoginModal() {
 }
 
 function closeLoginModal() {
-  const modal = document.getElementById('modal-login');
-  if (modal) modal.classList.add('hidden');
+  document.getElementById('modal-login')?.classList.add('hidden');
 }
 
 function handleLoginSubmit() {
@@ -514,7 +365,468 @@ function handleLoginSubmit() {
   closeLoginModal();
 }
 
-// ================= UI RENDERING =================
+// ================= CALENDAR GRID RENDERING =================
+
+function renderCalendarGrid() {
+  const monthTitle = document.getElementById('month-title-label');
+  const container = document.getElementById('calendar-grid-container');
+  if (!container) return;
+
+  const monthNames = ['Januari', 'Februari', 'Mars', 'April', 'Maj', 'Juni', 'Juli', 'Augusti', 'September', 'Oktober', 'November', 'December'];
+  if (monthTitle) monthTitle.textContent = `${monthNames[state.viewMonth]} ${state.viewYear}`;
+
+  const calWeeks = getCalendarWeeksForMonth(state.viewYear, state.viewMonth);
+
+  container.innerHTML = calWeeks.map(w => {
+    const host = getHostForWeek(w.year, w.weekNumber);
+    const weekData = state.allWeeksCache[w.weekId];
+    const isPaused = !!weekData?.is_paused;
+    const isCurrentWeek = w.weekNumber === state.currentRealWeek && w.year === state.currentRealYear;
+    const isActiveWeek = w.weekNumber === state.activeWeekNumber && w.year === state.activeWeekYear;
+    const isMyHostWeek = state.currentUser && host && state.currentUser.id === host.id;
+
+    // Week column on the left
+    let weekColHtml = `
+      <div onclick="selectActiveWeek(${w.year}, ${w.weekNumber})" class="p-2 sm:p-3 bg-slate-950/80 border-r border-slate-800/80 flex flex-col justify-between items-center cursor-pointer hover:bg-slate-800/60 transition group text-center">
+        <div>
+          <span class="text-[11px] sm:text-xs font-black ${isCurrentWeek ? 'text-amber-400' : 'text-slate-400'} group-hover:text-white">
+            V.${w.weekNumber}
+          </span>
+        </div>
+        <div class="my-1">
+          <span class="w-6 h-6 rounded-lg ${isPaused ? 'bg-slate-800 text-slate-500' : isMyHostWeek ? 'bg-amber-500 text-slate-950 font-black' : 'bg-slate-800 text-amber-300 font-bold'} text-[10px] flex items-center justify-center shadow-sm" title="${escapeHtml(host?.name || '')}">
+            ${isPaused ? '⏸️' : isMyHostWeek ? '👑' : host ? host.name.charAt(0) : '?'}
+          </span>
+        </div>
+        <span class="text-[9px] text-slate-500 truncate max-w-[45px]">${isPaused ? 'Paus' : escapeHtml(host?.name.split(' ')[0] || '')}</span>
+      </div>
+    `;
+
+    // 7 Day Boxes
+    let daysHtml = w.days.map(d => {
+      const isProposed = !isPaused && weekData?.proposed_days?.some(p => p.date === d.dateStr);
+      const proposedDayObj = isProposed ? weekData.proposed_days.find(p => p.date === d.dateStr) : null;
+      const isConfirmed = !isPaused && weekData?.confirmed_day && (weekData.confirmed_day.includes(d.dateStr) || (proposedDayObj && weekData.confirmed_day.includes(proposedDayObj.day)));
+
+      // Vote counts for this day
+      const dayId = proposedDayObj?.id || d.dateStr;
+      const weekVotes = state.allVotesCache[w.weekId] || [];
+      const dayVotes = weekVotes.filter(v => v.day_id === dayId);
+      const yesAlcCount = dayVotes.filter(v => v.vote === 'yes').length;
+      const yesNoAlcCount = dayVotes.filter(v => v.vote === 'yes_no_alcohol').length;
+      const noCount = dayVotes.filter(v => v.vote === 'no').length;
+
+      // Event chips
+      let eventChipHtml = '';
+      if (isPaused) {
+        eventChipHtml = '';
+      } else if (isConfirmed) {
+        eventChipHtml = `
+          <div class="mt-1 px-1.5 py-1 rounded-md bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-[10px] font-bold truncate flex items-center gap-1 shadow-sm">
+            <span>✓</span>
+            <span class="truncate">Spikat ${proposedDayObj?.time || '18:30'}</span>
+          </div>
+        `;
+      } else if (isProposed) {
+        eventChipHtml = `
+          <div class="mt-1 px-1.5 py-1 rounded-md bg-amber-500/20 border border-amber-500/40 text-amber-300 text-[10px] font-bold shadow-sm space-y-0.5">
+            <div class="flex items-center justify-between">
+              <span>🍽️ ${proposedDayObj?.time || '18:30'}</span>
+              <span class="text-[9px] opacity-80">${host?.name.split(' ')[0]}</span>
+            </div>
+            ${(yesAlcCount > 0 || yesNoAlcCount > 0 || noCount > 0) ? `
+              <div class="flex items-center gap-1.5 text-[9px] pt-0.5 font-mono">
+                ${yesAlcCount > 0 ? `<span class="text-emerald-400 font-bold">🍻${yesAlcCount}</span>` : ''}
+                ${yesNoAlcCount > 0 ? `<span class="text-sky-400 font-bold">🥤${yesNoAlcCount}</span>` : ''}
+                ${noCount > 0 ? `<span class="text-rose-400 font-bold">❌${noCount}</span>` : ''}
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }
+
+      return `
+        <div onclick="handleDayCellClick('${d.dateStr}', ${w.year}, ${w.weekNumber}, ${isProposed ? `'${proposedDayObj.id}'` : 'null'})" class="min-h-[80px] sm:min-h-[100px] p-1.5 sm:p-2 border-r border-slate-800/60 last:border-r-0 flex flex-col justify-between transition cursor-pointer hover:bg-slate-800/40 group ${d.isCurrentMonth ? 'bg-slate-900' : 'bg-slate-950/40 text-slate-600'} ${d.isToday ? 'ring-1 ring-inset ring-amber-400/50 bg-amber-500/5' : ''}">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold ${d.isToday ? 'w-5 h-5 rounded-full bg-amber-400 text-slate-950 flex items-center justify-center text-[11px]' : d.isCurrentMonth ? 'text-slate-300' : 'text-slate-600'}">
+              ${d.dayNum}
+            </span>
+          </div>
+
+          <div class="flex-grow flex flex-col justify-end">
+            ${eventChipHtml}
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    return `
+      <div class="cal-grid-row ${isActiveWeek ? 'bg-amber-500/[0.02]' : ''}">
+        ${weekColHtml}
+        ${daysHtml}
+      </div>
+    `;
+  }).join('');
+}
+
+window.selectActiveWeek = function(year, weekNumber) {
+  state.activeWeekYear = year;
+  state.activeWeekNumber = weekNumber;
+  renderCalendarGrid();
+  renderActiveWeekDetail();
+};
+
+// ================= DAY MODAL & 3-TIER VOTING =================
+
+window.handleDayCellClick = function(dateStr, year, weekNumber, dayId) {
+  const weekId = getWeekId(year, weekNumber);
+  const weekData = state.allWeeksCache[weekId];
+  const host = getHostForWeek(year, weekNumber);
+  const isHost = state.currentUser && host && state.currentUser.id === host.id;
+
+  // Find or create proposed day object
+  let dayObj = weekData?.proposed_days?.find(p => p.date === dateStr);
+
+  // If clicking on a day not proposed yet, and current user IS host, offer to add it!
+  if (!dayObj && isHost) {
+    const weekdayNames = ['Söndag', 'Måndag', 'Tisdag', 'Onsdag', 'Torsdag', 'Fredag', 'Lördag'];
+    const d = new Date(dateStr + 'T12:00:00');
+    const weekday = weekdayNames[d.getDay()];
+
+    const confirmAdd = confirm(`Vill du föreslå ${weekday} (${dateStr}) kl. 18:30 för middagen?`);
+    if (confirmAdd) {
+      const newDay = {
+        id: 'd_' + Date.now(),
+        day: weekday,
+        date: dateStr,
+        time: '18:30'
+      };
+      const updatedDays = [...(weekData?.proposed_days || []), newDay];
+      const updatedWeek = {
+        ...(weekData || {}),
+        week_id: weekId,
+        week_number: weekNumber,
+        year: year,
+        host_id: host.id,
+        proposed_days: updatedDays,
+        updated_at: new Date().toISOString()
+      };
+      saveWeekData(weekId, updatedWeek);
+      dayObj = newDay;
+    } else {
+      return;
+    }
+  }
+
+  state.selectedDayForModal = {
+    dateStr,
+    year,
+    weekNumber,
+    dayId: dayObj?.id || dayId || dateStr,
+    dayObj: dayObj
+  };
+
+  openDayVoteModal();
+};
+
+function openDayVoteModal() {
+  const modal = document.getElementById('modal-day-vote');
+  if (!modal) return;
+
+  renderDayVoteModalContent();
+  modal.classList.remove('hidden');
+}
+
+function closeDayVoteModal() {
+  document.getElementById('modal-day-vote')?.classList.add('hidden');
+}
+
+function renderDayVoteModalContent() {
+  const dayInfo = state.selectedDayForModal;
+  if (!dayInfo) return;
+
+  const weekId = getWeekId(dayInfo.year, dayInfo.weekNumber);
+  const weekData = state.allWeeksCache[weekId];
+  const host = getHostForWeek(dayInfo.year, dayInfo.weekNumber);
+  const isHost = state.currentUser && host && state.currentUser.id === host.id;
+
+  const weekdayLabel = document.getElementById('day-modal-weekday');
+  const titleEl = document.getElementById('day-modal-title');
+  const hostNameEl = document.getElementById('day-modal-host-name');
+  const timeBadge = document.getElementById('day-modal-time-badge');
+  const breakdownContainer = document.getElementById('day-modal-votes-breakdown');
+  const hostActions = document.getElementById('day-modal-host-actions');
+
+  const d = new Date(dayInfo.dateStr + 'T12:00:00');
+  const weekdayNames = ['Söndag', 'Måndag', 'Tisdag', 'Onsdag', 'Torsdag', 'Fredag', 'Lördag'];
+  const months = ['jan', 'feb', 'mar', 'apr', 'maj', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec'];
+  
+  if (weekdayLabel) weekdayLabel.textContent = `${weekdayNames[d.getDay()]} ${d.getDate()} ${months[d.getMonth()]}`;
+  if (titleEl) titleEl.textContent = dayInfo.dayObj ? `Middag: ${dayInfo.dayObj.day}` : 'Middagsdatum';
+  if (hostNameEl) hostNameEl.textContent = host ? host.name : 'Värd';
+  if (timeBadge) timeBadge.textContent = `kl. ${dayInfo.dayObj?.time || '18:30'}`;
+
+  // Highlight my current vote button
+  const dayId = dayInfo.dayId;
+  const weekVotes = state.allVotesCache[weekId] || [];
+  const myVoteObj = state.currentUser ? weekVotes.find(v => v.member_id === state.currentUser.id && v.day_id === dayId) : null;
+  const myVote = myVoteObj?.vote;
+
+  const btnYes = document.getElementById('vote-btn-yes');
+  const btnNoAlc = document.getElementById('vote-btn-no-alc');
+  const btnNo = document.getElementById('vote-btn-no');
+
+  btnYes?.classList.remove('bg-emerald-500/20', 'border-emerald-500', 'ring-2', 'ring-emerald-500/40');
+  btnNoAlc?.classList.remove('bg-sky-500/20', 'border-sky-500', 'ring-2', 'ring-sky-500/40');
+  btnNo?.classList.remove('bg-rose-500/20', 'border-rose-500', 'ring-2', 'ring-rose-500/40');
+
+  if (myVote === 'yes') {
+    btnYes?.classList.add('bg-emerald-500/20', 'border-emerald-500', 'ring-2', 'ring-emerald-500/40');
+  } else if (myVote === 'yes_no_alcohol') {
+    btnNoAlc?.classList.add('bg-sky-500/20', 'border-sky-500', 'ring-2', 'ring-sky-500/40');
+  } else if (myVote === 'no') {
+    btnNo?.classList.add('bg-rose-500/20', 'border-rose-500', 'ring-2', 'ring-rose-500/40');
+  }
+
+  // Votes breakdown
+  const dayVotes = weekVotes.filter(v => v.day_id === dayId);
+  const yesAlcMembers = dayVotes.filter(v => v.vote === 'yes').map(v => getMemberName(v.member_id));
+  const yesNoAlcMembers = dayVotes.filter(v => v.vote === 'yes_no_alcohol').map(v => getMemberName(v.member_id));
+  const noMembers = dayVotes.filter(v => v.vote === 'no').map(v => getMemberName(v.member_id));
+
+  if (breakdownContainer) {
+    if (dayVotes.length === 0) {
+      breakdownContainer.innerHTML = `<p class="text-slate-500 italic py-1">Inga röster registrerade på denna dag än.</p>`;
+    } else {
+      breakdownContainer.innerHTML = `
+        ${yesAlcMembers.length > 0 ? `
+          <div class="flex items-center justify-between p-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
+            <span class="font-bold text-emerald-400">🍻 JA (Med alkohol)</span>
+            <span class="text-slate-300 font-medium">${yesAlcMembers.join(', ')}</span>
+          </div>
+        ` : ''}
+        ${yesNoAlcMembers.length > 0 ? `
+          <div class="flex items-center justify-between p-2 rounded-xl bg-sky-500/10 border border-sky-500/20">
+            <span class="font-bold text-sky-400">🥤 Ja, men utan alkohol</span>
+            <span class="text-slate-300 font-medium">${yesNoAlcMembers.join(', ')}</span>
+          </div>
+        ` : ''}
+        ${noMembers.length > 0 ? `
+          <div class="flex items-center justify-between p-2 rounded-xl bg-rose-500/10 border border-rose-500/20">
+            <span class="font-bold text-rose-400">❌ Nej, kan inte</span>
+            <span class="text-slate-300 font-medium">${noMembers.join(', ')}</span>
+          </div>
+        ` : ''}
+      `;
+    }
+  }
+
+  // Host finalize button
+  if (hostActions) {
+    if (isHost && dayInfo.dayObj) {
+      hostActions.classList.remove('hidden');
+      const confirmBtn = document.getElementById('btn-day-modal-confirm');
+      if (confirmBtn) {
+        confirmBtn.onclick = () => {
+          const finalStr = `${dayInfo.dayObj.day} ${dayInfo.dateStr} kl. ${dayInfo.dayObj.time || '18:30'}`;
+          const updated = { ...(weekData || {}), confirmed_day: finalStr, updated_at: new Date().toISOString() };
+          saveWeekData(weekId, updated);
+          alert(`Middag fastställd till ${finalStr}!`);
+          closeDayVoteModal();
+          renderApp();
+        };
+      }
+    } else {
+      hostActions.classList.add('hidden');
+    }
+  }
+}
+
+// ================= ACTIVE WEEK SUMMARY & MATRIX =================
+
+function renderActiveWeekDetail() {
+  const weekId = getWeekId(state.activeWeekYear, state.activeWeekNumber);
+  const host = getHostForWeek(state.activeWeekYear, state.activeWeekNumber);
+  const weekData = state.allWeeksCache[weekId];
+  const isPaused = !!weekData?.is_paused;
+  const isHost = state.currentUser && host && state.currentUser.id === host.id;
+
+  const titleEl = document.getElementById('week-detail-title');
+  const statusBadge = document.getElementById('week-detail-status-badge');
+  const datesEl = document.getElementById('week-detail-dates');
+  const avatarEl = document.getElementById('week-detail-avatar');
+  const pauseBtn = document.getElementById('btn-toggle-pause-week');
+  const quickHostPanel = document.getElementById('quick-host-panel');
+  const matrixTable = document.getElementById('votes-matrix-table');
+
+  if (titleEl) titleEl.textContent = `Vecka ${state.activeWeekNumber}`;
+  if (datesEl) datesEl.textContent = getWeekDateRange(state.activeWeekYear, state.activeWeekNumber);
+
+  if (statusBadge) {
+    if (isPaused) {
+      statusBadge.textContent = 'Pausad vecka';
+      statusBadge.className = 'px-2 py-0.5 rounded-md text-[10px] font-bold uppercase bg-slate-800 text-slate-400 border border-slate-700';
+    } else if (weekData?.confirmed_day) {
+      statusBadge.textContent = `Spikad: ${weekData.confirmed_day}`;
+      statusBadge.className = 'px-2 py-0.5 rounded-md text-[10px] font-bold uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-500/40';
+    } else {
+      statusBadge.textContent = `Värd: ${host?.name || 'Ingen'}`;
+      statusBadge.className = 'px-2 py-0.5 rounded-md text-[10px] font-bold uppercase bg-amber-500/20 text-amber-400 border border-amber-500/30';
+    }
+  }
+
+  if (avatarEl && host) {
+    avatarEl.textContent = isPaused ? '⏸️' : isHost ? '👑' : host.name.charAt(0);
+  }
+
+  if (pauseBtn) {
+    pauseBtn.textContent = isPaused ? '▶️ Återaktivera' : '⏸️ Pausa';
+  }
+
+  // Host quick proposals
+  if (quickHostPanel) {
+    if (isHost && !isPaused) {
+      quickHostPanel.classList.remove('hidden');
+      renderQuickHostDays(weekId, weekData);
+    } else {
+      quickHostPanel.classList.add('hidden');
+    }
+  }
+
+  // Render Vote Matrix Table
+  if (matrixTable) {
+    const proposedDays = weekData?.proposed_days || [];
+    if (proposedDays.length === 0 || isPaused) {
+      matrixTable.innerHTML = `<tr><td class="text-slate-500 text-center py-4">${isPaused ? 'Veckan är pausad' : 'Inga föreslagna dagar än för denna vecka'}</td></tr>`;
+      return;
+    }
+
+    const weekVotes = state.allVotesCache[weekId] || [];
+
+    let html = `
+      <thead>
+        <tr class="border-b border-slate-800 text-slate-400 text-xs">
+          <th class="py-2 pr-3 font-bold">Kompis</th>
+          ${proposedDays.map(d => `<th class="py-2 px-2 text-center font-semibold text-slate-300">${escapeHtml(d.day)}<br><span class="text-[10px] text-slate-500 font-mono">${d.date.split('-').slice(1).join('/')}</span></th>`).join('')}
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-800/60 text-xs">
+    `;
+
+    state.members.forEach(member => {
+      const isMe = state.currentUser?.id === member.id;
+      html += `
+        <tr class="${isMe ? 'bg-amber-500/5 font-semibold text-white' : 'text-slate-300'}">
+          <td class="py-2.5 pr-3 flex items-center gap-2">
+            <span class="w-5 h-5 rounded-full bg-slate-800 text-slate-300 text-[10px] font-bold flex items-center justify-center">${member.name.charAt(0)}</span>
+            <span>${escapeHtml(member.name)} ${isMe ? '<span class="text-[10px] text-amber-400">(Du)</span>' : ''}</span>
+          </td>
+      `;
+
+      proposedDays.forEach(d => {
+        const vote = weekVotes.find(v => v.member_id === member.id && v.day_id === d.id)?.vote;
+        let badge = '<span class="text-slate-600">-</span>';
+        if (vote === 'yes') {
+          badge = '<span class="text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded text-[11px]">🍻 JA</span>';
+        } else if (vote === 'yes_no_alcohol') {
+          badge = '<span class="text-sky-400 font-bold bg-sky-500/10 px-2 py-0.5 rounded text-[11px]">🥤 Ja (utan alc)</span>';
+        } else if (vote === 'no') {
+          badge = '<span class="text-rose-400 font-bold bg-rose-500/10 px-2 py-0.5 rounded text-[11px]">❌ Nej</span>';
+        }
+
+        html += `<td class="py-2.5 px-2 text-center">${badge}</td>`;
+      });
+
+      html += `</tr>`;
+    });
+
+    html += `</tbody>`;
+    matrixTable.innerHTML = html;
+  }
+}
+
+function renderQuickHostDays(weekId, weekData) {
+  const container = document.getElementById('quick-host-days-list');
+  if (!container) return;
+
+  const days = weekData?.proposed_days || [];
+  container.innerHTML = days.map((d, index) => `
+    <div class="flex items-center gap-2 bg-slate-950 p-2 rounded-xl border border-slate-800 text-xs">
+      <span class="font-bold text-white flex-1">${escapeHtml(d.day)} ${d.date} kl. ${d.time || '18:30'}</span>
+      <button onclick="removeQuickDay('${weekId}', ${index})" class="p-1 text-slate-500 hover:text-rose-400 rounded transition" title="Ta bort">
+        ✕
+      </button>
+    </div>
+  `).join('') || '<p class="text-xs text-slate-400 italic">Inga dagar tillagda än. Klicka i kalendern för att lägga till!</p>';
+}
+
+window.removeQuickDay = function(weekId, index) {
+  const weekData = state.allWeeksCache[weekId];
+  if (!weekData || !weekData.proposed_days) return;
+  weekData.proposed_days.splice(index, 1);
+  saveWeekData(weekId, weekData);
+  renderApp();
+};
+
+// ================= MODAL MANAGERS =================
+
+function openSwapModal() {
+  if (!state.currentUser) {
+    openLoginModal();
+    return;
+  }
+  const modal = document.getElementById('modal-swap');
+  const myWeekText = document.getElementById('swap-my-week-text');
+  const targetSelect = document.getElementById('swap-target-select');
+
+  const currentWeekId = getWeekId(state.activeWeekYear, state.activeWeekNumber);
+  if (myWeekText) myWeekText.textContent = `${currentWeekId} (${getWeekDateRange(state.activeWeekYear, state.activeWeekNumber)})`;
+
+  if (targetSelect) {
+    const options = [];
+    for (let i = 1; i <= 8; i++) {
+      let w = state.activeWeekNumber + i;
+      let y = state.activeWeekYear;
+      if (w > 52) { w -= 52; y += 1; }
+      const host = getHostForWeek(y, w);
+      if (host && host.id !== state.currentUser.id) {
+        options.push(`<option value="${host.id}|${getWeekId(y, w)}">V.${w} (${host.name}) - ${getWeekDateRange(y, w).split('–')[0].trim()}</option>`);
+      }
+    }
+    targetSelect.innerHTML = options.join('') || '<option value="">Inga andra veckor tillgängliga</option>';
+  }
+
+  modal?.classList.remove('hidden');
+}
+
+function closeSwapModal() {
+  document.getElementById('modal-swap')?.classList.add('hidden');
+}
+
+function openManageModal() {
+  const modal = document.getElementById('modal-manage');
+  renderManageMembersList();
+  modal?.classList.remove('hidden');
+}
+
+function closeManageModal() {
+  document.getElementById('modal-manage')?.classList.add('hidden');
+}
+
+function renderManageMembersList() {
+  const container = document.getElementById('manage-members-list');
+  if (!container) return;
+
+  container.innerHTML = state.members.map((m, idx) => `
+    <div class="flex items-center justify-between p-2.5 bg-slate-950 rounded-xl border border-slate-800 text-xs">
+      <div class="flex items-center gap-2">
+        <span class="w-6 h-6 rounded-full bg-amber-500/20 text-amber-400 font-bold flex items-center justify-center">${idx + 1}</span>
+        <span class="font-bold text-white">${escapeHtml(m.name)}</span>
+      </div>
+      <span class="text-slate-500 text-[11px]">Ordning #${idx + 1}</span>
+    </div>
+  `).join('');
+}
 
 function renderHeaderUser() {
   const nameEl = document.getElementById('header-user-name');
@@ -535,416 +847,6 @@ function renderHeaderUser() {
   }
 }
 
-// Switch between Month and Week views
-function setViewMode(mode) {
-  state.currentView = mode;
-  const monthSection = document.getElementById('view-month-section');
-  const weekSection = document.getElementById('view-week-section');
-  const btnMonth = document.getElementById('tab-btn-month');
-  const btnWeek = document.getElementById('tab-btn-week');
-
-  if (mode === 'month') {
-    monthSection?.classList.remove('hidden');
-    weekSection?.classList.add('hidden');
-    btnMonth?.classList.add('bg-amber-500', 'text-slate-950', 'shadow-md', 'shadow-amber-500/20');
-    btnMonth?.classList.remove('text-slate-400');
-    btnWeek?.classList.remove('bg-amber-500', 'text-slate-950', 'shadow-md', 'shadow-amber-500/20');
-    btnWeek?.classList.add('text-slate-400');
-    renderMonthOverview();
-  } else {
-    monthSection?.classList.add('hidden');
-    weekSection?.classList.remove('hidden');
-    btnWeek?.classList.add('bg-amber-500', 'text-slate-950', 'shadow-md', 'shadow-amber-500/20');
-    btnWeek?.classList.remove('text-slate-400');
-    btnMonth?.classList.remove('bg-amber-500', 'text-slate-950', 'shadow-md', 'shadow-amber-500/20');
-    btnMonth?.classList.add('text-slate-400');
-    renderWeekView();
-  }
-}
-
-// Render Month Overview
-function renderMonthOverview() {
-  const monthTitle = document.getElementById('month-title-label');
-  const grid = document.getElementById('month-weeks-grid');
-  if (!grid) return;
-
-  const monthNames = ['Januari', 'Februari', 'Mars', 'April', 'Maj', 'Juni', 'Juli', 'Augusti', 'September', 'Oktober', 'November', 'December'];
-  if (monthTitle) {
-    monthTitle.textContent = `${monthNames[state.viewMonth]} ${state.viewMonthYear}`;
-  }
-
-  const weeks = getWeeksInMonth(state.viewMonthYear, state.viewMonth);
-
-  grid.innerHTML = weeks.map(item => {
-    const host = getHostForWeek(item.year, item.weekNumber);
-    const weekData = state.allWeeksCache[item.weekId];
-    const isPaused = isWeekPaused(item.year, item.weekNumber);
-    const isCurrent = item.weekNumber === state.currentRealWeek && item.year === state.currentRealYear;
-    const isSelected = item.weekNumber === state.selectedWeek && item.year === state.selectedYear;
-    const isMe = state.currentUser && host && state.currentUser.id === host.id;
-
-    let statusBadge = '';
-    if (isPaused) {
-      statusBadge = '<span class="px-2.5 py-1 rounded-lg bg-slate-800 text-slate-400 text-xs font-semibold">⏸️ Pausad vecka</span>';
-    } else if (weekData?.confirmed_day) {
-      statusBadge = `<span class="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-bold">✓ Spikad: ${escapeHtml(weekData.confirmed_day)}</span>`;
-    } else if (weekData?.proposed_days && weekData.proposed_days.length > 0) {
-      statusBadge = '<span class="px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-bold animate-pulse">🗳️ Röstning pågår</span>';
-    } else {
-      statusBadge = '<span class="px-2.5 py-1 rounded-lg bg-slate-800/80 text-slate-400 text-xs">⏳ Planeras</span>';
-    }
-
-    return `
-      <div onclick="selectWeekAndOpen(${item.year}, ${item.weekNumber})" class="bg-slate-900 border ${isSelected ? 'border-amber-500 ring-2 ring-amber-500/30' : isCurrent ? 'border-emerald-500/60' : 'border-slate-800'} hover:border-amber-500/50 rounded-2xl p-4 sm:p-5 transition flex flex-col sm:flex-row sm:items-center justify-between gap-4 cursor-pointer group shadow-md">
-        <div class="flex items-center gap-4">
-          <div class="w-12 h-12 rounded-2xl ${isPaused ? 'bg-slate-800 text-slate-500' : isMe ? 'bg-amber-500 text-slate-950 font-black' : 'bg-slate-800 text-amber-400 font-bold'} flex items-center justify-center text-lg shadow-inner">
-            ${isPaused ? '⏸️' : isMe ? '👑' : host ? host.name.charAt(0) : '?'}
-          </div>
-          <div>
-            <div class="flex items-center gap-2">
-              <h4 class="text-base font-extrabold text-white group-hover:text-amber-300 transition">
-                Vecka ${item.weekNumber}
-              </h4>
-              ${isCurrent ? '<span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-bold uppercase">Denna vecka</span>' : ''}
-            </div>
-            <p class="text-xs text-slate-400 font-medium mt-0.5">
-              ${getWeekDateRange(item.year, item.weekNumber)} &bull; Värd: <strong class="${isMe ? 'text-amber-400' : 'text-slate-200'}">${escapeHtml(host?.name || 'Ingen')}</strong>
-            </p>
-          </div>
-        </div>
-
-        <div class="flex items-center justify-between sm:justify-end gap-3 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-800">
-          ${statusBadge}
-          <span class="text-xs text-slate-500 group-hover:text-amber-400 transition font-semibold">Öppna &rarr;</span>
-        </div>
-      </div>
-    `;
-  }).join('');
-}
-
-window.selectWeekAndOpen = function(year, week) {
-  state.selectedYear = year;
-  state.selectedWeek = week;
-  loadWeekData(year, week).then(() => {
-    setViewMode('week');
-  });
-};
-
-// Render Week View
-function renderWeekView() {
-  renderWeekNavigator();
-  renderHostCard();
-  renderVotingSection();
-  renderMatrixTable();
-  renderSwapAlerts();
-}
-
-function renderWeekNavigator() {
-  const labelEl = document.getElementById('current-week-label');
-  const datesEl = document.getElementById('current-week-dates');
-  const isNowBadge = document.getElementById('current-week-is-now-badge');
-
-  if (labelEl) labelEl.textContent = `Vecka ${state.selectedWeek}`;
-  if (datesEl) datesEl.textContent = getWeekDateRange(state.selectedYear, state.selectedWeek);
-
-  const isCurrent = state.selectedWeek === state.currentRealWeek && state.selectedYear === state.currentRealYear;
-  if (isNowBadge) {
-    if (isCurrent) isNowBadge.classList.remove('hidden');
-    else isNowBadge.classList.add('hidden');
-  }
-}
-
-function renderHostCard() {
-  const host = getHostForWeek(state.selectedYear, state.selectedWeek);
-  const isPaused = isWeekPaused(state.selectedYear, state.selectedWeek);
-  const isCurrentUserHost = state.currentUser && host && state.currentUser.id === host.id;
-
-  const hostCard = document.getElementById('host-banner-card');
-  const pausedBanner = document.getElementById('paused-week-banner');
-  const votingMatrixWrapper = document.getElementById('voting-matrix-wrapper');
-  const hostControlsSection = document.getElementById('host-controls-section');
-  const togglePauseBtn = document.getElementById('btn-toggle-pause-week');
-
-  if (togglePauseBtn) {
-    togglePauseBtn.textContent = isPaused ? '▶️ Återaktivera' : '⏸️ Pausa';
-  }
-
-  if (isPaused) {
-    pausedBanner?.classList.remove('hidden');
-    hostCard?.classList.add('hidden');
-    votingMatrixWrapper?.classList.add('hidden');
-    hostControlsSection?.classList.add('hidden');
-    return;
-  } else {
-    pausedBanner?.classList.add('hidden');
-    hostCard?.classList.remove('hidden');
-    votingMatrixWrapper?.classList.remove('hidden');
-  }
-
-  const hostNameEl = document.getElementById('host-name-display');
-  const hostAvatarBadge = document.getElementById('host-avatar-badge');
-  const hostStatusSubtitle = document.getElementById('host-status-subtitle');
-  const confirmedDateBanner = document.getElementById('confirmed-date-banner');
-  const confirmedDateText = document.getElementById('confirmed-date-text');
-  const hostNoteWrapper = document.getElementById('host-note-display-wrapper');
-  const hostNoteText = document.getElementById('host-note-text');
-
-  if (hostNameEl) hostNameEl.textContent = host ? host.name : 'Ingen värd tilldelad';
-  if (hostAvatarBadge && host) hostAvatarBadge.textContent = isCurrentUserHost ? '👑' : host.name.charAt(0).toUpperCase();
-
-  if (hostStatusSubtitle) {
-    if (isCurrentUserHost) {
-      hostStatusSubtitle.textContent = 'Du är värd denna vecka! Fyll i dina förslag nedan.';
-    } else {
-      hostStatusSubtitle.textContent = `${host?.name || 'Värden'} bjuder på middag denna vecka.`;
-    }
-  }
-
-  if (state.weekData?.confirmed_day) {
-    confirmedDateBanner?.classList.remove('hidden');
-    if (confirmedDateText) confirmedDateText.textContent = state.weekData.confirmed_day;
-  } else {
-    confirmedDateBanner?.classList.add('hidden');
-  }
-
-  if (state.weekData?.host_notes) {
-    hostNoteWrapper?.classList.remove('hidden');
-    if (hostNoteText) hostNoteText.textContent = `"${state.weekData.host_notes}"`;
-  } else {
-    hostNoteWrapper?.classList.add('hidden');
-  }
-
-  if (hostControlsSection) {
-    if (isCurrentUserHost) {
-      hostControlsSection.classList.remove('hidden');
-      renderHostInputs();
-    } else {
-      hostControlsSection.classList.add('hidden');
-    }
-  }
-}
-
-function renderHostInputs() {
-  const container = document.getElementById('proposed-days-inputs');
-  const noteInput = document.getElementById('input-host-note');
-  if (!container) return;
-
-  if (noteInput && state.weekData) {
-    noteInput.value = state.weekData.host_notes || '';
-  }
-
-  let days = state.weekData?.proposed_days || [];
-  if (days.length === 0) {
-    days = [
-      { id: 'd1', day: 'Onsdag', date: getWeekdayDate(state.selectedYear, state.selectedWeek, 2), time: '18:30' },
-      { id: 'd2', day: 'Torsdag', date: getWeekdayDate(state.selectedYear, state.selectedWeek, 3), time: '18:30' },
-    ];
-  }
-
-  container.innerHTML = days.map((d, index) => `
-    <div class="flex flex-wrap sm:flex-nowrap items-center gap-2 bg-slate-950 p-2.5 rounded-xl border border-slate-800 day-input-row" data-day-id="${d.id}">
-      <input type="text" class="input-day-label flex-1 bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-white" value="${escapeHtml(d.day)}" placeholder="Veckodag (t.ex. Onsdag)">
-      <input type="date" class="input-day-date w-36 bg-slate-900 border border-slate-800 rounded-lg px-2 py-1.5 text-xs text-white" value="${d.date || ''}">
-      <input type="time" class="input-day-time w-24 bg-slate-900 border border-slate-800 rounded-lg px-2 py-1.5 text-xs text-white" value="${d.time || '18:30'}">
-      <button type="button" onclick="removeDayRow(${index})" class="p-1.5 text-slate-500 hover:text-rose-400 rounded-lg transition" title="Ta bort">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-      </button>
-    </div>
-  `).join('');
-}
-
-window.removeDayRow = function(index) {
-  const container = document.getElementById('proposed-days-inputs');
-  const rows = container.querySelectorAll('.day-input-row');
-  if (rows.length > index) rows[index].remove();
-};
-
-function addDayRowOption() {
-  const container = document.getElementById('proposed-days-inputs');
-  if (!container) return;
-
-  const newId = 'd_' + Date.now();
-  const div = document.createElement('div');
-  div.className = 'flex flex-wrap sm:flex-nowrap items-center gap-2 bg-slate-950 p-2.5 rounded-xl border border-slate-800 day-input-row';
-  div.dataset.dayId = newId;
-  div.innerHTML = `
-    <input type="text" class="input-day-label flex-1 bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-white" placeholder="Veckodag (t.ex. Fredag)">
-    <input type="date" class="input-day-date w-36 bg-slate-900 border border-slate-800 rounded-lg px-2 py-1.5 text-xs text-white" value="${getWeekdayDate(state.selectedYear, state.selectedWeek, 4)}">
-    <input type="time" class="input-day-time w-24 bg-slate-900 border border-slate-800 rounded-lg px-2 py-1.5 text-xs text-white" value="18:30">
-    <button type="button" onclick="this.closest('.day-input-row').remove()" class="p-1.5 text-slate-500 hover:text-rose-400 rounded-lg transition" title="Ta bort">
-      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-    </button>
-  `;
-  container.appendChild(div);
-}
-
-function handleSaveProposalsClick() {
-  const container = document.getElementById('proposed-days-inputs');
-  const noteInput = document.getElementById('input-host-note');
-  if (!container) return;
-
-  const rows = container.querySelectorAll('.day-input-row');
-  const proposedDays = [];
-
-  rows.forEach((row, i) => {
-    const label = row.querySelector('.input-day-label').value.trim();
-    const date = row.querySelector('.input-day-date').value;
-    const time = row.querySelector('.input-day-time').value;
-
-    if (label) {
-      proposedDays.push({
-        id: row.dataset.dayId || 'd' + (i + 1),
-        day: label,
-        date: date,
-        time: time
-      });
-    }
-  });
-
-  if (proposedDays.length === 0) {
-    alert('Lägg till minst ett datumalternativ.');
-    return;
-  }
-
-  saveProposals(proposedDays, noteInput?.value.trim() || '');
-}
-
-function renderVotingSection() {
-  const container = document.getElementById('voting-days-container');
-  const statusTag = document.getElementById('voting-status-tag');
-  if (!container) return;
-
-  const host = getHostForWeek(state.selectedYear, state.selectedWeek);
-  const isCurrentUserHost = state.currentUser && host && state.currentUser.id === host.id;
-  const days = state.weekData?.proposed_days || [];
-
-  if (days.length === 0) {
-    if (statusTag) {
-      statusTag.textContent = 'Inga datum föreslagna än';
-      statusTag.className = 'text-xs font-semibold px-3 py-1 rounded-full bg-slate-800 text-slate-400';
-    }
-
-    container.innerHTML = `
-      <div class="text-center py-10 px-4 bg-slate-950/60 rounded-2xl border border-dashed border-slate-800">
-        <div class="text-3xl mb-2">⏳</div>
-        <p class="text-sm font-bold text-slate-300">Värden har inte föreslagit datum för denna vecka än</p>
-        <p class="text-xs text-slate-500 mt-1">
-          ${isCurrentUserHost ? 'Använd kontrollpanelen ovan för att lägga till dina datum.' : `Väntar på att ${host?.name || 'värden'} ska lägga upp alternativ.`}
-        </p>
-      </div>
-    `;
-    return;
-  }
-
-  if (statusTag) {
-    statusTag.textContent = 'Röstning öppen';
-    statusTag.className = 'text-xs font-semibold px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20';
-  }
-
-  const tallies = {};
-  days.forEach(d => {
-    const dayVotes = state.votes.filter(v => v.day_id === d.id);
-    const yesCount = dayVotes.filter(v => v.vote === 'yes').length;
-    const maybeCount = dayVotes.filter(v => v.vote === 'maybe').length;
-    tallies[d.id] = { yes: yesCount, maybe: maybeCount, score: yesCount * 2 + maybeCount };
-  });
-
-  const maxScore = Math.max(...Object.values(tallies).map(t => t.score), 0);
-
-  container.innerHTML = days.map(d => {
-    const dayVotes = state.votes.filter(v => v.day_id === d.id);
-    const yesList = dayVotes.filter(v => v.vote === 'yes').map(v => getMemberName(v.member_id));
-    const maybeList = dayVotes.filter(v => v.vote === 'maybe').map(v => getMemberName(v.member_id));
-    const noList = dayVotes.filter(v => v.vote === 'no').map(v => getMemberName(v.member_id));
-
-    const myVote = state.currentUser ? dayVotes.find(v => v.member_id === state.currentUser.id)?.vote : null;
-    const isTopChoice = tallies[d.id].score === maxScore && maxScore > 0;
-    const isConfirmed = state.weekData?.confirmed_day === `${d.day} ${d.time}`;
-
-    return `
-      <div class="bg-slate-950 border ${isConfirmed ? 'border-emerald-500 ring-2 ring-emerald-500/30' : isTopChoice ? 'border-amber-500/50 bg-amber-950/10' : 'border-slate-800'} rounded-2xl p-4 sm:p-5 transition flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div class="space-y-1">
-          <div class="flex items-center gap-2">
-            <h4 class="text-base sm:text-lg font-bold text-white">${escapeHtml(d.day)} kl. ${escapeHtml(d.time || '18:30')}</h4>
-            ${isConfirmed ? '<span class="px-2 py-0.5 rounded-md bg-emerald-500 text-slate-950 text-[10px] font-black uppercase">Fastställd</span>' : isTopChoice ? '<span class="px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-400 text-[10px] font-bold uppercase border border-amber-500/30">Flest röster ⭐</span>' : ''}
-          </div>
-          <p class="text-xs text-slate-400 font-mono">${d.date ? formatDateSwedish(d.date) : ''}</p>
-
-          <div class="pt-2 flex flex-wrap gap-1.5 text-[11px]">
-            ${yesList.length > 0 ? `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">✅ ${yesList.join(', ')}</span>` : ''}
-            ${maybeList.length > 0 ? `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-300 border border-amber-500/20">❓ ${maybeList.join(', ')}</span>` : ''}
-            ${noList.length > 0 ? `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-rose-500/10 text-rose-300 border border-rose-500/20">❌ ${noList.join(', ')}</span>` : ''}
-          </div>
-        </div>
-
-        <div class="flex flex-wrap items-center gap-2 pt-2 md:pt-0 border-t md:border-t-0 border-slate-800">
-          <button onclick="submitVote('${d.id}', 'yes')" class="px-3.5 py-2 rounded-xl text-xs font-bold transition active:scale-95 cursor-pointer flex items-center gap-1.5 ${myVote === 'yes' ? 'bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20' : 'bg-slate-900 hover:bg-emerald-500/20 text-slate-300 border border-slate-800'}">
-            <span>✅ Kan</span>
-          </button>
-          <button onclick="submitVote('${d.id}', 'maybe')" class="px-3 py-2 rounded-xl text-xs font-bold transition active:scale-95 cursor-pointer flex items-center gap-1.5 ${myVote === 'maybe' ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20' : 'bg-slate-900 hover:bg-amber-500/20 text-slate-300 border border-slate-800'}">
-            <span>❓ Kanske</span>
-          </button>
-          <button onclick="submitVote('${d.id}', 'no')" class="px-3 py-2 rounded-xl text-xs font-bold transition active:scale-95 cursor-pointer flex items-center gap-1.5 ${myVote === 'no' ? 'bg-rose-500 text-slate-950 shadow-md shadow-rose-500/20' : 'bg-slate-900 hover:bg-rose-500/20 text-slate-300 border border-slate-800'}">
-            <span>❌ Kan ej</span>
-          </button>
-          ${isCurrentUserHost ? `
-            <button onclick="confirmFinalDate('${d.day} kl. ${d.time || '18:30'}')" class="ml-2 px-3 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-xl transition cursor-pointer shadow-sm" title="Välj detta som officiellt datum">
-              Välj dag
-            </button>
-          ` : ''}
-        </div>
-      </div>
-    `;
-  }).join('');
-}
-
-function renderMatrixTable() {
-  const table = document.getElementById('votes-matrix-table');
-  if (!table) return;
-
-  const days = state.weekData?.proposed_days || [];
-  if (days.length === 0 || state.members.length === 0) {
-    table.innerHTML = `<tr><td class="text-slate-500 text-center py-4">Ingen röstningsdata än</td></tr>`;
-    return;
-  }
-
-  let html = `
-    <thead>
-      <tr class="border-b border-slate-800 text-slate-400">
-        <th class="py-2 pr-4 font-semibold">Kompis</th>
-        ${days.map(d => `<th class="py-2 px-3 text-center font-semibold text-slate-300">${escapeHtml(d.day)}<br><span class="text-[10px] text-slate-500">${escapeHtml(d.time || '18:30')}</span></th>`).join('')}
-      </tr>
-    </thead>
-    <tbody class="divide-y divide-slate-800/60">
-  `;
-
-  state.members.forEach(member => {
-    const isMe = state.currentUser?.id === member.id;
-    html += `
-      <tr class="${isMe ? 'bg-amber-500/5 font-semibold text-white' : 'text-slate-300'}">
-        <td class="py-2.5 pr-4 flex items-center gap-2">
-          <span class="w-5 h-5 rounded-full bg-slate-800 text-slate-300 text-[10px] font-bold flex items-center justify-center">${member.name.charAt(0)}</span>
-          <span>${escapeHtml(member.name)} ${isMe ? '<span class="text-[10px] text-amber-400">(Du)</span>' : ''}</span>
-        </td>
-    `;
-
-    days.forEach(d => {
-      const vote = state.votes.find(v => v.member_id === member.id && v.day_id === d.id)?.vote;
-      let badge = '<span class="text-slate-600">-</span>';
-      if (vote === 'yes') badge = '<span class="text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded">Ja</span>';
-      else if (vote === 'maybe') badge = '<span class="text-amber-400 font-bold bg-amber-500/10 px-2 py-0.5 rounded">Kanske</span>';
-      else if (vote === 'no') badge = '<span class="text-rose-400 font-bold bg-rose-500/10 px-2 py-0.5 rounded">Nej</span>';
-
-      html += `<td class="py-2.5 px-3 text-center">${badge}</td>`;
-    });
-
-    html += `</tr>`;
-  });
-
-  html += `</tbody>`;
-  table.innerHTML = html;
-}
-
 function renderSwapAlerts() {
   const container = document.getElementById('swap-alert-container');
   if (!container) return;
@@ -960,7 +862,6 @@ function renderSwapAlerts() {
 
   if (myPendingSwaps.length === 0) {
     container.classList.add('hidden');
-    container.innerHTML = '';
     return;
   }
 
@@ -985,83 +886,27 @@ function renderSwapAlerts() {
   }).join('');
 }
 
-function openSwapModal() {
-  if (!state.currentUser) {
-    openLoginModal();
-    return;
-  }
+window.respondSwap = async function(swapId, newStatus) {
+  const swap = state.swaps.find(s => s.id === swapId);
+  if (!swap) return;
 
-  const modal = document.getElementById('modal-swap');
-  const myWeekText = document.getElementById('swap-my-week-text');
-  const targetSelect = document.getElementById('swap-target-select');
+  swap.status = newStatus;
+  localStorage.setItem('mida_all_swaps', JSON.stringify(state.swaps));
 
-  const currentWeekId = getWeekId(state.selectedYear, state.selectedWeek);
-  if (myWeekText) myWeekText.textContent = `${currentWeekId} (${getWeekDateRange(state.selectedYear, state.selectedWeek)})`;
-
-  if (targetSelect) {
-    const options = [];
-    for (let i = 1; i <= 8; i++) {
-      let w = state.selectedWeek + i;
-      let y = state.selectedYear;
-      if (w > 52) { w -= 52; y += 1; }
-      
-      const host = getHostForWeek(y, w);
-      if (host && host.id !== state.currentUser.id) {
-        options.push(`<option value="${host.id}|${getWeekId(y, w)}">V.${w} (${host.name}) - ${getWeekDateRange(y, w).split('–')[0].trim()}</option>`);
-      }
+  if (supabaseClient) {
+    try {
+      await supabaseClient.from('mida_swaps').update({ status: newStatus }).eq('id', swapId);
+    } catch (e) {
+      console.warn('Swap update error', e);
     }
-    targetSelect.innerHTML = options.join('') || '<option value="">Inga andra veckor tillgängliga</option>';
   }
 
-  if (modal) modal.classList.remove('hidden');
-}
-
-function closeSwapModal() {
-  const modal = document.getElementById('modal-swap');
-  if (modal) modal.classList.add('hidden');
-}
-
-function openManageModal() {
-  const modal = document.getElementById('modal-manage');
-  renderManageMembersList();
-  if (modal) modal.classList.remove('hidden');
-}
-
-function closeManageModal() {
-  const modal = document.getElementById('modal-manage');
-  if (modal) modal.classList.add('hidden');
-}
-
-function renderManageMembersList() {
-  const container = document.getElementById('manage-members-list');
-  if (!container) return;
-
-  container.innerHTML = state.members.map((m, idx) => `
-    <div class="flex items-center justify-between p-2.5 bg-slate-950 rounded-xl border border-slate-800 text-xs">
-      <div class="flex items-center gap-2">
-        <span class="w-6 h-6 rounded-full bg-amber-500/20 text-amber-400 font-bold flex items-center justify-center">${idx + 1}</span>
-        <span class="font-bold text-white">${escapeHtml(m.name)}</span>
-      </div>
-      <span class="text-slate-500 text-[11px]">Ordning #${idx + 1}</span>
-    </div>
-  `).join('');
-}
-
-// ================= GLOBAL HELPERS =================
+  renderApp();
+};
 
 function getMemberName(memberId) {
   const member = state.members.find(m => m.id === memberId);
   return member ? member.name : memberId;
-}
-
-function formatDateSwedish(isoDateStr) {
-  try {
-    const parts = isoDateStr.split('-');
-    if (parts.length === 3) return `${parseInt(parts[2], 10)}/${parseInt(parts[1], 10)}`;
-    return isoDateStr;
-  } catch (e) {
-    return isoDateStr;
-  }
 }
 
 function escapeHtml(str) {
@@ -1077,84 +922,93 @@ function escapeHtml(str) {
 
 function renderApp() {
   renderHeaderUser();
-  if (state.currentView === 'month') {
-    renderMonthOverview();
-  } else {
-    renderWeekView();
-  }
+  renderCalendarGrid();
+  renderActiveWeekDetail();
+  renderSwapAlerts();
 }
 
-// ================= INITIALIZATION =================
+// ================= APP INITIALIZATION =================
 
 document.addEventListener('DOMContentLoaded', async () => {
-  console.log('MIDA Dinner Calendar starting...');
+  console.log('MIDA Month Grid & 3-Tier Voting Engine started...');
 
-  // Setup DOM Listeners
-  document.getElementById('tab-btn-month')?.addEventListener('click', () => setViewMode('month'));
-  document.getElementById('tab-btn-week')?.addEventListener('click', () => setViewMode('week'));
-
+  // Month navigation
   document.getElementById('btn-prev-month')?.addEventListener('click', () => {
     state.viewMonth -= 1;
     if (state.viewMonth < 0) {
       state.viewMonth = 11;
-      state.viewMonthYear -= 1;
+      state.viewYear -= 1;
     }
-    renderMonthOverview();
+    renderCalendarGrid();
   });
 
   document.getElementById('btn-next-month')?.addEventListener('click', () => {
     state.viewMonth += 1;
     if (state.viewMonth > 11) {
       state.viewMonth = 0;
-      state.viewMonthYear += 1;
+      state.viewYear += 1;
     }
-    renderMonthOverview();
+    renderCalendarGrid();
   });
 
+  document.getElementById('btn-today-jump')?.addEventListener('click', () => {
+    state.viewMonth = new Date().getMonth();
+    state.viewYear = new Date().getFullYear();
+    state.activeWeekNumber = getISOWeek(new Date());
+    state.activeWeekYear = new Date().getFullYear();
+    renderApp();
+  });
+
+  // User auth buttons
   document.getElementById('btn-user-profile')?.addEventListener('click', openLoginModal);
   document.getElementById('btn-login-submit')?.addEventListener('click', handleLoginSubmit);
   document.getElementById('btn-login-cancel')?.addEventListener('click', closeLoginModal);
 
-  document.getElementById('btn-prev-week')?.addEventListener('click', () => {
-    state.selectedWeek -= 1;
-    if (state.selectedWeek < 1) {
-      state.selectedWeek = 52;
-      state.selectedYear -= 1;
-    }
-    loadWeekData(state.selectedYear, state.selectedWeek).then(renderWeekView);
+  // Day modal close
+  document.getElementById('btn-close-day-modal')?.addEventListener('click', closeDayVoteModal);
+
+  // Pause week toggle
+  document.getElementById('btn-toggle-pause-week')?.addEventListener('click', () => {
+    const weekId = getWeekId(state.activeWeekYear, state.activeWeekNumber);
+    const weekData = state.allWeeksCache[weekId] || {
+      week_id: weekId,
+      week_number: state.activeWeekNumber,
+      year: state.activeWeekYear,
+      host_id: getHostForWeek(state.activeWeekYear, state.activeWeekNumber)?.id,
+      is_paused: false,
+      proposed_days: []
+    };
+    weekData.is_paused = !weekData.is_paused;
+    weekData.updated_at = new Date().toISOString();
+    saveWeekData(weekId, weekData);
+    renderApp();
   });
 
-  document.getElementById('btn-next-week')?.addEventListener('click', () => {
-    state.selectedWeek += 1;
-    if (state.selectedWeek > 52) {
-      state.selectedWeek = 1;
-      state.selectedYear += 1;
-    }
-    loadWeekData(state.selectedYear, state.selectedWeek).then(renderWeekView);
-  });
-
-  document.getElementById('btn-jump-current-week')?.addEventListener('click', () => {
-    state.selectedYear = state.currentRealYear;
-    state.selectedWeek = state.currentRealWeek;
-    loadWeekData(state.selectedYear, state.selectedWeek).then(renderWeekView);
-  });
-
-  document.getElementById('btn-toggle-pause-week')?.addEventListener('click', togglePauseWeek);
-  document.getElementById('btn-unpause-week')?.addEventListener('click', togglePauseWeek);
-
-  document.getElementById('btn-add-day-option')?.addEventListener('click', addDayRowOption);
-  document.getElementById('btn-save-proposals')?.addEventListener('click', handleSaveProposalsClick);
-
+  // Swap modal
   document.getElementById('btn-open-swap-modal')?.addEventListener('click', openSwapModal);
   document.getElementById('btn-close-swap-modal')?.addEventListener('click', closeSwapModal);
-
   document.getElementById('btn-submit-swap-request')?.addEventListener('click', () => {
     const select = document.getElementById('swap-target-select');
     if (!select || !select.value) return;
     const [targetId, targetWeek] = select.value.split('|');
-    requestSwap(targetId, targetWeek);
+    const swapObj = {
+      id: 'swap_' + Date.now(),
+      requester_id: state.currentUser.id,
+      requester_week: getWeekId(state.activeWeekYear, state.activeWeekNumber),
+      target_id: targetId,
+      target_week: targetWeek,
+      status: 'pending',
+      created_at: new Date().toISOString()
+    };
+    state.swaps.push(swapObj);
+    localStorage.setItem('mida_all_swaps', JSON.stringify(state.swaps));
+    if (supabaseClient) supabaseClient.from('mida_swaps').insert([swapObj]).then();
+    alert('Bytesförfrågan skickad!');
+    closeSwapModal();
+    renderApp();
   });
 
+  // Admin / manage modal
   document.getElementById('btn-admin-manage')?.addEventListener('click', openManageModal);
   document.getElementById('btn-close-manage-modal')?.addEventListener('click', closeManageModal);
 
@@ -1168,9 +1022,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (state.currentUser) {
       state.currentUser.pin = newPin;
       localStorage.setItem('mida_cached_members', JSON.stringify(state.members));
-      if (supabaseClient) {
-        supabaseClient.from('mida_members').update({ pin: newPin }).eq('id', state.currentUser.id).then();
-      }
+      if (supabaseClient) supabaseClient.from('mida_members').update({ pin: newPin }).eq('id', state.currentUser.id).then();
       alert('Din PIN-kod har uppdaterats!');
       input.value = '';
       closeManageModal();
@@ -1183,7 +1035,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const input = document.getElementById('input-new-member-name');
     const name = input?.value.trim();
     if (!name) return;
-
     const newId = name.toLowerCase().replace(/\s+/g, '');
     const newMember = {
       id: newId,
@@ -1191,18 +1042,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       pin: '1234',
       rotation_order: state.members.length + 1
     };
-
     state.members.push(newMember);
     localStorage.setItem('mida_cached_members', JSON.stringify(state.members));
-
-    if (supabaseClient) {
-      try {
-        await supabaseClient.from('mida_members').insert([newMember]);
-      } catch (e) {
-        console.warn('Failed to insert member to Supabase:', e);
-      }
-    }
-
+    if (supabaseClient) supabaseClient.from('mida_members').insert([newMember]).then();
     input.value = '';
     renderManageMembersList();
     renderApp();
@@ -1223,14 +1065,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   });
 
-  // Load initial data
+  // Load data & start
   await loadMembers();
   initCurrentUser();
-  await loadAllWeeksData();
-  await loadWeekData(state.selectedYear, state.selectedWeek);
-  
-  // Set default view
-  setViewMode('month');
+  await loadAllWeeksAndVotes();
+  renderApp();
 
   if (!state.currentUser) {
     setTimeout(openLoginModal, 600);
