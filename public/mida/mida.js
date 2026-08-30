@@ -369,6 +369,17 @@ function handleLoginSubmit() {
   closeLoginModal();
 }
 
+function getMemberInitials(name) {
+  if (!name) return '?';
+  if (name.toLowerCase().includes('arvid a')) return 'AA';
+  if (name.toLowerCase().includes('arvid h')) return 'AH';
+  const parts = name.trim().split(/\s+/);
+  if (parts.length > 1) {
+    return (parts[0][0] + parts[1][0]).toUpperCase();
+  }
+  return name.charAt(0).toUpperCase();
+}
+
 // ================= CALENDAR GRID RENDERING =================
 
 function renderCalendarGrid() {
@@ -391,18 +402,20 @@ function renderCalendarGrid() {
 
     // Week column on the left
     let weekColHtml = `
-      <div onclick="selectActiveWeek(${w.year}, ${w.weekNumber})" class="p-2 sm:p-3 bg-slate-950/80 border-r border-slate-800/80 flex flex-col justify-between items-center cursor-pointer hover:bg-slate-800/60 transition group text-center">
+      <div onclick="selectActiveWeek(${w.year}, ${w.weekNumber})" class="p-1.5 sm:p-2.5 bg-slate-950/80 border-r border-slate-800/80 flex flex-col justify-between items-center cursor-pointer hover:bg-slate-800/60 transition group text-center">
         <div>
-          <span class="text-[11px] sm:text-xs font-black ${isCurrentWeek ? 'text-amber-400' : 'text-slate-400'} group-hover:text-white">
+          <span class="text-[10px] sm:text-xs font-black ${isCurrentWeek ? 'text-amber-400' : 'text-slate-400'} group-hover:text-white">
             V.${w.weekNumber}
           </span>
         </div>
         <div class="my-1">
           <span class="w-6 h-6 rounded-lg ${isPaused ? 'bg-slate-800 text-slate-500' : isMyHostWeek ? 'bg-amber-500 text-slate-950 font-black' : 'bg-slate-800 text-amber-300 font-bold'} text-[10px] flex items-center justify-center shadow-sm" title="${escapeHtml(host?.name || '')}">
-            ${isPaused ? '⏸️' : isMyHostWeek ? '👑' : host ? host.name.charAt(0) : '?'}
+            ${isPaused ? '⏸️' : isMyHostWeek ? '👑' : host ? getMemberInitials(host.name) : '?'}
           </span>
         </div>
-        <span class="text-[9px] text-slate-500 truncate max-w-[45px]">${isPaused ? 'Paus' : escapeHtml(host?.name.split(' ')[0] || '')}</span>
+        <span class="text-[9px] text-slate-300 font-bold leading-tight truncate max-w-[48px] sm:max-w-[60px] block" title="${escapeHtml(host?.name || '')}">
+          ${isPaused ? 'Paus' : escapeHtml(host?.name || '')}
+        </span>
       </div>
     `;
 
@@ -428,15 +441,15 @@ function renderCalendarGrid() {
         eventChipHtml = `
           <div class="mt-1 px-1.5 py-1 rounded-md bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-[10px] font-bold truncate flex items-center gap-1 shadow-sm">
             <span>✓</span>
-            <span class="truncate">Spikat ${proposedDayObj?.time || '18:30'}</span>
+            <span class="truncate">${proposedDayObj?.time || '18:30'} ${escapeHtml(host?.name || '')}</span>
           </div>
         `;
       } else if (isProposed) {
         eventChipHtml = `
           <div class="mt-1 px-1.5 py-1 rounded-md bg-amber-500/20 border border-amber-500/40 text-amber-300 text-[10px] font-bold shadow-sm space-y-0.5">
-            <div class="flex items-center justify-between">
+            <div class="flex items-center justify-between gap-1">
               <span>🍽️ ${proposedDayObj?.time || '18:30'}</span>
-              <span class="text-[9px] opacity-80">${host?.name.split(' ')[0]}</span>
+              <span class="text-[9px] text-amber-200/90 font-bold truncate max-w-[45px]">${escapeHtml(host?.name || '')}</span>
             </div>
             ${(yesAlcCount > 0 || yesNoAlcCount > 0 || noCount > 0) ? `
               <div class="flex items-center gap-1.5 text-[9px] pt-0.5 font-mono">
@@ -745,7 +758,7 @@ function renderActiveWeekDetail() {
   }
 
   if (avatarEl && host) {
-    avatarEl.textContent = isPaused ? '⏸️' : isHost ? '👑' : host.name.charAt(0);
+    avatarEl.textContent = isPaused ? '⏸️' : isHost ? '👑' : getMemberInitials(host.name);
   }
 
   if (pauseBtn) {
@@ -787,7 +800,7 @@ function renderActiveWeekDetail() {
       html += `
         <tr class="${isMe ? 'bg-amber-500/5 font-semibold text-white' : 'text-slate-300'}">
           <td class="py-2.5 pr-3 flex items-center gap-2">
-            <span class="w-5 h-5 rounded-full bg-slate-800 text-slate-300 text-[10px] font-bold flex items-center justify-center">${member.name.charAt(0)}</span>
+            <span class="w-5 h-5 rounded-full bg-slate-800 text-slate-300 text-[9px] font-bold flex items-center justify-center font-mono">${getMemberInitials(member.name)}</span>
             <span>${escapeHtml(member.name)} ${isMe ? '<span class="text-[10px] text-amber-400">(Du)</span>' : ''}</span>
           </td>
       `;
@@ -926,8 +939,8 @@ function renderHeaderUser() {
   if (state.currentUser) {
     if (nameEl) nameEl.textContent = state.currentUser.name;
     if (avatarEl) {
-      avatarEl.textContent = state.currentUser.name.charAt(0).toUpperCase();
-      avatarEl.className = 'w-6 h-6 rounded-full bg-amber-400 text-slate-950 font-black flex items-center justify-center text-xs shadow-sm';
+      avatarEl.textContent = getMemberInitials(state.currentUser.name);
+      avatarEl.className = 'w-6 h-6 rounded-full bg-amber-400 text-slate-950 font-black flex items-center justify-center text-[10px] shadow-sm font-mono';
     }
   } else {
     if (nameEl) nameEl.textContent = 'Välj profil';
