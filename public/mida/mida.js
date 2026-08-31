@@ -306,6 +306,9 @@ async function loadAllWeeksAndVotes() {
       const { data: weeksData } = await supabaseClient.from('mida_weeks').select('*');
       if (weeksData) {
         weeksData.forEach(w => {
+          if (w.is_paused === undefined) {
+            w.is_paused = !!(w.host_notes && w.host_notes.includes('[PAUSED]'));
+          }
           state.allWeeksCache[w.week_id] = w;
         });
       }
@@ -332,8 +335,31 @@ async function saveWeekData(weekId, data) {
   localStorage.setItem(`mida_week_${weekId}`, JSON.stringify(data));
 
   if (supabaseClient) {
+    const payload = {
+      week_id: data.week_id || weekId,
+      week_number: data.week_number,
+      year: data.year,
+      host_id: data.host_id || null,
+      proposed_days: data.proposed_days || [],
+      host_notes: data.is_paused ? `[PAUSED] ${(data.host_notes || '').replace('[PAUSED]', '').trim()}` : (data.host_notes || '').replace('[PAUSED]', '').trim(),
+      confirmed_day: data.confirmed_day || '',
+      updated_at: data.updated_at || new Date().toISOString()
+    };
+
     try {
-      await supabaseClient.from('mida_weeks').upsert(data, { onConflict: 'week_id' });
+      const { error } = await supabaseClient.from('mida_weeks').upsert(payload, { onConflict: 'week_id' });
+      if (error) {
+        console.warn('Supabase save error, fallback without host_notes:', error);
+        await supabaseClient.from('mida_weeks').upsert({
+          week_id: payload.week_id,
+          week_number: payload.week_number,
+          year: payload.year,
+          host_id: payload.host_id,
+          proposed_days: payload.proposed_days,
+          confirmed_day: payload.confirmed_day,
+          updated_at: payload.updated_at
+        }, { onConflict: 'week_id' });
+      }
     } catch (e) {
       console.warn('Supabase save week error', e);
     }
