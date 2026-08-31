@@ -91,8 +91,15 @@
         </div>
       </div>
 
-      <!-- User Profile Button -->
+      <!-- Action Buttons -->
       <div class="flex items-center gap-2">
+        <!-- Calendar Subscribe Button -->
+        <button id="btn-open-calendar-sub" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 text-xs sm:text-sm font-semibold transition active:scale-95 cursor-pointer" title="Prenumerera i din kalender">
+          <span>📅</span>
+          <span class="hidden sm:inline">Prenumerera</span>
+        </button>
+
+        <!-- User Profile Button -->
         <button id="btn-user-profile" class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs sm:text-sm font-semibold transition active:scale-95 text-slate-200 cursor-pointer">
           <span id="header-user-avatar" class="w-6 h-6 rounded-full bg-amber-500 text-slate-950 font-bold flex items-center justify-center text-xs">?</span>
           <span id="header-user-name">Välj profil</span>
@@ -500,8 +507,76 @@
     </div>
   </div>
 
+  <!-- 5. CALENDAR SUBSCRIPTION MODAL -->
+  <div id="modal-calendar-sub" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 hidden">
+    <div class="bg-slate-900 border-t sm:border border-slate-800 rounded-t-[32px] sm:rounded-3xl max-w-md w-full p-5 sm:p-6 pb-8 sm:pb-6 shadow-2xl space-y-4 max-h-[88vh] sm:max-h-[90vh] overflow-y-auto custom-scroll animate-in slide-in-from-bottom sm:zoom-in duration-200">
+      
+      <div class="w-12 h-1.5 bg-slate-700/80 rounded-full mx-auto -mt-1 mb-2 sm:hidden"></div>
+
+      <div class="flex items-center justify-between pb-2.5 border-b border-slate-800">
+        <div class="flex items-center gap-2.5">
+          <span class="text-xl">📅</span>
+          <h3 class="text-base sm:text-lg font-black text-white">Prenumerera på kalendern</h3>
+        </div>
+        <button id="btn-close-calendar-sub-modal" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center cursor-pointer">
+          ✕
+        </button>
+      </div>
+
+      <p class="text-xs text-slate-300 leading-relaxed">
+        Få alla planerade och spikade MIDA-middagar direkt i din vanliga kalender i mobilen! Kalendern uppdateras automatiskt varje timme.
+      </p>
+
+      <div class="space-y-2.5 pt-1">
+        
+        <!-- Apple Calendar (1-tap on iPhone/Mac) -->
+        <a id="btn-sub-apple" href="webcal://uppsaladeals.se/mida/calendar.ics" class="p-3.5 rounded-2xl bg-gradient-to-r from-slate-800 to-slate-850 hover:from-slate-750 hover:to-slate-800 border border-slate-700 flex items-center justify-between transition active:scale-98 group">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-slate-700/80 text-white flex items-center justify-center text-lg shadow-sm">
+              
+            </div>
+            <div class="text-left">
+              <div class="text-xs font-bold text-white group-hover:text-amber-300 transition">Apple Calendar (iPhone & Mac)</div>
+              <div class="text-[10px] text-slate-400">1-klick prenumeration (autouppdateras)</div>
+            </div>
+          </div>
+          <span class="text-amber-400 text-xs font-bold">Lägg till &rarr;</span>
+        </a>
+
+        <!-- Google Calendar -->
+        <a id="btn-sub-google" href="https://calendar.google.com/calendar/render?cid=webcal%3A%2F%2Fuppsaladeals.se%2Fmida%2Fcalendar.ics" target="_blank" rel="noopener noreferrer" class="p-3.5 rounded-2xl bg-gradient-to-r from-slate-800 to-slate-850 hover:from-slate-750 hover:to-slate-800 border border-slate-700 flex items-center justify-between transition active:scale-98 group">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center text-base font-bold shadow-sm">
+              G
+            </div>
+            <div class="text-left">
+              <div class="text-xs font-bold text-white group-hover:text-amber-300 transition">Google Calendar</div>
+              <div class="text-[10px] text-slate-400">Lägg till i ditt Google-konto</div>
+            </div>
+          </div>
+          <span class="text-amber-400 text-xs font-bold">Öppna &rarr;</span>
+        </a>
+
+        <!-- Copy URL (Outlook & Others) -->
+        <div class="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 space-y-2">
+          <div class="text-xs font-bold text-slate-300 flex items-center justify-between">
+            <span>Kopiera prenumerationslänk (Outlook / Övriga)</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <input type="text" readonly value="https://uppsaladeals.se/mida/calendar.ics" id="cal-sub-url-input" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-2.5 py-1.5 text-[11px] font-mono text-slate-300 focus:outline-none select-all">
+            <button id="btn-copy-cal-sub-url" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-xl cursor-pointer transition shrink-0">
+              Kopiera
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
   <!-- Load optional local config (gitignored) then main engine -->
   <script src="/mida/config.js" onerror="/* Optional config.js not found in git, falls back to localStorage */"></script>
-  <script src="/mida/mida.js?v=2.2"></script>
+  <script src="/mida/mida.js?v=2.3"></script>
 </body>
 </html>

@@ -1074,6 +1074,29 @@ function closeManageModal() {
   document.getElementById('modal-manage')?.classList.add('hidden');
 }
 
+function openCalendarSubModal() {
+  const modal = document.getElementById('modal-calendar-sub');
+  const urlInput = document.getElementById('cal-sub-url-input');
+  if (urlInput) {
+    urlInput.value = `${window.location.origin}/mida/calendar.ics`;
+  }
+  const appleBtn = document.getElementById('btn-sub-apple');
+  if (appleBtn) {
+    const webcalUrl = `${window.location.origin.replace(/^http/, 'webcal')}/mida/calendar.ics`;
+    appleBtn.href = webcalUrl;
+  }
+  const googleBtn = document.getElementById('btn-sub-google');
+  if (googleBtn) {
+    const icsUrl = `${window.location.origin}/mida/calendar.ics`;
+    googleBtn.href = `https://calendar.google.com/calendar/render?cid=${encodeURIComponent(icsUrl)}`;
+  }
+  modal?.classList.remove('hidden');
+}
+
+function closeCalendarSubModal() {
+  document.getElementById('modal-calendar-sub')?.classList.add('hidden');
+}
+
 function renderManageMembersList() {
   const container = document.getElementById('manage-members-list');
   if (!container) return;
@@ -1232,12 +1255,27 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Day modal close
   document.getElementById('btn-close-day-modal')?.addEventListener('click', closeDayVoteModal);
 
+  // Calendar Subscription Modal
+  document.getElementById('btn-open-calendar-sub')?.addEventListener('click', openCalendarSubModal);
+  document.getElementById('btn-close-calendar-sub-modal')?.addEventListener('click', closeCalendarSubModal);
+  document.getElementById('btn-copy-cal-sub-url')?.addEventListener('click', () => {
+    const input = document.getElementById('cal-sub-url-input');
+    if (input) {
+      navigator.clipboard.writeText(input.value).then(() => {
+        alert('Prenumerationslänk kopierad!\nKlistra in den i din kalenderapp (t.ex. Outlook eller Google Calendar).');
+      }).catch(() => {
+        prompt('Kopiera denna prenumerationslänk:', input.value);
+      });
+    }
+  });
+
   // Close modals when clicking on the dark backdrop
   const modalBackdrops = [
     { id: 'modal-day-vote', closeFn: closeDayVoteModal },
     { id: 'modal-login', closeFn: closeLoginModal },
     { id: 'modal-swap', closeFn: closeSwapModal },
     { id: 'modal-manage', closeFn: closeManageModal },
+    { id: 'modal-calendar-sub', closeFn: closeCalendarSubModal },
   ];
 
   modalBackdrops.forEach(({ id, closeFn }) => {
