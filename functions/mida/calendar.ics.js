@@ -18,18 +18,6 @@ const DEFAULT_MEMBERS = [
   { id: 'isak', name: 'Isak', rotation_order: 7 }
 ];
 
-function getMondayOfISOWeek(year, week) {
-  const simple = new Date(Date.UTC(year, 0, 1 + (week - 1) * 7));
-  const dow = simple.getUTCDay();
-  const ISOweekStart = simple;
-  if (dow <= 4) {
-    ISOweekStart.setUTCDate(simple.getUTCDate() - simple.getUTCDay() + 1);
-  } else {
-    ISOweekStart.setUTCDate(simple.getUTCDate() + 8 - simple.getUTCDay());
-  }
-  return ISOweekStart;
-}
-
 function formatDateToICSDate(d) {
   const year = d.getUTCFullYear();
   const month = String(d.getUTCMonth() + 1).padStart(2, '0');
@@ -108,11 +96,9 @@ export async function onRequest(context) {
 
     const sortedMembers = [...members].sort((a, b) => a.rotation_order - b.rotation_order);
 
-    // 2. Generate events from 4 weeks in past to 24 weeks in future
+    // 2. Generate events from anchor week 35 forward 30 weeks
     const now = new Date();
-    // Approximate current ISO week
-    const currentYear = now.getUTCFullYear();
-    const startWeek = Math.max(1, 35); // Anchor start week (2026-W35)
+    const startWeek = Math.max(1, 35);
     const totalWeeksToGenerate = 30;
 
     let eventsICS = [];
@@ -143,34 +129,19 @@ export async function onRequest(context) {
       }
 
       const isPaused = weekData?.is_paused || (weekData?.host_notes && weekData.host_notes.includes('[PAUSED]'));
-      const monday = getMondayOfISOWeek(y, w);
-      const nextMonday = new Date(monday.getTime() + 7 * 24 * 60 * 60 * 1000);
-
       if (isPaused) {
-        eventsICS.push([
-          'BEGIN:VEVENT',
-          `UID:mida-paused-${weekId}@uppsaladeals.se`,
-          `DTSTAMP:${formatDateToICSDate(now)}T000000Z`,
-          `DTSTART;VALUE=DATE:${formatDateToICSDate(monday)}`,
-          `DTEND;VALUE=DATE:${formatDateToICSDate(nextMonday)}`,
-          `SUMMARY:${escapeICS(`⏸️ MIDA V.${w}: Pausad vecka`)}`,
-          `DESCRIPTION:${escapeICS(`Ingen middag denna vecka (Paus).\\nMer info: https://uppsaladeals.se/mida`)}`,
-          'STATUS:CONFIRMED',
-          'END:VEVENT'
-        ].join('\r\n'));
+        // Skip paused weeks completely to keep calendar clean!
         continue;
       }
 
-      // Check if a specific day is spikad / proposed
       const confirmedDayStr = weekData?.confirmed_day || '';
       const proposedDays = Array.isArray(weekData?.proposed_days) ? weekData.proposed_days : [];
 
-      // Find date for confirmed day
+      // Check if there is a confirmed/spikat date
       let confirmedDate = null;
       let confirmedTime = '18:30';
 
       if (confirmedDayStr) {
-        // Try finding date in string e.g. "Fredag 2026-09-04 kl. 18:30"
         const dateMatch = confirmedDayStr.match(/\d{4}-\d{2}-\d{2}/);
         const timeMatch = confirmedDayStr.match(/\d{1,2}:\d{2}/);
         if (dateMatch) confirmedDate = dateMatch[0];
@@ -178,18 +149,18 @@ export async function onRequest(context) {
       }
 
       if (confirmedDate) {
-        // Confirmed Dinner Event with exact time!
+        // 1. SPIKAD MIDDAG: Single exact event on this specific day and time!
         const dtStart = formatDateTimeToICS(confirmedDate, confirmedTime);
-        const dtEnd = addHoursToDateTimeICS(confirmedDate, confirmedTime, 4);
+        const dtEnd = addHoursToDateTimeICS(confirmedDate, confirmedTime, 3);
 
         eventsICS.push([
           'BEGIN:VEVENT',
-          `UID:mida-confirmed-${weekId}@uppsaladeals.se`,
+          `UID:mida-confirmed-${weekId}-${confirmedDate}@uppsaladeals.se`,
           `DTSTAMP:${formatDateToICSDate(now)}T000000Z`,
           `DTSTART;TZID=Europe/Stockholm:${dtStart}`,
           `DTEND;TZID=Europe/Stockholm:${dtEnd}`,
-          `SUMMARY:${escapeICS(`🍽️ MIDA: ${host.name} bjuder på middag!`)}`,
-          `DESCRIPTION:${escapeICS(`Värd: ${host.name}\\nTid: kl. ${confirmedTime}\\n\\nSe vem som kommer och info på: https://uppsaladeals.se/mida`)}`,
+          `SUMMARY:${escapeICS(`🍽️ SPIKAD: MIDA hos ${host.name}!`)}`,
+          `DESCRIPTION:${escapeICS(`Spikad middag hos ${host.name}!\\nTid: kl. ${confirmedTime}\\n\\nSe info på: https://uppsaladeals.se/mida`)}`,
           `LOCATION:${escapeICS(`Hemma hos ${host.name}`)}`,
           'STATUS:CONFIRMED',
           'BEGIN:VALARM',
@@ -201,34 +172,28 @@ export async function onRequest(context) {
         ].join('\r\n'));
 
       } else if (proposedDays.length > 0) {
-        // Show proposed options or host planning chip
-        const proposedList = proposedDays.map(p => `${p.day} (${p.date}) kl. ${p.time || '18:30'}`).join('\\n');
-        eventsICS.push([
-          'BEGIN:VEVENT',
-          `UID:mida-proposed-${weekId}@uppsaladeals.se`,
-          `DTSTAMP:${formatDateToICSDate(now)}T000000Z`,
-          `DTSTART;VALUE=DATE:${formatDateToICSDate(monday)}`,
-          `DTEND;VALUE=DATE:${formatDateToICSDate(nextMonday)}`,
-          `SUMMARY:${escapeICS(`👑 V.${w} MIDA-värd: ${host.name} (Röstning pågår)`)}`,
-          `DESCRIPTION:${escapeICS(`Värd denna vecka är ${host.name}.\\nFöreslagna datum:\\n${proposedList}\\n\\nGå in och rösta på: https://uppsaladeals.se/mida`)}`,
-          'STATUS:CONFIRMED',
-          'END:VEVENT'
-        ].join('\r\n'));
+        // 2. FÖRSLAG: Create individual calendar events for EACH proposed day at its exact proposed time!
+        proposedDays.forEach((p, idx) => {
+          if (!p.date) return;
+          const pTime = p.time || '18:30';
+          const dtStart = formatDateTimeToICS(p.date, pTime);
+          const dtEnd = addHoursToDateTimeICS(p.date, pTime, 3);
 
-      } else {
-        // All-day week event indicating who is host
-        eventsICS.push([
-          'BEGIN:VEVENT',
-          `UID:mida-week-${weekId}@uppsaladeals.se`,
-          `DTSTAMP:${formatDateToICSDate(now)}T000000Z`,
-          `DTSTART;VALUE=DATE:${formatDateToICSDate(monday)}`,
-          `DTEND;VALUE=DATE:${formatDateToICSDate(nextMonday)}`,
-          `SUMMARY:${escapeICS(`👑 V.${w} MIDA-värd: ${host.name}`)}`,
-          `DESCRIPTION:${escapeICS(`Värd denna vecka är ${host.name}.\\n\\nFöreslå datum och rösta på: https://uppsaladeals.se/mida`)}`,
-          'STATUS:CONFIRMED',
-          'END:VEVENT'
-        ].join('\r\n'));
+          eventsICS.push([
+            'BEGIN:VEVENT',
+            `UID:mida-prop-${weekId}-${p.id || idx}@uppsaladeals.se`,
+            `DTSTAMP:${formatDateToICSDate(now)}T000000Z`,
+            `DTSTART;TZID=Europe/Stockholm:${dtStart}`,
+            `DTEND;TZID=Europe/Stockholm:${dtEnd}`,
+            `SUMMARY:${escapeICS(`❓ FÖRSLAG: MIDA hos ${host.name}`)}`,
+            `DESCRIPTION:${escapeICS(`Föreslaget datum för middag hos ${host.name}.\\nDag: ${p.day} (${p.date}) kl. ${pTime}\\n\\nRösta på: https://uppsaladeals.se/mida`)}`,
+            `LOCATION:${escapeICS(`Hemma hos ${host.name}`)}`,
+            'STATUS:TENTATIVE',
+            'END:VEVENT'
+          ].join('\r\n'));
+        });
       }
+      // If no days proposed and not confirmed yet, don't output anything to keep the calendar uncluttered!
     }
 
     // 3. Build Full iCalendar Feed
@@ -239,7 +204,7 @@ export async function onRequest(context) {
       'CALSCALE:GREGORIAN',
       'METHOD:PUBLISH',
       'X-WR-CALNAME:MIDA Middagar 🍽️',
-      'X-WR-CALDESC:Middagsrotation och spikade middagar för kompisgänget.',
+      'X-WR-CALDESC:Middagsförslag och spikade middagar för kompisgänget.',
       'X-WR-TIMEZONE:Europe/Stockholm',
       'X-PUBLISHED-TTL:PT1H',
       'REFRESH-INTERVAL;VALUE=DURATION:PT1H',
@@ -252,7 +217,7 @@ export async function onRequest(context) {
       headers: {
         'Content-Type': 'text/calendar; charset=utf-8',
         'Content-Disposition': 'inline; filename="mida-calendar.ics"',
-        'Cache-Control': 'public, max-age=3600, stale-while-revalidate=600',
+        'Cache-Control': 'public, max-age=1800, stale-while-revalidate=300',
         'Access-Control-Allow-Origin': '*'
       }
     });
