@@ -159,12 +159,47 @@ function getCalendarWeeksForMonth(year, monthIndex) {
   return weeks;
 }
 
+function isAdmin(user) {
+  if (!user) return false;
+  return user.id === 'arvidh' || user.id === 'arvid h' || user.name?.toLowerCase().includes('arvid h') || user.is_admin === true;
+}
+
+function parseWeekId(weekId) {
+  if (!weekId) return [new Date().getFullYear(), getISOWeek(new Date())];
+  const parts = weekId.split('-W');
+  if (parts.length === 2) {
+    return [parseInt(parts[0], 10), parseInt(parts[1], 10)];
+  }
+  return [new Date().getFullYear(), getISOWeek(new Date())];
+}
+
 // ================= ROTATION ENGINE =================
+
+function getDefaultHostForWeek(year, week) {
+  if (!state.members || state.members.length === 0) return null;
+  const sorted = [...state.members].sort((a, b) => a.rotation_order - b.rotation_order);
+
+  const targetAbsoluteWeek = (year * 52) + week;
+  const anchorAbsoluteWeek = (ANCHOR_YEAR * 52) + ANCHOR_WEEK;
+  const diffWeeks = targetAbsoluteWeek - anchorAbsoluteWeek;
+
+  let hostIdx = ((ANCHOR_HOST_INDEX + diffWeeks) % sorted.length);
+  if (hostIdx < 0) hostIdx += sorted.length;
+
+  return sorted[hostIdx] || sorted[0];
+}
 
 function getHostForWeek(year, week) {
   const weekId = getWeekId(year, week);
 
-  // Check Swap
+  // 1. Check if week has a custom persistent host_id in state.allWeeksCache
+  const weekData = state.allWeeksCache[weekId];
+  if (weekData && weekData.host_id) {
+    const assignedMember = state.members.find(m => m.id === weekData.host_id);
+    if (assignedMember) return assignedMember;
+  }
+
+  // 2. Check active accepted swaps
   const activeSwap = state.swaps.find(s => 
     s.status === 'accepted' && (s.requester_week === weekId || s.target_week === weekId)
   );
@@ -178,17 +213,67 @@ function getHostForWeek(year, week) {
     }
   }
 
-  if (!state.members || state.members.length === 0) return null;
-  const sorted = [...state.members].sort((a, b) => a.rotation_order - b.rotation_order);
+  // 3. Otherwise return standard repeating rotation
+  return getDefaultHostForWeek(year, week);
+}
 
-  const targetAbsoluteWeek = (year * 52) + week;
-  const anchorAbsoluteWeek = (ANCHOR_YEAR * 52) + ANCHOR_WEEK;
-  const diffWeeks = targetAbsoluteWeek - anchorAbsoluteWeek;
+// ================= TEMPORARY 1-TO-1 SWAPS & ADMIN =================
 
-  let hostIdx = ((ANCHOR_HOST_INDEX + diffWeeks) % sorted.length);
-  if (hostIdx < 0) hostIdx += sorted.length;
+async function executeSwap(weekIdA, weekIdB) {
+  const [yA, wA] = parseWeekId(weekIdA);
+  const [yB, wB] = parseWeekId(weekIdB);
 
-  return sorted[hostIdx] || sorted[0];
+  const hostA = getHostForWeek(yA, wA);
+  const hostB = getHostForWeek(yB, wB);
+
+  if (!hostA || !hostB) {
+    alert('Kunde inte identifiera värdar för de valda veckorna.');
+    return false;
+  }
+
+  const weekDataA = state.allWeeksCache[weekIdA] || {
+    week_id: weekIdA,
+    week_number: wA,
+    year: yA,
+    is_paused: false,
+    proposed_days: []
+  };
+  const weekDataB = state.allWeeksCache[weekIdB] || {
+    week_id: weekIdB,
+    week_number: wB,
+    year: yB,
+    is_paused: false,
+    proposed_days: []
+  };
+
+  // Swap host_ids for these two specific weeks only
+  weekDataA.host_id = hostB.id;
+  weekDataA.updated_at = new Date().toISOString();
+
+  weekDataB.host_id = hostA.id;
+  weekDataB.updated_at = new Date().toISOString();
+
+  await saveWeekData(weekIdA, weekDataA);
+  await saveWeekData(weekIdB, weekDataB);
+
+  return true;
+}
+
+async function setWeekHost(weekId, hostId) {
+  const [y, w] = parseWeekId(weekId);
+  const weekData = state.allWeeksCache[weekId] || {
+    week_id: weekId,
+    week_number: w,
+    year: y,
+    is_paused: false,
+    proposed_days: []
+  };
+
+  weekData.host_id = hostId || null;
+  weekData.updated_at = new Date().toISOString();
+
+  await saveWeekData(weekId, weekData);
+  renderApp();
 }
 
 // ================= SUPABASE DATA SYNC =================
@@ -765,6 +850,36 @@ function renderActiveWeekDetail() {
     pauseBtn.textContent = isPaused ? '▶️ Återaktivera' : '⏸️ Pausa';
   }
 
+  // Admin Host Control
+  const adminControl = document.getElementById('admin-week-control');
+  const adminSelect = document.getElementById('admin-select-host');
+  const adminSaveBtn = document.getElementById('btn-admin-save-host');
+
+  if (adminControl && adminSelect) {
+    if (isAdmin(state.currentUser)) {
+      adminControl.classList.remove('hidden');
+      const defaultHost = getDefaultHostForWeek(state.activeWeekYear, state.activeWeekNumber);
+      const currentHost = getHostForWeek(state.activeWeekYear, state.activeWeekNumber);
+
+      let opts = `<option value="">-- Standard rullande (${defaultHost?.name || ''}) --</option>`;
+      state.members.forEach(m => {
+        const isSel = (weekData?.host_id === m.id) || (!weekData?.host_id && currentHost?.id === m.id);
+        opts += `<option value="${m.id}" ${isSel ? 'selected' : ''}>${escapeHtml(m.name)} ${weekData?.host_id === m.id ? '(Manuellt satt)' : ''}</option>`;
+      });
+      adminSelect.innerHTML = opts;
+
+      if (adminSaveBtn) {
+        adminSaveBtn.onclick = async () => {
+          const chosenHostId = adminSelect.value;
+          await setWeekHost(weekId, chosenHostId);
+          alert(`Värd för ${weekId} har sparats!`);
+        };
+      }
+    } else {
+      adminControl.classList.add('hidden');
+    }
+  }
+
   // Host quick proposals
   if (quickHostPanel) {
     if (isHost && !isPaused) {
@@ -860,8 +975,17 @@ function openSwapModal() {
   const modal = document.getElementById('modal-swap');
   const myWeekSelect = document.getElementById('swap-my-week-select');
   const targetSelect = document.getElementById('swap-target-select');
+  const adminDirectBtn = document.getElementById('btn-admin-direct-swap');
+  const isUserAdmin = isAdmin(state.currentUser);
 
-  // 1. Populate all weeks where current user is scheduled as host (from current week to +20 weeks)
+  if (adminDirectBtn) {
+    if (isUserAdmin) {
+      adminDirectBtn.classList.remove('hidden');
+    } else {
+      adminDirectBtn.classList.add('hidden');
+    }
+  }
+
   const myWeeksOptions = [];
   const targetOptions = [];
   const currentWeekId = getWeekId(state.activeWeekYear, state.activeWeekNumber);
@@ -883,16 +1007,23 @@ function openSwapModal() {
     const dateRange = getWeekDateRange(y, w).split('–')[0].trim();
 
     if (host) {
-      if (host.id === state.currentUser.id) {
+      if (isUserAdmin) {
+        // Admin can select ANY week as origin
         const isSelected = weekId === currentWeekId;
-        myWeeksOptions.push(`<option value="${weekId}" ${isSelected ? 'selected' : ''}>${weekId} (Din vecka) - start ${dateRange}</option>`);
-      } else {
+        myWeeksOptions.push(`<option value="${weekId}" ${isSelected ? 'selected' : ''}>V.${w} (${host.name}) - start ${dateRange}</option>`);
         targetOptions.push(`<option value="${host.id}|${weekId}">V.${w} (${host.name}) - start ${dateRange}</option>`);
+      } else {
+        // Regular user: origin must be user's own host week
+        if (host.id === state.currentUser.id) {
+          const isSelected = weekId === currentWeekId;
+          myWeeksOptions.push(`<option value="${weekId}" ${isSelected ? 'selected' : ''}>${weekId} (Din vecka) - start ${dateRange}</option>`);
+        } else {
+          targetOptions.push(`<option value="${host.id}|${weekId}">V.${w} (${host.name}) - start ${dateRange}</option>`);
+        }
       }
     }
   }
 
-  // If no host weeks found for me in the loop, add current active week as fallback
   if (myWeeksOptions.length === 0) {
     myWeeksOptions.push(`<option value="${currentWeekId}" selected>${currentWeekId} (Vald vecka)</option>`);
   }
@@ -996,6 +1127,10 @@ window.respondSwap = async function(swapId, newStatus) {
 
   swap.status = newStatus;
   localStorage.setItem('mida_all_swaps', JSON.stringify(state.swaps));
+
+  if (newStatus === 'accepted') {
+    await executeSwap(swap.requester_week, swap.target_week);
+  }
 
   if (supabaseClient) {
     try {
@@ -1140,6 +1275,36 @@ document.addEventListener('DOMContentLoaded', async () => {
     alert('Bytesförfrågan skickad!');
     closeSwapModal();
     renderApp();
+  });
+
+  document.getElementById('btn-admin-direct-swap')?.addEventListener('click', async () => {
+    const myWeekSelect = document.getElementById('swap-my-week-select');
+    const targetSelect = document.getElementById('swap-target-select');
+
+    if (!myWeekSelect || !myWeekSelect.value) {
+      alert('Välj första veckan.');
+      return;
+    }
+    if (!targetSelect || !targetSelect.value) {
+      alert('Välj andra veckan.');
+      return;
+    }
+
+    const weekIdA = myWeekSelect.value;
+    const targetRaw = targetSelect.value;
+    const weekIdB = targetRaw.includes('|') ? targetRaw.split('|')[1] : targetRaw;
+
+    if (weekIdA === weekIdB) {
+      alert('Du måste välja två olika veckor för att byta.');
+      return;
+    }
+
+    const success = await executeSwap(weekIdA, weekIdB);
+    if (success) {
+      alert(`Byte genomfört mellan ${weekIdA} och ${weekIdB}!`);
+      closeSwapModal();
+      renderApp();
+    }
   });
 
   // Admin / manage modal
