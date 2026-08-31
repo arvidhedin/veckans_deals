@@ -120,7 +120,7 @@ function categorizeOfferJS(offer) {
   }
 
   // 4. Mejeri & Ägg (fil/filmjölk only as standalone word \bfil\b or filmjölk)
-  if (/\b(?:färskost|mjölk|grädde|smör|ost|ostar|margarin|yoggi|yoghurt|filmjölk|kvarg|ägg|crème fraiche|creme fraiche|fraiche|keso|halloumi|norrloumi|mozzarella|vispgrädde|matlagningsgrädde|bregott|flora|lätta|kesella|gräddfil|ricotta|feta|vitost|brie|camembert|parmesan|parmigiano|gouda|hushållsost|prästost|herrgård|grevé|svecia|västerbottensost|gräddost|havredryck|mandeldryck|sojadryck|oatly|yalla|actimel|danonino|skyr|hamburgerost|smältost|mjukost|skivost|rivost|proteinshake|fil)\b/i.test(text)) {
+  if (/\b(?:färskost|mjölk|grädde|smör|ost|ostar|margarin|yoggi|yoghurt|filmjölk|kvarg|ägg|crème fraiche|creme fraiche|fraiche|keso|halloumi|norrloumi|mozzarella|vispgrädde|matlagningsgrädde|bregott|flora|lätta|kesella|gräddfil|ricotta|feta|vitost|brie|camembert|parmesan|parmigiano|gouda|hushållsost|prästost|präst|herrgård|grevé|svecia|västerbottensost|gräddost|havredryck|mandeldryck|sojadryck|oatly|yalla|actimel|danonino|skyr|hamburgerost|smältost|mjukost|skivost|rivost|proteinshake|fil|familjefavoriter|familjefavorit|billinge)\b/i.test(text)) {
     return 'Mejeri & Ägg';
   }
 
@@ -805,7 +805,7 @@ function isMeatUnder80PerKg(offer) {
   }
 
   // Case 2: Calculate exact price per kg from package weight
-  const textForWeight = `${offer.product || ''} ${offer.description || ''}`;
+  const textForWeight = `${offer.product || ''} ${offer.description || ''} ${offer.price || ''}`;
   const weightKg = extractPackageWeightInKgJS(textForWeight);
 
   if (weightKg > 0) {
@@ -816,6 +816,54 @@ function isMeatUnder80PerKg(offer) {
   return false;
 }
 
+// --- Helper for Ost från Arla < 80 kr/kg Filter ---
+function isArlaCheeseUnder80PerKg(offer) {
+  const brand = (offer.brand || '').toLowerCase();
+  const prod = (offer.product || '').toLowerCase();
+  const desc = (offer.description || '').toLowerCase();
+  const fullText = `${prod} ${brand} ${desc}`.toLowerCase();
+
+  // 1. Must be Arla
+  const isArla = brand.includes('arla') || prod.includes('arla') || desc.includes('arla') || /\barla\b/i.test(fullText);
+  if (!isArla) return false;
+
+  // 2. Must be cheese
+  const textWithoutFrukost = fullText.replace(/frukost/g, '');
+  const cheesePattern = /\b(?:ost|ostar|ostskivor|skivost|skivad ost|rivost|riven ost|hushållsost|prästost|präst|herrgård|herrgårdsost|grevé|greve|svecia|gräddost|gouda|edamer|port salut|havarti|mozzarella|feta|färskost|brie|camembert|kvibille|ädelost|blåmögelost|vitmögelost|cheddar|västerbottensost|parmesan|parmigiano|halloumi|norrloumi|grillost|smältost|mjukost|flödeost|familjefavoriter|familjefavorit|billinge)\b/i;
+  if (!cheesePattern.test(textWithoutFrukost)) return false;
+
+  // 3. Price per kg calculation
+  const { pricePerUnit, isExplicitPerKg } = extractPerUnitDealPriceJS(offer.price);
+  if (pricePerUnit <= 0) return false;
+
+  // Explicit per kg price
+  if (isExplicitPerKg) {
+    return pricePerUnit <= 80.0;
+  }
+
+  // Calculated per kg price from package weight
+  const textForWeight = `${offer.product || ''} ${offer.description || ''} ${offer.price || ''}`;
+  const weightKg = extractPackageWeightInKgJS(textForWeight);
+
+  if (weightKg > 0) {
+    const calculatedPricePerKg = pricePerUnit / weightKg;
+    return calculatedPricePerKg <= 80.0;
+  }
+
+  return false;
+}
+
+// --- Helper for Fun Light Extrapris Filter ---
+function isFunLightDeal(offer) {
+  // If ordinary price assortment item without promotion, ignore
+  if (offer.store === 'Willys Ord.pris' && (!offer.discount_percentage || parseFloat(offer.discount_percentage) <= 0)) {
+    return false;
+  }
+
+  const text = `${offer.product || ''} ${offer.brand || ''} ${offer.description || ''}`.toLowerCase();
+  return text.includes('fun light') || text.includes('funlight') || /\bfun\s*light\b/i.test(text);
+}
+
 // Compute Category Counts based on active store filter
 function computeCategoryCounts() {
   state.categoryCounts = {};
@@ -823,6 +871,8 @@ function computeCategoryCounts() {
     state.categoryCounts[cat] = 0;
   }
   state.categoryCounts['Kött & Fågel <80 kr/kg'] = 0;
+  state.categoryCounts['Arla ost <80 kr/kg'] = 0;
+  state.categoryCounts['Fun Light extrapris'] = 0;
 
   for (const offer of state.allOffers) {
     const store = (offer.store || '').trim();
@@ -837,6 +887,12 @@ function computeCategoryCounts() {
 
     if (isMeatUnder80PerKg(offer)) {
       state.categoryCounts['Kött & Fågel <80 kr/kg']++;
+    }
+    if (isArlaCheeseUnder80PerKg(offer)) {
+      state.categoryCounts['Arla ost <80 kr/kg']++;
+    }
+    if (isFunLightDeal(offer)) {
+      state.categoryCounts['Fun Light extrapris']++;
     }
   }
 }
@@ -890,7 +946,7 @@ function renderCategoryPills() {
     // Render Kött & Fågel <80 kr/kg right after Kött & Fågel
     if (cat === 'Kött & Fågel') {
       const meatUnder80Count = state.categoryCounts['Kött & Fågel <80 kr/kg'] || 0;
-      if (meatUnder80Count > 0) {
+      if (meatUnder80Count > 0 || state.activeCategoryPill === 'Kött & Fågel <80 kr/kg') {
         const isMeatUnder80Active = state.activeCategoryPill === 'Kött & Fågel <80 kr/kg';
         html += `
           <button 
@@ -906,6 +962,54 @@ function renderCategoryPills() {
             <span class="px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
               isMeatUnder80Active ? 'bg-rose-900 text-rose-100' : 'bg-rose-200/80 text-rose-900'
             }">${meatUnder80Count}</span>
+          </button>
+        `;
+      }
+    }
+
+    // Render Arla ost <80 kr/kg right after Mejeri & Ägg
+    if (cat === 'Mejeri & Ägg') {
+      const arlaCheeseCount = state.categoryCounts['Arla ost <80 kr/kg'] || 0;
+      if (arlaCheeseCount > 0 || state.activeCategoryPill === 'Arla ost <80 kr/kg') {
+        const isArlaCheeseActive = state.activeCategoryPill === 'Arla ost <80 kr/kg';
+        html += `
+          <button 
+            type="button" 
+            data-cat="Arla ost <80 kr/kg" 
+            class="cat-pill cursor-pointer select-none px-3 py-1.5 rounded-full text-xs font-bold border transition-all duration-150 flex items-center gap-1.5 ${
+              isArlaCheeseActive
+                ? 'bg-amber-600 text-white border-amber-600 shadow-sm'
+                : 'bg-amber-50 text-amber-950 border-amber-200/90 hover:bg-amber-100 hover:border-amber-300'
+            }"
+          >
+            <span>Arla ost <80 kr/kg</span>
+            <span class="px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
+              isArlaCheeseActive ? 'bg-amber-800 text-amber-100' : 'bg-amber-200/80 text-amber-900'
+            }">${arlaCheeseCount}</span>
+          </button>
+        `;
+      }
+    }
+
+    // Render Fun Light extrapris right after Dryck
+    if (cat === 'Dryck') {
+      const funLightCount = state.categoryCounts['Fun Light extrapris'] || 0;
+      if (funLightCount > 0 || state.activeCategoryPill === 'Fun Light extrapris') {
+        const isFunLightActive = state.activeCategoryPill === 'Fun Light extrapris';
+        html += `
+          <button 
+            type="button" 
+            data-cat="Fun Light extrapris" 
+            class="cat-pill cursor-pointer select-none px-3 py-1.5 rounded-full text-xs font-bold border transition-all duration-150 flex items-center gap-1.5 ${
+              isFunLightActive
+                ? 'bg-purple-600 text-white border-purple-600 shadow-sm'
+                : 'bg-purple-50 text-purple-950 border-purple-200/90 hover:bg-purple-100 hover:border-purple-300'
+            }"
+          >
+            <span>Fun Light extrapris</span>
+            <span class="px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
+              isFunLightActive ? 'bg-purple-800 text-purple-100' : 'bg-purple-200/80 text-purple-900'
+            }">${funLightCount}</span>
           </button>
         `;
       }
@@ -1070,6 +1174,12 @@ function applyFilters() {
   result = result.filter(offer => {
     if (state.activeCategoryPill === 'Kött & Fågel <80 kr/kg') {
       return isMeatUnder80PerKg(offer);
+    }
+    if (state.activeCategoryPill === 'Arla ost <80 kr/kg') {
+      return isArlaCheeseUnder80PerKg(offer);
+    }
+    if (state.activeCategoryPill === 'Fun Light extrapris') {
+      return isFunLightDeal(offer);
     }
     const cat = offer.category || categorizeOfferJS(offer);
     if (!state.selectedCategories.has(cat)) return false;
