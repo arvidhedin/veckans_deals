@@ -1,7 +1,7 @@
 {
-  "updated_at": "2026-09-14T06:09:57.253793+00:00",
-  "updated_at_readable": "2026-09-14 06:09 UTC",
-  "total_offers": 1064,
+  "updated_at": "2026-09-14T07:42:19.377586+00:00",
+  "updated_at_readable": "2026-09-14 07:42 UTC",
+  "total_offers": 1074,
   "store_counts": {
     "ICA Nära Råbyvägen": 39,
     "ICA Supermarket Torgkassen": 49,
@@ -13,23 +13,23 @@
     "ICA Folkes Livs": 37,
     "ICA Nära Hörnan": 36,
     "Willys": 212,
-    "Hemköp (Svava)": 58,
-    "Hemköp (Rosendal)": 58,
+    "Hemköp (Svava)": 62,
+    "Hemköp (Rosendal)": 62,
     "Coop (Centralhuset)": 5,
     "Coop (Liljegatan)": 19,
-    "Lidl": 382
+    "Lidl": 384
   },
   "category_counts": {
     "Mejeri & Ägg": 120,
-    "Övrigt": 380,
-    "Kött & Fågel": 107,
-    "Dryck": 57,
+    "Övrigt": 386,
+    "Kött & Fågel": 110,
+    "Dryck": 59,
     "Frukt & Grönt": 111,
     "Skafferi": 75,
     "Frys & Färdigmat": 37,
     "Fisk & Skaldjur": 21,
     "Bröd & Bageri": 41,
-    "Hushåll & Hygien": 72,
+    "Hushåll & Hygien": 71,
     "Snacks & Godis": 43
   },
   "offers": [
@@ -1179,6 +1179,19 @@
     },
     {
       "store": "Hemköp (Svava)",
+      "product": "Läsk 6-pack",
+      "brand": "Pepsi, Zingo",
+      "price": "30 kr",
+      "discount": "LOYALTY",
+      "description": "6x33cl",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310072001090_C1L1_s01",
+      "category": "Dryck",
+      "restriction": "",
+      "original_price": "47,27 kr",
+      "discount_percentage": 37
+    },
+    {
+      "store": "Hemköp (Svava)",
       "product": "Kattmat",
       "brand": "Sheba",
       "price": "25 kr",
@@ -1201,6 +1214,19 @@
       "category": "Frukt & Grönt",
       "restriction": "",
       "original_price": "7,98 kr",
+      "discount_percentage": 37
+    },
+    {
+      "store": "Hemköp (Rosendal)",
+      "product": "Läsk 6-pack",
+      "brand": "Pepsi, Zingo",
+      "price": "30 kr",
+      "discount": "LOYALTY",
+      "description": "6x33cl",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310072001090_C1L1_s01",
+      "category": "Dryck",
+      "restriction": "",
+      "original_price": "47,27 kr",
       "discount_percentage": 37
     },
     {
@@ -3297,6 +3323,19 @@
       "discount_percentage": 28
     },
     {
+      "store": "Hemköp (Rosendal)",
+      "product": "Chokladkaka",
+      "brand": "Ritter Sport",
+      "price": "20 kr",
+      "discount": "GENERAL",
+      "description": "75-100g",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/04000417700001_C1N1_s01",
+      "category": "Övrigt",
+      "restriction": "",
+      "original_price": "27,75 kr",
+      "discount_percentage": 28
+    },
+    {
       "store": "ICA Nära Råbyvägen",
       "product": "Fetaost",
       "brand": "",
@@ -3537,7 +3576,7 @@
       "price": "25 kr",
       "discount": "GENERAL",
       "description": "132-184g",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07622300589882_C1N1_s02",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07622202842078_C1C1_s01",
       "category": "Bröd & Bageri",
       "restriction": "",
       "original_price": "34,02 kr",
@@ -4447,7 +4486,7 @@
       "price": "25 kr",
       "discount": "GENERAL",
       "description": "132-184g",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07622300589882_C1N1_s02",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07622202842078_C1C1_s01",
       "category": "Bröd & Bageri",
       "restriction": "",
       "original_price": "33,07 kr",
@@ -5339,6 +5378,19 @@
     },
     {
       "store": "Hemköp (Svava)",
+      "product": "Vallmobröd",
+      "brand": "Dafgårds",
+      "price": "15 kr",
+      "discount": "LOYALTY",
+      "description": "280g",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310960053057_C1L1_s01",
+      "category": "Övrigt",
+      "restriction": "",
+      "original_price": "18,88 kr",
+      "discount_percentage": 21
+    },
+    {
+      "store": "Hemköp (Svava)",
       "product": "Müslimorgon",
       "brand": "Fazer",
       "price": "28,95 kr",
@@ -5348,6 +5400,19 @@
       "category": "Bröd & Bageri",
       "restriction": "",
       "original_price": "36,86 kr",
+      "discount_percentage": 21
+    },
+    {
+      "store": "Hemköp (Rosendal)",
+      "product": "Vallmobröd",
+      "brand": "Dafgårds",
+      "price": "15 kr",
+      "discount": "LOYALTY",
+      "description": "280g",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310960053057_C1L1_s01",
+      "category": "Övrigt",
+      "restriction": "",
+      "original_price": "18,88 kr",
       "discount_percentage": 21
     },
     {
@@ -9122,6 +9187,32 @@
     },
     {
       "store": "Hemköp (Svava)",
+      "product": "Svensk kassler",
+      "brand": "Garant",
+      "price": "89 kr/kg",
+      "discount": "GENERAL",
+      "description": "ca 600g",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/02359773300007_C1N1_s01",
+      "category": "Kött & Fågel",
+      "restriction": "",
+      "original_price": "103,10 kr",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Hemköp (Svava)",
+      "product": "Högrev",
+      "brand": "Dalsjöfors",
+      "price": "169 kr/kg",
+      "discount": "GENERAL",
+      "description": "ca 1kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/02330046100005_C1N1_s02",
+      "category": "Kött & Fågel",
+      "restriction": "",
+      "original_price": "225,00 kr",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Hemköp (Svava)",
       "product": "Lösviktsgodis",
       "brand": "Smått & Gott",
       "price": "89 kr/kg",
@@ -9161,6 +9252,19 @@
     },
     {
       "store": "Hemköp (Rosendal)",
+      "product": "Svensk kassler",
+      "brand": "Garant",
+      "price": "89 kr/kg",
+      "discount": "GENERAL",
+      "description": "ca 600g",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/02359773300007_C1N1_s01",
+      "category": "Kött & Fågel",
+      "restriction": "",
+      "original_price": "103,10 kr",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Hemköp (Rosendal)",
       "product": "Högrev",
       "brand": "Dalsjöfors",
       "price": "169 kr/kg",
@@ -9183,19 +9287,6 @@
       "category": "Övrigt",
       "restriction": "",
       "original_price": "103,10 kr",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Coop (Centralhuset)",
-      "product": "Pan Pizza",
-      "brand": "Billys",
-      "price": "4 för 40:-",
-      "discount": "Medlemspris",
-      "description": "170 g. Fryst. Välj mellan olika sorter.",
-      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1734535333/cloud/417235.png",
-      "category": "Frys & Färdigmat",
-      "restriction": "",
-      "original_price": "",
       "discount_percentage": 0
     },
     {
@@ -9226,6 +9317,19 @@
     },
     {
       "store": "Coop (Centralhuset)",
+      "product": "Pan Pizza",
+      "brand": "Billys",
+      "price": "4 för 40:-",
+      "discount": "Medlemspris",
+      "description": "170 g. Fryst. Välj mellan olika sorter.",
+      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1734535333/cloud/417235.png",
+      "category": "Frys & Färdigmat",
+      "restriction": "",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Coop (Centralhuset)",
       "product": "Rågbitar/Chiabröd",
       "brand": "Hatting",
       "price": "2 för 35:-",
@@ -9246,6 +9350,32 @@
       "description": "1000 g. Välj mellan olika sorters original och mini. Gäller ej laktosfri.",
       "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1597388279/405157.png",
       "category": "Mejeri & Ägg",
+      "restriction": "",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Coop (Liljegatan)",
+      "product": "Pan Pizza",
+      "brand": "Billys",
+      "price": "4 för 40:-",
+      "discount": "Medlemspris",
+      "description": "170 g. Fryst. Välj mellan olika sorter.",
+      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1734535333/cloud/417235.png",
+      "category": "Frys & Färdigmat",
+      "restriction": "",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Coop (Liljegatan)",
+      "product": "Grönsaksplock",
+      "brand": "Coop",
+      "price": "10:-",
+      "discount": "Medlemspris",
+      "description": "500-1000 g. Välj mellan palsternacka 500 g, gul lök 1 kg och morötter 1 kg.",
+      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1699258907/cloud/297908.png",
+      "category": "Frukt & Grönt",
       "restriction": "",
       "original_price": "",
       "discount_percentage": 0
@@ -9278,32 +9408,6 @@
     },
     {
       "store": "Coop (Liljegatan)",
-      "product": "Grönsaksplock",
-      "brand": "Coop",
-      "price": "10:-",
-      "discount": "Medlemspris",
-      "description": "500-1000 g. Välj mellan palsternacka 500 g, gul lök 1 kg och morötter 1 kg.",
-      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1699258907/cloud/297908.png",
-      "category": "Frukt & Grönt",
-      "restriction": "",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Coop (Liljegatan)",
-      "product": "Pan Pizza",
-      "brand": "Billys",
-      "price": "4 för 40:-",
-      "discount": "Medlemspris",
-      "description": "170 g. Fryst. Välj mellan olika sorter.",
-      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1734535333/cloud/417235.png",
-      "category": "Frys & Färdigmat",
-      "restriction": "",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Coop (Liljegatan)",
       "product": "Rågbitar/Chiabröd",
       "brand": "Hatting",
       "price": "2 för 35:-",
@@ -9330,13 +9434,13 @@
     },
     {
       "store": "Coop (Liljegatan)",
-      "product": "Yoghurt",
-      "brand": "Yoggi",
-      "price": "2 för 36:-",
+      "product": "Gräddglass",
+      "brand": "Triumfglass",
+      "price": "2 för 69:-",
       "discount": "Medlemspris",
-      "description": "1000 g. Välj mellan olika sorters original och mini. Gäller ej laktosfri.",
-      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1597388279/405157.png",
-      "category": "Mejeri & Ägg",
+      "description": "1750 ml. Välj mellan olika sorter.",
+      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1770068742/cloud/610400.png",
+      "category": "Övrigt",
       "restriction": "",
       "original_price": "",
       "discount_percentage": 0
@@ -9356,19 +9460,6 @@
     },
     {
       "store": "Coop (Liljegatan)",
-      "product": "Gräddglass",
-      "brand": "Triumfglass",
-      "price": "2 för 69:-",
-      "discount": "Medlemspris",
-      "description": "1750 ml. Välj mellan olika sorter.",
-      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1770068742/cloud/610400.png",
-      "category": "Övrigt",
-      "restriction": "",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Coop (Liljegatan)",
       "product": "Vispgrädde",
       "brand": "Sverige/Coop",
       "price": "25:-",
@@ -9382,13 +9473,26 @@
     },
     {
       "store": "Coop (Liljegatan)",
-      "product": "Isbergssallad",
-      "brand": "Sverige",
-      "price": "29:-/kg",
+      "product": "Yoghurt",
+      "brand": "Yoggi",
+      "price": "2 för 36:-",
+      "discount": "Medlemspris",
+      "description": "1000 g. Välj mellan olika sorters original och mini. Gäller ej laktosfri.",
+      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1597388279/405157.png",
+      "category": "Mejeri & Ägg",
+      "restriction": "",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Coop (Liljegatan)",
+      "product": "Njalla",
+      "brand": "Polarbröd",
+      "price": "2 för 25:-",
       "discount": "",
-      "description": "Ca 1 kg. Klass 1.",
-      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1440062755/49628.png",
-      "category": "Övrigt",
+      "description": "250 g.",
+      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1670594484/cloud/269231.png",
+      "category": "Bröd & Bageri",
       "restriction": "",
       "original_price": "",
       "discount_percentage": 0
@@ -9408,13 +9512,13 @@
     },
     {
       "store": "Coop (Liljegatan)",
-      "product": "Svenska päron",
+      "product": "Isbergssallad",
       "brand": "Sverige",
-      "price": "20:-/kg",
+      "price": "29:-/kg",
       "discount": "",
-      "description": "Klass 1. Lösvikt.",
-      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1694002081/cloud/290048.png",
-      "category": "Frukt & Grönt",
+      "description": "Ca 1 kg. Klass 1.",
+      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1440062755/49628.png",
+      "category": "Övrigt",
       "restriction": "",
       "original_price": "",
       "discount_percentage": 0
@@ -9447,26 +9551,13 @@
     },
     {
       "store": "Coop (Liljegatan)",
-      "product": "Kitkat chokladkakor",
-      "brand": "Nestlé",
-      "price": "2 för 29:-",
+      "product": "Svenska päron",
+      "brand": "Sverige",
+      "price": "20:-/kg",
       "discount": "",
-      "description": "99 g. Välj mellan salted caramel, double chocolat och hasselnöt.",
-      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1764523132/cloud/566593.png",
-      "category": "Övrigt",
-      "restriction": "",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Coop (Liljegatan)",
-      "product": "Njalla",
-      "brand": "Polarbröd",
-      "price": "2 för 25:-",
-      "discount": "",
-      "description": "250 g.",
-      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1670594484/cloud/269231.png",
-      "category": "Bröd & Bageri",
+      "description": "Klass 1. Lösvikt.",
+      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1694002081/cloud/290048.png",
+      "category": "Frukt & Grönt",
       "restriction": "",
       "original_price": "",
       "discount_percentage": 0
@@ -9480,6 +9571,19 @@
       "description": "750 g. Gäller ej fiberhavregryn.",
       "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1736635438/cloud/422980.png",
       "category": "Skafferi",
+      "restriction": "",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Coop (Liljegatan)",
+      "product": "Kitkat chokladkakor",
+      "brand": "Nestlé",
+      "price": "2 för 29:-",
+      "discount": "",
+      "description": "99 g. Välj mellan salted caramel, double chocolat och hasselnöt.",
+      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1764523132/cloud/566593.png",
+      "category": "Övrigt",
       "restriction": "",
       "original_price": "",
       "discount_percentage": 0
@@ -9668,13 +9772,13 @@
     },
     {
       "store": "Lidl",
-      "product": "W5 Rengöring för diskmaskin SK1",
+      "product": "Diskmaskinsrengöring",
       "brand": "",
       "price": "29,90/st",
       "discount": "",
       "description": "2x 250 ml",
       "image_url": "https://www.lidl.se/assets/gcpc348ec95a9d2477c831629b36afdc4fa.png",
-      "category": "Hushåll & Hygien",
+      "category": "Övrigt",
       "restriction": "I butik 21/09 - 27/09",
       "original_price": "",
       "discount_percentage": 0
@@ -9701,7 +9805,7 @@
       "description": "",
       "image_url": "https://www.lidl.se/assets/gcp5498bc1c19a54c7fbce9b947921cd711.png",
       "category": "Övrigt",
-      "restriction": "I butik 17/09 - 23/09",
+      "restriction": "I butik 17/09 - 20/09",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -9922,7 +10026,7 @@
       "description": "",
       "image_url": "https://www.lidl.se/assets/gcpc92108299e934453a14f1b705c6d243a.png",
       "category": "Övrigt",
-      "restriction": "I butik 14/09 - 25/09",
+      "restriction": "I butik 14/09 - 20/09",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -10578,7 +10682,7 @@
     },
     {
       "store": "Lidl",
-      "product": "Parkside 20V Batteridriven Slagborr 14 Limi",
+      "product": "Parkside Slagskruvdragare, batteridriven",
       "brand": "Parkside",
       "price": "249:-",
       "discount": "",
@@ -11358,14 +11462,14 @@
     },
     {
       "store": "Lidl",
-      "product": "Parkside Performance H Snickarbyxor KAT",
+      "product": "Parkside Performance Snickarbyxor",
       "brand": "Parkside Performance",
       "price": "199:-",
       "discount": "",
       "description": "",
       "image_url": "https://www.lidl.se/assets/gcp8e74b14b49bb436e88df0fcbd98c85ca.png",
       "category": "Övrigt",
-      "restriction": "I butik 21/09",
+      "restriction": "I butik 21/09 - 27/09",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -11423,7 +11527,7 @@
     },
     {
       "store": "Lidl",
-      "product": "Ultimate Speed Bilpresenning KAT",
+      "product": "Ultimate Speed Bilpresenning",
       "brand": "Ultimate Speed",
       "price": "199:-",
       "discount": "",
@@ -12068,6 +12172,19 @@
       "image_url": "https://www.lidl.se/assets/gcp3d3dbc2f7d1f499cb012823d42864f8c.png",
       "category": "Övrigt",
       "restriction": "I butik 24/09 - 27/09",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Lidl",
+      "product": "Ljung, trefärgad",
+      "brand": "",
+      "price": "139:-",
+      "discount": "",
+      "description": "",
+      "image_url": "https://www.lidl.se/assets/gcpc9446a6eab26404f8632c7a8f06803ff.png",
+      "category": "Övrigt",
+      "restriction": "I butik 17/09 - 20/09",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -13458,7 +13575,7 @@
       "description": "",
       "image_url": "https://www.lidl.se/assets/gcp1de6ff3f04e840d69d8d8235143a969f.png",
       "category": "Övrigt",
-      "restriction": "I butik 14/09 - 25/09",
+      "restriction": "I butik 14/09 - 20/09",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -13594,7 +13711,7 @@
     },
     {
       "store": "Lidl",
-      "product": "Gelatelli Kardemummapinne",
+      "product": "Gelatelli Kardemumma gräddglass",
       "brand": "Gelatelli",
       "price": "27,90/st",
       "discount": "",
@@ -13823,6 +13940,19 @@
       "image_url": "https://www.lidl.se/assets/gcp5eeb6b5d9ee84fcdaff4608f48ce4ec0.png",
       "category": "Övrigt",
       "restriction": "I butik 24/09 - 27/09",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Lidl",
+      "product": "Liljor i bunt",
+      "brand": "",
+      "price": "44,90/st",
+      "discount": "",
+      "description": "",
+      "image_url": "https://www.lidl.se/assets/gcpe712cd628ae54d3b8b829b44be0bbdac.png",
+      "category": "Övrigt",
+      "restriction": "I butik 17/09 - 20/09",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -14929,21 +15059,21 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Lövbiff Skivad Sverige",
-      "brand": "Smakavgotland",
-      "price": "269,00 kr",
-      "description": "ca: 500g | Jmf: 269,00 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/02313113100009_C1L1_s02",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Lövbiff Sverige",
       "brand": "Scan",
       "price": "279,00 kr",
       "description": "ca: 400g | Jmf: 697,50 kr/kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/02320453300006_C1N1_s02",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Lövbiff Skivad Sverige",
+      "brand": "Smakavgotland",
+      "price": "269,00 kr",
+      "description": "ca: 500g | Jmf: 269,00 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/02313113100009_C1L1_s02",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -15139,21 +15269,21 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Gallerrökt Skinka Skivad",
-      "brand": "Jakobsdals",
-      "price": "27,90 kr",
-      "description": "100g | Jmf: 279,00 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07391196075501_C1N1_s02",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Kokt Skinka Skivad",
       "brand": "Eldorado",
       "price": "29,90 kr",
       "description": "400g | Jmf: 74,75 kr/kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083433122_C1C1_s02",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Gallerrökt Skinka Skivad",
+      "brand": "Jakobsdals",
+      "price": "27,90 kr",
+      "description": "100g | Jmf: 279,00 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07391196075501_C1N1_s02",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -20169,21 +20299,21 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Persika Passion Kvarg 0,2%",
-      "brand": "Garant",
-      "price": "29,90 kr",
-      "description": "900g | Jmf: 33,22 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043025329_C1C1_s01",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Vanilj Kvarg 0,5%",
       "brand": "Wapnö",
       "price": "25,45 kr",
       "description": "500g | Jmf: 50,90 kr/kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07331102035656_C1N1_s01",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Persika Passion Kvarg 0,2%",
+      "brand": "Garant",
+      "price": "29,90 kr",
+      "description": "900g | Jmf: 33,22 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043025329_C1C1_s01",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -23999,11 +24129,11 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Ingefära Citro Te",
+      "product": "Rabarber Vanilj Te",
       "brand": "Garant",
-      "price": "13,90 kr",
-      "description": "20p | Jmf: 0,70 kr/st",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043019281_C1L1_s01",
+      "price": "22,90 kr",
+      "description": "150g | Jmf: 152,67 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041059784_C1L1_s03",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -24019,11 +24149,11 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Rabarber Vanilj Te",
+      "product": "Ingefära Citro Te",
       "brand": "Garant",
-      "price": "22,90 kr",
-      "description": "150g | Jmf: 152,67 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041059784_C1L1_s03",
+      "price": "13,90 kr",
+      "description": "20p | Jmf: 0,70 kr/st",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043019281_C1L1_s01",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -31449,21 +31579,21 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Potatis Smått&gott Klass 1",
-      "brand": "Garant Eko",
-      "price": "23,90 kr",
-      "description": "900g | Jmf: 26,56 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042010166_C1L1_s01",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Potatis Fast Eko Klass 2",
       "brand": "Garant Eko",
       "price": "37,90 kr",
       "description": "2kg | Jmf: 18,95 kr/kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042010197_C1L1_s01",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Potatis Smått&gott Klass 1",
+      "brand": "Garant Eko",
+      "price": "23,90 kr",
+      "description": "900g | Jmf: 26,56 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042010166_C1L1_s01",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -35269,21 +35399,21 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Dr Pepper Zero Läsk Burk",
-      "brand": "Dr Pepper",
-      "price": "9,36 kr",
-      "description": "33cl | Jmf: 28,36 kr/l",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310401062051_C1N1_s01",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Coca-cola Zero Läsk Burk",
       "brand": "Coca-cola",
       "price": "39,90 kr",
       "description": "6p 20cl | Jmf: 33,25 kr/l",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/05000112690279_C1L1_s02",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Dr Pepper Zero Läsk Burk",
+      "brand": "Dr Pepper",
+      "price": "9,36 kr",
+      "description": "33cl | Jmf: 28,36 kr/l",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310401062051_C1N1_s01",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -36489,21 +36619,21 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Salt&vinäger Chips",
-      "brand": "Estrella",
-      "price": "27,90 kr",
-      "description": "275g | Jmf: 101,46 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310532106662_C1N1_s05",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Paprika Havs Salt Chips",
       "brand": "Estrella",
       "price": "27,90 kr",
       "description": "275g | Jmf: 101,46 kr/kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310532304716_C1N1_s02",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Salt&vinäger Chips",
+      "brand": "Estrella",
+      "price": "27,90 kr",
+      "description": "275g | Jmf: 101,46 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310532106662_C1N1_s05",
       "original_price": "",
       "discount_percentage": 0
     },
