@@ -1,14 +1,12 @@
 /**
- * NetworkPeer: Universal Multiplayer Engine for Catan
- * Supports:
- * 1. Pass & Play (100% offline, 2-8 players on 1 device)
- * 2. WebRTC Peer-to-Peer via PeerJS (Host runs authoritative game, up to 7 peers connect via room code)
+ * NetworkPeer: WebRTC Real-Time Multiplayer Engine for Catan
+ * Uses PeerJS with public STUN servers for seamless mobile-to-mobile connections.
  */
 
 class NetworkPeer {
   constructor(app) {
     this.app = app;
-    this.mode = 'pass'; // 'pass' or 'webrtc_host' or 'webrtc_guest'
+    this.mode = 'webrtc_host'; // 'webrtc_host' or 'webrtc_guest'
     this.peer = null;
     this.localGame = null;
     this.connections = {}; // pid -> DataConnection (if host)
@@ -17,21 +15,21 @@ class NetworkPeer {
     this.roomId = null;
   }
 
-  // --- PASS & PLAY MODE ---
-  startPassAndPlay(roomId, numPlayers, targetVP) {
-    this.mode = 'pass';
-    this.roomId = roomId;
-    this.myPlayerId = 0;
+  _getPeerConfig() {
+    return {
+      debug: 1,
+      config: {
+        iceServers: [
+          { urls: 'stun:stun.l.google.com:19302' },
+          { urls: 'stun:global.stun.twilio.com:3478' },
+          { urls: 'stun:stun.cloudflare.com:3478' }
+        ]
+      }
+    };
+  }
 
-    const boardType = numPlayers <= 4 ? 'standard' : (numPlayers <= 6 ? 'extended' : 'mega');
-    this.localGame = new ClientGameState(roomId, numPlayers, boardType, targetVP);
-    this.localGame.is_pass_and_play = true;
-
-    for (let i = 0; i < numPlayers; i++) {
-      this.localGame.addPlayer(`Spelare ${i + 1}`, false);
-    }
-    this.localGame.startGame();
-    this._broadcastLocalState();
+  _cleanCode(code) {
+    return (code || 'KATA8').trim().toLowerCase().replace(/[^a-z0-9]/g, '');
   }
 
   // --- WEBRTC ROOM HOSTING ---
@@ -45,25 +43,32 @@ class NetworkPeer {
     this.localGame.is_pass_and_play = false;
     this.localGame.addPlayer(playerName, false);
 
-    const peerId = `catan8_${this.roomId}`;
+    const cleanCode = this._cleanCode(this.roomId);
+    const peerId = `catan8_${cleanCode}`;
     this._initHostPeer(peerId);
   }
 
   _initHostPeer(peerId) {
     if (typeof Peer === 'undefined') {
-      alert('Kunde inte ladda PeerJS för onlinespel. Kontrollera internetanslutningen.');
+      alert('Kunde inte ladda PeerJS. Kontrollera att du är ansluten till internet.');
       return;
     }
 
+    // Clean up previous peer if any
+    if (this.peer) {
+      try { this.peer.destroy(); } catch (e) {}
+    }
+
     try {
-      this.peer = new Peer(peerId, { debug: 1 });
+      this.peer = new Peer(peerId, this._getPeerConfig());
 
       this.peer.on('open', (id) => {
-        console.log('WebRTC Host ready with Peer ID:', id);
+        console.log('Host ready with Peer ID:', id);
         this._broadcastLocalState();
       });
 
       this.peer.on('connection', (conn) => {
+        console.log('Incoming connection from guest:', conn.peer);
         conn.on('open', () => {
           conn.on('data', (data) => {
             this._handleHostMessage(conn, data);
@@ -71,7 +76,6 @@ class NetworkPeer {
         });
 
         conn.on('close', () => {
-          // Find player and mark disconnected
           for (const [pid, c] of Object.entries(this.connections)) {
             if (c === conn) {
               delete this.connections[pid];
@@ -82,9 +86,9 @@ class NetworkPeer {
       });
 
       this.peer.on('error', (err) => {
-        console.error('PeerJS Host Error:', err);
+        console.error('Host peer error:', err);
         if (err.type === 'unavailable-id') {
-          alert('Rumskoden är redan upptagen. Välj en annan kod eller slumpa.');
+          alert(`Rumskoden "${this.roomId}" är redan upptagen. Välj en annan kod (t.ex. slumpa) och försök igen.`);
         }
       });
     } catch (e) {
@@ -98,7 +102,7 @@ class NetworkPeer {
     if (data.type === 'join_room') {
       const pid = this.localGame.addPlayer(data.player_name || 'Spelare', false);
       if (pid === null) {
-        conn.send({ type: 'error', message: 'Rummet är fullt eller spelet har startat.' });
+        conn.send({ type: 'error', message: 'Rummet är fullt eller spelet har redan startat.' });
         return;
       }
       this.connections[pid] = conn;
@@ -120,18 +124,28 @@ class NetworkPeer {
     this.roomId = roomId.toUpperCase();
 
     if (typeof Peer === 'undefined') {
-      alert('Kunde inte ladda PeerJS. Kontrollera internetanslutningen.');
+      alert('Kunde inte ladda PeerJS. Kontrollera din internetanslutning.');
       return;
     }
 
-    try {
-      this.peer = new Peer();
+    if (this.peer) {
+      try { this.peer.destroy(); } catch (e) {}
+    }
 
-      this.peer.on('open', () => {
-        const hostPeerId = `catan8_${this.roomId}`;
+    const cleanCode = this._cleanCode(this.roomId);
+    const hostPeerId = `catan8_${cleanCode}`;
+
+    try {
+      this.peer = new Peer(this._getPeerConfig());
+
+      this.peer.on('open', (myId) => {
+        console.log('Guest peer initialized with ID:', myId);
+        console.log('Connecting to host:', hostPeerId);
+        
         this.hostConn = this.peer.connect(hostPeerId, { reliable: true });
 
         this.hostConn.on('open', () => {
+          console.log('Connected to host data channel successfully!');
           this.hostConn.send({
             type: 'join_room',
             player_name: playerName
@@ -142,15 +156,18 @@ class NetworkPeer {
           this._handleGuestMessage(data);
         });
 
-        this.hostConn.on('error', (err) => {
-          console.error('Host connection error:', err);
-          alert('Kunde inte ansluta till värden. Kontrollera att rumskoden är rätt.');
+        this.hostConn.on('close', () => {
+          alert('Anslutningen till rummets värd bröts.');
         });
       });
 
       this.peer.on('error', (err) => {
-        console.error('Guest Peer error:', err);
-        alert('Nätverksfel vid anslutning: ' + err.type);
+        console.error('Guest peer error:', err);
+        if (err.type === 'peer-unavailable') {
+          alert(`Kunde inte hitta något rum med koden "${this.roomId}". Kontrollera att värden har skapat rummet och att koden är rätt stavad.`);
+        } else {
+          alert('Nätverksfel vid anslutning: ' + err.type);
+        }
       });
     } catch (e) {
       console.error('Error starting guest peer:', e);
@@ -184,9 +201,8 @@ class NetworkPeer {
       return;
     }
 
-    // Host or Pass & Play
     if (!this.localGame) return;
-    const pid = (senderPid !== null) ? senderPid : (this.mode === 'pass' ? this.localGame.current_turn_idx : this.myPlayerId);
+    const pid = (senderPid !== null) ? senderPid : this.myPlayerId;
 
     if (action === 'place_setup_settlement') {
       this.localGame.placeSetupSettlement(pid, extra.vertex_id);
@@ -275,7 +291,7 @@ class NetworkPeer {
     this.app.boardData = this.localGame.board ? this.localGame.board.toDict() : null;
     this.app.onStateUpdated();
 
-    // Broadcast to peers if host
+    // Broadcast to connected peers
     if (this.mode === 'webrtc_host') {
       for (const [pidStr, conn] of Object.entries(this.connections)) {
         const pid = parseInt(pidStr);

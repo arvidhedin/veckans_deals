@@ -25,86 +25,98 @@
             <span class="logo-icon">🎲</span>
             <h1>KATAN <span>8P</span></h1>
           </div>
-          <p class="subtitle">Spela Katan för upp till 8 spelare – optimerat för mobilen</p>
+          <p class="subtitle">Spela Katan för upp till 8 spelare – skriv in rumskod och spela direkt från mobilen!</p>
         </div>
 
-        <!-- MODE SELECTION: ONLINE MULTIPLAYER VS PASS & PLAY -->
+        <!-- MODE TABS: SKAPA NYTT RUM VS GÅ MED I RUM -->
         <div class="mode-tabs">
-          <button id="tab-mode-online" class="mode-tab active">📱 Flera Mobiler (Wi-Fi)</button>
-          <button id="tab-mode-pass" class="mode-tab">👥 Pass & Play (Samma Skärm)</button>
+          <button id="tab-mode-create" class="mode-tab active">➕ Skapa Nytt Rum</button>
+          <button id="tab-mode-join" class="mode-tab">🚀 Gå Med i Rum</button>
         </div>
 
         <div id="lobby-join-form" class="lobby-section">
-          <!-- Online Mode Fields -->
-          <div id="online-fields">
+          <!-- CREATE ROOM PANE -->
+          <div id="create-room-pane">
             <div class="input-group">
-              <label for="player-name-input">Ditt Spelarnamn</label>
-              <input type="text" id="player-name-input" placeholder="Ange ditt namn..." maxlength="15" value="Spelare 1">
+              <label for="create-player-name">Ditt Spelarnamn</label>
+              <input type="text" id="create-player-name" placeholder="Ange ditt namn..." maxlength="15" value="Spelare 1">
             </div>
 
             <div class="input-group mt-2">
-              <label for="room-code-input">Rumskod</label>
+              <label for="create-room-code">Välj Rumskod</label>
               <div class="room-input-row">
-                <input type="text" id="room-code-input" placeholder="T.ex. KATAN8" value="KATAN8" maxlength="12">
-                <button id="random-room-btn" class="btn btn-secondary btn-sm" title="Slumpa rum">🎲 Slumpa</button>
+                <input type="text" id="create-room-code" placeholder="T.ex. KATA8" value="KATA8" maxlength="10" style="text-transform:uppercase;font-weight:700;">
+                <button id="random-room-btn" class="btn btn-secondary btn-sm" title="Slumpa kod">🎲 Slumpa</button>
               </div>
             </div>
-          </div>
 
-          <!-- Pass & Play Fields -->
-          <div id="pass-fields" style="display: none;">
-            <p class="text-muted" style="font-size: 0.85rem; line-height: 1.4;">
-              Spela tillsammans runt ett bord på samma mobil eller surfplatta. Skärmen anpassas automatiskt efter vem som har turen!
-            </p>
-          </div>
+            <div class="settings-grid mt-2">
+              <div class="input-group">
+                <label for="max-players-select">Antal Spelare</label>
+                <select id="max-players-select">
+                  <option value="2">2 Spelare</option>
+                  <option value="3">3 Spelare</option>
+                  <option value="4">4 Spelare</option>
+                  <option value="5">5 Spelare</option>
+                  <option value="6">6 Spelare</option>
+                  <option value="7">7 Spelare</option>
+                  <option value="8" selected>8 Spelare (Mega Karta)</option>
+                </select>
+              </div>
 
-          <div class="settings-grid">
-            <div class="input-group">
-              <label for="max-players-select">Antal Spelare</label>
-              <select id="max-players-select">
-                <option value="2">2 Spelare</option>
-                <option value="3">3 Spelare</option>
-                <option value="4">4 Spelare</option>
-                <option value="5">5 Spelare</option>
-                <option value="6">6 Spelare</option>
-                <option value="7">7 Spelare</option>
-                <option value="8" selected>8 Spelare (Mega Karta)</option>
-              </select>
+              <div class="input-group">
+                <label for="target-vp-select">Målpoäng för Vinst</label>
+                <select id="target-vp-select">
+                  <option value="10" selected>10 Segerpoäng</option>
+                  <option value="12">12 Segerpoäng (8P)</option>
+                  <option value="14">14 Segerpoäng</option>
+                </select>
+              </div>
             </div>
 
-            <div class="input-group">
-              <label for="target-vp-select">Målpoäng för Vinst</label>
-              <select id="target-vp-select">
-                <option value="10" selected>10 Segerpoäng</option>
-                <option value="12">12 Segerpoäng (8P)</option>
-                <option value="14">14 Segerpoäng</option>
-              </select>
-            </div>
+            <button id="btn-create-room" class="btn btn-primary btn-lg btn-block mt-3">
+              Skapa Rum 🎲
+            </button>
           </div>
 
-          <button id="join-btn" class="btn btn-primary btn-lg btn-block">
-            <span id="join-btn-text" class="btn-text">Skapa / Gå med i Rum 🚀</span>
-          </button>
+          <!-- JOIN ROOM PANE -->
+          <div id="join-room-pane" style="display: none;">
+            <div class="input-group">
+              <label for="join-player-name">Ditt Spelarnamn</label>
+              <input type="text" id="join-player-name" placeholder="Ange ditt namn..." maxlength="15" value="Spelare 2">
+            </div>
+
+            <div class="input-group mt-2">
+              <label for="join-room-code">Skriv in Rumskod</label>
+              <input type="text" id="join-room-code" placeholder="Ange rumskod (t.ex. KATA8)..." maxlength="10" style="font-size:1.15rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;">
+            </div>
+
+            <button id="btn-join-room" class="btn btn-success btn-lg btn-block mt-3">
+              Gå Med i Rum 🚀
+            </button>
+          </div>
         </div>
 
         <!-- LOBBY ROOM WAITING ROOM -->
         <div id="lobby-room" class="lobby-section" style="display: none;">
           <div class="room-info-box">
             <div class="room-tag">
-              <span class="tag-label">Rum:</span>
-              <strong id="active-room-id">CATAN8</strong>
+              <span class="tag-label">Rumskod:</span>
+              <strong id="active-room-id" style="font-size:1.5rem;color:var(--accent-gold);">KATA8</strong>
             </div>
             <button id="copy-link-btn" class="btn btn-sm btn-outline">
-              📋 Kopiera Inbjudningslänk
+              📋 Kopiera Länk
             </button>
           </div>
 
-          <div id="mobile-ip-banner" class="mobile-ip-banner" style="display: none;">
+          <div id="mobile-ip-banner" class="mobile-ip-banner">
             <div class="ip-info">
               <span class="mobile-icon">📱</span>
               <div>
-                <strong>Dela med vänner på samma Wi-Fi:</strong>
-                <div id="mobile-join-url" class="ip-link">http://192.168.x.x:8888</div>
+                <strong>Dela med vänner:</strong>
+                <div style="font-size:0.8rem;color:var(--text-muted);margin-top:2px;">
+                  Be vänner gå in på <strong>uppsaladeals.se/catan</strong> och ange rumskoden <strong id="hint-room-code" style="color:var(--accent-gold);">KATA8</strong>
+                </div>
               </div>
             </div>
           </div>

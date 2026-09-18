@@ -1,10 +1,9 @@
 /**
- * Main Application: Katan 8-Player Real-Time Controller
+ * Main Application: Katan 8-Player WebRTC Mobile Controller
  */
 
 class CatanApp {
   constructor() {
-    this.ws = null;
     this.roomId = null;
     this.playerId = null;
     this.gameState = null;
@@ -22,7 +21,6 @@ class CatanApp {
     this.network = new NetworkPeer(this);
     this.ui = new UIController(this);
 
-    this.useLocalPeer = false;
     this.lastTurnIdx = null;
     this.lastDiceRolled = false;
 
@@ -32,225 +30,114 @@ class CatanApp {
   init() {
     this._bindLobbyEvents();
     this._checkUrlRoomCode();
-    this._fetchServerInfo();
   }
 
   _bindLobbyEvents() {
-    const joinBtn = document.getElementById('join-btn');
+    const tabCreate = document.getElementById('tab-mode-create');
+    const tabJoin = document.getElementById('tab-mode-join');
+    const createPane = document.getElementById('create-room-pane');
+    const joinPane = document.getElementById('join-room-pane');
+
+    const btnCreateRoom = document.getElementById('btn-create-room');
+    const btnJoinRoom = document.getElementById('btn-join-room');
     const randomBtn = document.getElementById('random-room-btn');
     const addBotBtn = document.getElementById('add-bot-btn');
     const startBtn = document.getElementById('start-game-btn');
     const copyLinkBtn = document.getElementById('copy-link-btn');
 
-    const tabOnline = document.getElementById('tab-mode-online');
-    const tabPass = document.getElementById('tab-mode-pass');
-    const onlineFields = document.getElementById('online-fields');
-    const passFields = document.getElementById('pass-fields');
-    const joinBtnText = document.getElementById('join-btn-text');
-
-    this.currentLobbyMode = 'online';
-
-    tabOnline.addEventListener('click', () => {
-      this.currentLobbyMode = 'online';
-      tabOnline.classList.add('active');
-      tabPass.classList.remove('active');
-      onlineFields.style.display = 'block';
-      passFields.style.display = 'none';
-      joinBtnText.textContent = 'Skapa / Gå med i Rum 🚀';
+    // Switch between Create and Join tabs
+    tabCreate.addEventListener('click', () => {
+      tabCreate.classList.add('active');
+      tabJoin.classList.remove('active');
+      createPane.style.display = 'block';
+      joinPane.style.display = 'none';
     });
 
-    tabPass.addEventListener('click', () => {
-      this.currentLobbyMode = 'pass';
-      tabPass.classList.add('active');
-      tabOnline.classList.remove('active');
-      onlineFields.style.display = 'none';
-      passFields.style.display = 'block';
-      joinBtnText.textContent = 'Starta Pass & Play Direkt 🎮';
+    tabJoin.addEventListener('click', () => {
+      tabJoin.classList.add('active');
+      tabCreate.classList.remove('active');
+      createPane.style.display = 'none';
+      joinPane.style.display = 'block';
+      const joinInput = document.getElementById('join-room-code');
+      if (joinInput) joinInput.focus();
     });
 
+    // Random room code generator
     randomBtn.addEventListener('click', () => {
-      const code = 'CATAN' + Math.floor(10 + Math.random() * 90);
-      document.getElementById('room-code-input').value = code;
+      const code = 'KATA' + Math.floor(10 + Math.random() * 90);
+      document.getElementById('create-room-code').value = code;
     });
 
-    joinBtn.addEventListener('click', () => {
+    // Create Room action
+    btnCreateRoom.addEventListener('click', () => {
+      const name = document.getElementById('create-player-name').value.trim() || 'Spelare 1';
+      const room = document.getElementById('create-room-code').value.trim().toUpperCase() || 'KATA8';
       const maxPlayers = parseInt(document.getElementById('max-players-select').value) || 8;
       const targetVP = parseInt(document.getElementById('target-vp-select').value) || 10;
 
-      if (this.currentLobbyMode === 'pass') {
-        const room = 'PNP-' + Math.floor(100 + Math.random() * 900);
-        this.startPassAndPlay(room, maxPlayers, targetVP);
-      } else {
-        const name = document.getElementById('player-name-input').value.trim() || 'Spelare 1';
-        const room = document.getElementById('room-code-input').value.trim().toUpperCase() || 'CATAN8';
-        this.joinRoom(room, name, maxPlayers, targetVP);
-      }
+      this.roomId = room;
+      this.network.createOnlineRoom(room, name, maxPlayers, targetVP);
     });
 
-    addBotBtn.addEventListener('click', () => {
-      if (this.useLocalPeer) {
-        this.network.addBot();
-      } else {
-        this.send({ type: 'add_bot' });
+    // Join Room action
+    btnJoinRoom.addEventListener('click', () => {
+      const name = document.getElementById('join-player-name').value.trim() || 'Spelare';
+      const room = document.getElementById('join-room-code').value.trim().toUpperCase();
+
+      if (!room) {
+        alert('Vänligen ange en rumskod.');
+        return;
       }
+
+      this.roomId = room;
+      this.network.joinOnlineRoom(room, name);
+    });
+
+    // Waiting room actions
+    addBotBtn.addEventListener('click', () => {
+      this.network.addBot();
     });
 
     startBtn.addEventListener('click', () => {
-      if (this.useLocalPeer) {
-        this.network.startHostGame();
-      } else {
-        this.send({ type: 'start_game' });
-      }
+      this.network.startHostGame();
     });
 
     copyLinkBtn.addEventListener('click', () => {
-      const url = window.location.origin + window.location.pathname + `?room=${this.roomId}`;
+      const url = `${window.location.origin}${window.location.pathname}?room=${this.roomId}`;
       navigator.clipboard.writeText(url).then(() => {
         copyLinkBtn.textContent = '✅ Länk kopierad!';
-        setTimeout(() => copyLinkBtn.textContent = '📋 Kopiera Inbjudningslänk', 2000);
+        setTimeout(() => copyLinkBtn.textContent = '📋 Kopiera Länk', 2000);
       });
     });
-  }
-
-  startPassAndPlay(roomId, numPlayers, targetVP) {
-    this.roomId = roomId;
-    this.useLocalPeer = true;
-    this.network.startPassAndPlay(roomId, numPlayers, targetVP);
   }
 
   _checkUrlRoomCode() {
     const params = new URLSearchParams(window.location.search);
     const room = params.get('room');
     if (room) {
-      document.getElementById('room-code-input').value = room.toUpperCase();
-      this.isGuestJoin = true;
-      const btnText = document.getElementById('join-btn-text');
-      if (btnText) btnText.textContent = `Anslut till Rum ${room.toUpperCase()} 🚀`;
-    }
-  }
+      // Auto-switch to join tab
+      const tabJoin = document.getElementById('tab-mode-join');
+      const tabCreate = document.getElementById('tab-mode-create');
+      const createPane = document.getElementById('create-room-pane');
+      const joinPane = document.getElementById('join-room-pane');
+      const joinInput = document.getElementById('join-room-code');
 
-  _fetchServerInfo() {
-    const banner = document.getElementById('mobile-ip-banner');
-    const link = document.getElementById('mobile-join-url');
-    if (!banner || !link) return;
-
-    if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
-      banner.style.display = 'block';
-      link.textContent = `${window.location.origin}${window.location.pathname}?room=${this.roomId || 'CATAN8'}`;
-    } else {
-      fetch('/api/info')
-        .then(res => res.json())
-        .then(info => {
-          if (info.local_ip) {
-            banner.style.display = 'block';
-            link.textContent = `http://${info.local_ip}:${info.port}/?room=${this.roomId || 'CATAN8'}`;
-          }
-        })
-        .catch(() => {});
-    }
-  }
-
-  connectWS(callback) {
-    const isStaticDeploy = !['localhost', '127.0.0.1'].includes(window.location.hostname) && !window.location.hostname.includes('lhr.life');
-    if (isStaticDeploy) {
-      // Cloudflare Pages / Static deployment -> use WebRTC peer
-      this.useLocalPeer = true;
-      if (callback) callback();
-      return;
-    }
-
-    if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-      if (callback) callback();
-      return;
-    }
-
-    const proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const wsUrl = `${proto}//${window.location.host}/ws`;
-    this.ws = new WebSocket(wsUrl);
-
-    this.ws.onopen = () => {
-      console.log('Connected to Catan server');
-      if (callback) callback();
-    };
-
-    this.ws.onmessage = (event) => {
-      try {
-        const data = JSON.parse(event.data);
-        this.handleServerMessage(data);
-      } catch (err) {
-        console.error('Error handling message:', err);
+      if (tabJoin && joinInput) {
+        tabJoin.classList.add('active');
+        if (tabCreate) tabCreate.classList.remove('active');
+        if (createPane) createPane.style.display = 'none';
+        if (joinPane) joinPane.style.display = 'block';
+        joinInput.value = room.toUpperCase();
       }
-    };
-
-    this.ws.onclose = () => {
-      console.log('WebSocket closed, attempting reconnect...');
-      setTimeout(() => this.connectWS(), 2000);
-    };
-  }
-
-  send(msgObj) {
-    if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-      this.ws.send(JSON.stringify(msgObj));
     }
   }
 
   sendAction(action, extra = {}) {
-    if (this.useLocalPeer) {
-      this.network.handleAction(action, extra);
-    } else {
-      this.send({
-        type: 'game_action',
-        action: action,
-        ...extra
-      });
-    }
+    this.network.handleAction(action, extra);
   }
 
   sendChat(text) {
-    if (this.useLocalPeer) {
-      this.network.sendChat(text);
-    } else {
-      this.send({
-        type: 'chat',
-        text: text
-      });
-    }
-  }
-
-  joinRoom(roomId, playerName, maxPlayers = 8, targetVP = 10) {
-    this.roomId = roomId;
-
-    const isStaticDeploy = !['localhost', '127.0.0.1'].includes(window.location.hostname) && !window.location.hostname.includes('lhr.life');
-    if (isStaticDeploy) {
-      this.useLocalPeer = true;
-      if (this.isGuestJoin) {
-        this.network.joinOnlineRoom(roomId, playerName);
-      } else {
-        this.network.createOnlineRoom(roomId, playerName, maxPlayers, targetVP);
-      }
-      return;
-    }
-
-    this.connectWS(() => {
-      this.send({
-        type: 'join_room',
-        room_id: roomId,
-        player_name: playerName,
-        max_players: maxPlayers,
-        target_vp: targetVP
-      });
-    });
-  }
-
-  handleServerMessage(msg) {
-    if (msg.type === 'state_update') {
-      this.playerId = msg.your_player_id;
-      this.gameState = msg.state;
-      this.boardData = msg.state.board;
-      this.onStateUpdated();
-    } else if (msg.type === 'error') {
-      alert(msg.message);
-    }
+    this.network.sendChat(text);
   }
 
   onStateUpdated() {
@@ -306,6 +193,9 @@ class CatanApp {
     this.lobbyJoinForm.style.display = 'none';
     this.lobbyRoom.style.display = 'flex';
     document.getElementById('active-room-id').textContent = state.room_id;
+    const hint = document.getElementById('hint-room-code');
+    if (hint) hint.textContent = state.room_id;
+
     document.getElementById('player-count').textContent = state.players.length;
     document.getElementById('player-max').textContent = state.max_players;
 
@@ -333,7 +223,7 @@ class CatanApp {
     grid.querySelectorAll('.slot-remove-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
         const targetId = parseInt(e.currentTarget.getAttribute('data-id'));
-        this.send({ type: 'remove_player', player_id: targetId });
+        this.network.removePlayer(targetId);
       });
     });
 
@@ -368,7 +258,6 @@ class CatanApp {
 
   startSetupSettlementPlacement() {
     if (!this.boardData) return;
-    // Find all valid vertices (empty + distance rule satisfied)
     const validVertices = [];
     for (const [vid, v] of Object.entries(this.boardData.vertices)) {
       if (v.building === null) {
@@ -386,13 +275,9 @@ class CatanApp {
 
   startSetupRoadPlacement() {
     if (!this.boardData) return;
-    // Edges connected to the newly placed settlement
-    const myPlayer = this.gameState.players[this.playerId];
-    // Find player's most recent settlement
     let mySettlementVid = null;
     for (const [vid, v] of Object.entries(this.boardData.vertices)) {
       if (v.building && v.building.player_id === this.playerId) {
-        // Find if this vertex has roads yet
         const hasRoad = v.edges.some(eid => this.boardData.edges[eid].road !== null);
         if (!hasRoad) {
           mySettlementVid = vid;
@@ -402,7 +287,6 @@ class CatanApp {
     }
 
     if (!mySettlementVid) {
-      // Fallback to any vertex with settlement
       for (const [vid, v] of Object.entries(this.boardData.vertices)) {
         if (v.building && v.building.player_id === this.playerId) {
           mySettlementVid = vid;
@@ -426,7 +310,6 @@ class CatanApp {
     const pid = this.playerId;
 
     if (itemType === 'settlement') {
-      // Must be empty, satisfy distance rule, and connect to player's road
       const validVertices = [];
       for (const [vid, v] of Object.entries(this.boardData.vertices)) {
         if (v.building === null) {
@@ -453,7 +336,6 @@ class CatanApp {
       });
 
     } else if (itemType === 'city') {
-      // Must upgrade existing settlement owned by player
       const validVertices = [];
       for (const [vid, v] of Object.entries(this.boardData.vertices)) {
         if (v.building && v.building.type === 'settlement' && v.building.player_id === pid) {
@@ -472,7 +354,6 @@ class CatanApp {
       });
 
     } else if (itemType === 'road') {
-      // Must connect to player's road, settlement, or city
       const validEdges = [];
       for (const [eid, ed] of Object.entries(this.boardData.edges)) {
         if (ed.road === null) {
@@ -483,7 +364,6 @@ class CatanApp {
               canConnect = true;
               break;
             }
-            // Or connected road without enemy building blocking
             const enemyBldg = vdata.building && vdata.building.player_id !== pid;
             if (!enemyBldg) {
               for (const adjEid of vdata.edges) {
