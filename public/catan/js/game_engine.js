@@ -382,12 +382,14 @@ class ClientGameState {
       color_name: colorInfo.name,
       resources: { wood: 0, brick: 0, sheep: 0, wheat: 0, ore: 0 },
       dev_cards: [],
+      dev_cards_bought_this_turn: [],
       played_dev_cards: [],
       roads_remaining: 15,
       settlements_remaining: 5,
       cities_remaining: 4,
       army_size: 0,
       road_length: 0,
+      free_roads: 0,
       public_vp: 0,
       total_vp: 0,
       has_played_dev_this_turn: false,
@@ -620,7 +622,7 @@ class ClientGameState {
       this.sub_turn_players = [...targetPids];
       this.turn_phase = "ROBBER_STEAL";
     } else {
-      this.turn_phase = "ACTION";
+      this.turn_phase = this.dice_rolled ? "ACTION" : "BEFORE_ROLL";
     }
     return true;
   }
@@ -636,7 +638,7 @@ class ClientGameState {
     }
 
     if (cards.length === 0) {
-      this.turn_phase = "ACTION";
+      this.turn_phase = this.dice_rolled ? "ACTION" : "BEFORE_ROLL";
       return null;
     }
 
@@ -645,7 +647,7 @@ class ClientGameState {
     this.players[playerId].resources[stolen]++;
 
     this._addLog(`🗡️ ${this.players[playerId].name} stal ett kort från ${victim.name}.`);
-    this.turn_phase = "ACTION";
+    this.turn_phase = this.dice_rolled ? "ACTION" : "BEFORE_ROLL";
     return stolen;
   }
 
@@ -668,7 +670,9 @@ class ClientGameState {
     if (!["ACTION", "SPECIAL_BUILD"].includes(this.turn_phase)) return false;
 
     const player = this.players[playerId];
-    if (player.roads_remaining <= 0 || !this.canAfford(playerId, "road")) return false;
+    const isFree = (player.free_roads || 0) > 0;
+    if (player.roads_remaining <= 0) return false;
+    if (!isFree && !this.canAfford(playerId, "road")) return false;
 
     const edge = this.board.edges[edgeId];
     if (!edge || edge.road !== null) return false;
@@ -694,10 +698,14 @@ class ClientGameState {
 
     if (!canConnect) return false;
 
-    this._deductCost(playerId, "road");
+    if (isFree) {
+      player.free_roads--;
+    } else {
+      this._deductCost(playerId, "road");
+    }
     edge.road = { player_id: playerId };
     player.roads_remaining--;
-    this._addLog(`🛤️ ${player.name} byggde en väg.`);
+    this._addLog(`🛤️ ${player.name} byggde en väg${isFree ? ' (gratis via Vägbygge)' : ''}.`);
 
     this._updateLongestRoad();
     this._updateVictoryPoints();
@@ -757,18 +765,35 @@ class ClientGameState {
 
     this._deductCost(playerId, "dev_card");
     const card = this.dev_deck.pop();
-    this.players[playerId].dev_cards.push(card);
-    this._addLog(`📜 ${this.players[playerId].name} köpte ett utvecklingskort.`);
+    const player = this.players[playerId];
+    if (!player.dev_cards_bought_this_turn) {
+      player.dev_cards_bought_this_turn = [];
+    }
+    // Development cards bought this turn CANNOT be played on the same turn!
+    player.dev_cards_bought_this_turn.push(card);
+    this._addLog(`📜 ${player.name} köpte ett utvecklingskort (kan spelas från nästa runda).`);
     this._updateVictoryPoints();
     return card;
   }
 
   playDevCard(playerId, cardType, extraData = {}) {
     if (this.status !== "MAIN_GAME" || this.current_turn_idx !== playerId) return false;
+    if (!["BEFORE_ROLL", "ACTION"].includes(this.turn_phase)) return false;
+
     const player = this.players[playerId];
-    if (player.has_played_dev_this_turn && cardType !== "victory_point") return false;
+    if (player.has_played_dev_this_turn && cardType !== "victory_point") {
+      this._addLog(`⚠️ ${player.name} har redan spelat ett utvecklingskort denna runda!`);
+      return false;
+    }
+
+    // Only cards bought in PREVIOUS turns (in player.dev_cards) can be played!
     const cardIdx = player.dev_cards.indexOf(cardType);
-    if (cardIdx === -1) return false;
+    if (cardIdx === -1) {
+      if (player.dev_cards_bought_this_turn && player.dev_cards_bought_this_turn.includes(cardType)) {
+        this._addLog(`⚠️ ${player.name} kan inte spela ett utvecklingskort samma runda som det köptes!`);
+      }
+      return false;
+    }
 
     if (cardType === "knight") {
       player.dev_cards.splice(cardIdx, 1);
@@ -777,6 +802,7 @@ class ClientGameState {
       player.has_played_dev_this_turn = true;
       this._addLog(`⚔️ ${player.name} spelade en Riddare!`);
       this._updateLargestArmy();
+      this._updateVictoryPoints();
       this.turn_phase = "ROBBER_MOVE";
       return true;
     } else if (cardType === "year_of_plenty") {
@@ -810,6 +836,13 @@ class ClientGameState {
         this._addLog(`💰 ${player.name} tog monopol på ${resource} och fick ${total} kort!`);
         return true;
       }
+    } else if (cardType === "road_building") {
+      player.dev_cards.splice(cardIdx, 1);
+      player.played_dev_cards.push("road_building");
+      player.free_roads = Math.min(2, player.roads_remaining);
+      player.has_played_dev_this_turn = true;
+      this._addLog(`🛣️ ${player.name} spelade Vägbygge och får bygga upp till 2 gratis vägar!`);
+      return true;
     }
 
     return false;
@@ -842,6 +875,11 @@ class ClientGameState {
     const offerTotal = Object.values(offer).reduce((a, b) => a + b, 0);
     const targetTotal = Object.values(target).reduce((a, b) => a + b, 0);
     if (offerTotal === 0 || targetTotal === 0) return false;
+
+    // Catan Rule: Cannot trade identical resources (e.g. 1 wood for 1 wood)
+    for (const r of RESOURCE_TYPES) {
+      if ((offer[r] || 0) > 0 && (target[r] || 0) > 0) return false;
+    }
 
     this.current_trade = {
       proposer_id: playerId,
@@ -907,10 +945,21 @@ class ClientGameState {
 
   endTurn(playerId) {
     if (this.status !== "MAIN_GAME" || this.current_turn_idx !== playerId) return false;
-    if (!["ACTION", "BEFORE_ROLL"].includes(this.turn_phase) && !this.dice_rolled) return false;
+    // Catan Rule: Must roll dice before ending turn!
+    if (!this.dice_rolled) return false;
+    // Catan Rule: Must resolve robber before ending turn!
+    if (["ROBBER_DISCARD", "ROBBER_MOVE", "ROBBER_STEAL"].includes(this.turn_phase)) return false;
 
+    const player = this.players[playerId];
     this.current_trade = null;
-    this.players[playerId].has_played_dev_this_turn = false;
+    player.has_played_dev_this_turn = false;
+    player.free_roads = 0;
+
+    // Catan Rule: Cards bought this turn become available for future turns!
+    if (player.dev_cards_bought_this_turn && player.dev_cards_bought_this_turn.length > 0) {
+      player.dev_cards.push(...player.dev_cards_bought_this_turn);
+      player.dev_cards_bought_this_turn = [];
+    }
 
     if (this._checkWinner()) return true;
 
@@ -944,7 +993,8 @@ class ClientGameState {
       if (this.largest_army_player_id === p.id) publicVP += 2;
 
       p.public_vp = publicVP;
-      const secretVP = p.dev_cards.filter(c => c === "victory_point").length;
+      const allDev = [...(p.dev_cards || []), ...(p.dev_cards_bought_this_turn || [])];
+      const secretVP = allDev.filter(c => c === "victory_point").length;
       p.total_vp = publicVP + secretVP;
     }
   }
@@ -1028,13 +1078,12 @@ class ClientGameState {
 
   _checkWinner() {
     this._updateVictoryPoints();
-    for (const p of this.players) {
-      if (p.total_vp >= this.target_vp) {
-        this.status = "GAME_OVER";
-        this.winner_id = p.id;
-        this._addLog(`🏆 GRATTIS! ${p.name} har vunnit spelet med ${p.total_vp} segerpoäng!`);
-        return true;
-      }
+    const activePlayer = this.players[this.current_turn_idx];
+    if (activePlayer && activePlayer.total_vp >= this.target_vp) {
+      this.status = "GAME_OVER";
+      this.winner_id = activePlayer.id;
+      this._addLog(`🏆 GRATTIS! ${activePlayer.name} har vunnit spelet med ${activePlayer.total_vp} segerpoäng!`);
+      return true;
     }
     return false;
   }
@@ -1050,10 +1099,19 @@ class ClientGameState {
 
     for (const p of this.players) {
       const copy = { ...p };
-      copy.dev_cards_count = p.dev_cards.length;
+      const playableCards = p.dev_cards || [];
+      const newCards = p.dev_cards_bought_this_turn || [];
+      const totalDevCount = playableCards.length + newCards.length;
+
+      copy.dev_cards_count = totalDevCount;
       copy.resources_count = Object.values(p.resources).reduce((a, b) => a + b, 0);
+
       if (effectiveViewer !== p.id) {
-        copy.dev_cards = Array(p.dev_cards.length).fill("hidden");
+        copy.dev_cards = Array(totalDevCount).fill("hidden");
+        copy.dev_cards_bought_this_turn = [];
+      } else {
+        copy.dev_cards = [...playableCards];
+        copy.dev_cards_bought_this_turn = [...newCards];
       }
       playersData.push(copy);
     }

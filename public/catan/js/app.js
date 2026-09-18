@@ -248,7 +248,10 @@ class CatanApp {
         this.startSetupRoadPlacement();
       }
     } else if (s.status === 'MAIN_GAME') {
-      if (s.turn_phase === 'BEFORE_ROLL' || !s.dice_rolled) {
+      const myPlayer = s.players[this.playerId];
+      if (myPlayer && myPlayer.free_roads > 0) {
+        this.startBuildItem('road');
+      } else if (s.turn_phase === 'BEFORE_ROLL' || !s.dice_rolled) {
         this.sendAction('roll_dice');
       } else if (s.turn_phase === 'ACTION') {
         this.sendAction('end_turn');
@@ -405,17 +408,25 @@ class CatanApp {
   playDevCard(cardType) {
     if (cardType === 'year_of_plenty') {
       const r1 = prompt('Välj första resurs (wood, brick, sheep, wheat, ore):', 'ore');
+      if (!r1) return;
       const r2 = prompt('Välj andra resurs (wood, brick, sheep, wheat, ore):', 'wheat');
+      if (!r2) return;
       this.sendAction('play_dev_card', {
         card_type: 'year_of_plenty',
-        extra_data: { res1: r1, res2: r2 }
+        extra_data: { res1: r1.trim().toLowerCase(), res2: r2.trim().toLowerCase() }
       });
     } else if (cardType === 'monopoly') {
       const r = prompt('Välj resurs att ta monopol på (wood, brick, sheep, wheat, ore):', 'ore');
+      if (!r) return;
       this.sendAction('play_dev_card', {
         card_type: 'monopoly',
-        extra_data: { resource: r }
+        extra_data: { resource: r.trim().toLowerCase() }
       });
+    } else if (cardType === 'road_building') {
+      this.sendAction('play_dev_card', { card_type: 'road_building' });
+      setTimeout(() => {
+        this.startBuildItem('road');
+      }, 300);
     } else {
       this.sendAction('play_dev_card', { card_type: cardType });
     }

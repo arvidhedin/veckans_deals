@@ -369,7 +369,10 @@ class UIController {
       }
 
       if (isMyTurn) {
-        if (state.turn_phase === 'BEFORE_ROLL' || !state.dice_rolled) {
+        if (myPlayer && myPlayer.free_roads > 0) {
+          this.setInstruction(`🛣️ Du har ${myPlayer.free_roads} gratis väg${myPlayer.free_roads > 1 ? 'ar' : ''} att bygga!`);
+          this.setPrimaryButton(`Placera Gratis Väg (${myPlayer.free_roads})`, '🛣️', true);
+        } else if (state.turn_phase === 'BEFORE_ROLL' || !state.dice_rolled) {
           this.setInstruction('🎲 Det är din tur! Kasta tärningarna.');
           this.setPrimaryButton('Kasta Tärning', '🎲', true);
         } else if (state.turn_phase === 'ACTION') {
@@ -562,30 +565,72 @@ class UIController {
     if (!list) return;
     list.innerHTML = '';
 
-    const cards = player.dev_cards || [];
-    if (cards.length === 0) {
+    const playableCards = player.dev_cards || [];
+    const newCards = player.dev_cards_bought_this_turn || [];
+
+    if (playableCards.length === 0 && newCards.length === 0) {
       list.innerHTML = '<p class="text-muted">Du har inga utvecklingskort på hand.</p>';
       return;
     }
 
     const cardNames = {
       knight: { name: 'Riddare ⚔️', desc: 'Flytta rövaren och stjäl 1 kort från en intilliggande spelare.' },
-      victory_point: { name: 'Segerpoäng 🏆', desc: 'Ger 1 permanent hemlig segerpoäng!' },
+      victory_point: { name: 'Segerpoäng 🏆', desc: 'Ger 1 permanent hemlig segerpoäng (räknas automatiskt).' },
       road_building: { name: 'Vägbygge 🛣️', desc: 'Bygg 2 gratis vägar direkt.' },
       year_of_plenty: { name: 'Överflöd ✨', desc: 'Välj 2 valfria resurskort från banken.' },
       monopoly: { name: 'Monopol 💰', desc: 'Nämn en resurs. Alla andra spelare måste ge dig alla sina kort av den typen!' }
     };
 
-    cards.forEach((c) => {
+    const hasPlayedThisTurn = player.has_played_dev_this_turn;
+
+    // 1. Playable cards (bought in earlier turns)
+    playableCards.forEach((c) => {
       const info = cardNames[c] || { name: c, desc: '' };
       const cardEl = document.createElement('div');
       cardEl.className = 'build-card';
+      
+      let actionBtn = '';
+      if (c === 'victory_point') {
+        actionBtn = '<span style="font-size:0.75rem;color:var(--accent-gold);font-weight:700;">Aktiv (+1 VP)</span>';
+      } else if (hasPlayedThisTurn) {
+        actionBtn = '<button class="btn btn-sm btn-disabled" disabled style="opacity:0.6;font-size:0.75rem;">Redan spelat kort</button>';
+      } else {
+        actionBtn = `<button class="btn btn-sm btn-primary play-dev-btn" data-card="${c}">Spela</button>`;
+      }
+
       cardEl.innerHTML = `
         <div>
           <strong>${info.name}</strong>
           <p style="font-size:0.75rem;color:var(--text-muted);margin-top:2px;">${info.desc}</p>
         </div>
-        ${c !== 'victory_point' ? `<button class="btn btn-sm btn-primary play-dev-btn" data-card="${c}">Spela</button>` : ''}
+        ${actionBtn}
+      `;
+      list.appendChild(cardEl);
+    });
+
+    // 2. Newly bought cards (cannot be played in the same turn)
+    newCards.forEach((c) => {
+      const info = cardNames[c] || { name: c, desc: '' };
+      const cardEl = document.createElement('div');
+      cardEl.className = 'build-card';
+      cardEl.style.opacity = '0.8';
+      cardEl.style.border = '1px dashed rgba(245, 158, 11, 0.45)';
+
+      let actionText = '';
+      if (c === 'victory_point') {
+        actionText = '<span style="font-size:0.75rem;color:var(--accent-gold);font-weight:700;">Aktiv (+1 VP)</span>';
+      } else {
+        actionText = '<span style="font-size:0.75rem;color:var(--accent-gold);font-weight:600;display:block;line-height:1.2;">🔒 Köpt denna runda<br><small style="color:var(--text-muted);font-weight:400;">Kan spelas nästa runda</small></span>';
+      }
+
+      cardEl.innerHTML = `
+        <div>
+          <strong>${info.name}</strong>
+          <p style="font-size:0.75rem;color:var(--text-muted);margin-top:2px;">${info.desc}</p>
+        </div>
+        <div style="text-align:right;">
+          ${actionText}
+        </div>
       `;
       list.appendChild(cardEl);
     });
