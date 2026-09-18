@@ -650,24 +650,33 @@ select option {
 /* Harbors */
 .port-dock-line {
   stroke: #d97706;
-  stroke-width: 3.5;
-  stroke-dasharray: 4, 3;
+  stroke-width: 4.5;
+  stroke-linecap: round;
+  stroke-dasharray: 6 2;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6));
+}
+
+.port-post {
+  fill: #fbbf24;
+  stroke: #451a03;
+  stroke-width: 2;
+  filter: drop-shadow(0 1px 3px rgba(0,0,0,0.6));
 }
 
 .port-badge-bg {
-  fill: #1e293b;
-  stroke: #d97706;
-  stroke-width: 1.5;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
+  stroke-width: 2.2;
+  filter: drop-shadow(0 4px 10px rgba(0,0,0,0.85));
 }
 
 .port-badge-text {
   fill: #ffffff;
   font-family: var(--font-display);
-  font-size: 10px;
-  font-weight: 700;
+  font-size: 11.5px;
+  font-weight: 800;
   text-anchor: middle;
   dominant-baseline: central;
+  letter-spacing: 0.5px;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.9));
 }
 
 /* Edges & Roads */
@@ -694,22 +703,38 @@ select option {
   cursor: pointer;
 }
 
-/* Interactive Touch Targets for Mobile! */
+/* Interactive Touch Targets for Mobile (Static, no shifting!) */
 .touch-target-vertex {
   cursor: pointer;
-  fill: rgba(245, 158, 11, 0.4);
-  stroke: #ffffff;
+  fill: #ffffff;
+  stroke: #f59e0b;
   stroke-width: 2.5;
-  filter: url(#glow);
-  animation: pulseTouch 1.2s infinite alternate ease-in-out;
+  filter: drop-shadow(0 2px 5px rgba(0,0,0,0.7));
+  opacity: 0.95;
+  transition: fill 0.15s ease, stroke-width 0.15s ease;
+}
+
+.touch-target-vertex:hover,
+.touch-vertex-group:hover .touch-target-vertex {
+  fill: #fef08a;
+  stroke: #ffffff;
+  stroke-width: 3.5;
+  opacity: 1;
 }
 
 .touch-target-edge {
   cursor: pointer;
-  stroke: rgba(245, 158, 11, 0.85);
-  stroke-width: 8;
+  stroke: rgba(245, 158, 11, 0.9);
+  stroke-width: 7;
   stroke-linecap: round;
-  animation: pulseTouchEdge 1.2s infinite alternate ease-in-out;
+  stroke-dasharray: 6 3;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+}
+
+.touch-target-edge:hover {
+  stroke: #ffffff;
+  stroke-width: 8;
+  stroke-dasharray: none;
 }
 
 .touch-target-hex {
@@ -717,17 +742,6 @@ select option {
   fill: rgba(239, 68, 68, 0.35);
   stroke: #ef4444;
   stroke-width: 3;
-  animation: pulseTouch 1s infinite alternate;
-}
-
-@keyframes pulseTouch {
-  from { transform: scale(0.9); opacity: 0.7; }
-  to { transform: scale(1.15); opacity: 1; }
-}
-
-@keyframes pulseTouchEdge {
-  from { stroke-width: 6; opacity: 0.7; }
-  to { stroke-width: 10; opacity: 1; }
 }
 
 /* Robber Figure */

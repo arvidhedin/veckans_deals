@@ -21,9 +21,10 @@ class BoardRenderer {
   render(boardData, players) {
     if (!boardData) return;
 
+    this.boardData = boardData;
     this.clearAll();
     this.renderHexes(boardData.hexes);
-    this.renderPorts(boardData.ports);
+    this.renderPorts(boardData.ports, boardData);
     this.renderEdges(boardData.edges, players);
     this.renderVertices(boardData.vertices, players);
     this.renderNumberTokens(boardData.hexes);
@@ -144,8 +145,9 @@ class BoardRenderer {
   }
 
   // --- PORTS / HARBORS ---
-  renderPorts(ports) {
+  renderPorts(ports, boardData = this.boardData) {
     if (!ports) return;
+
     const portLabels = {
       generic_3_1: '3:1 ⛵',
       wood_2_1: '2:1 🌲',
@@ -155,26 +157,127 @@ class BoardRenderer {
       ore_2_1: '2:1 🪨'
     };
 
+    const portTheme = {
+      generic_3_1: { border: '#f59e0b', bg: '#0b1b2b', label: '3:1 ⛵' },
+      wood_2_1:    { border: '#22c55e', bg: '#0b2615', label: '2:1 🌲' },
+      brick_2_1:   { border: '#ea580c', bg: '#2b140b', label: '2:1 🧱' },
+      sheep_2_1:   { border: '#84cc16', bg: '#172b0b', label: '2:1 🐑' },
+      wheat_2_1:   { border: '#eab308', bg: '#2b230b', label: '2:1 🌾' },
+      ore_2_1:     { border: '#94a3b8', bg: '#18202b', label: '2:1 🪨' }
+    };
+
     ports.forEach((p) => {
       const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
       g.setAttribute('class', 'port-group');
       g.setAttribute('pointer-events', 'none');
 
-      // Port pier line connecting coastal points
+      const v1 = boardData?.vertices?.[p.v1];
+      const v2 = boardData?.vertices?.[p.v2];
+      const theme = portTheme[p.type] || { border: '#f59e0b', bg: '#0b1b2b', label: portLabels[p.type] || '3:1' };
+
+      if (!v1 || !v2) {
+        // Fallback without vertices
+        const badge = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        badge.setAttribute('x', p.x - 26);
+        badge.setAttribute('y', p.y - 12);
+        badge.setAttribute('width', '52');
+        badge.setAttribute('height', '24');
+        badge.setAttribute('rx', '12');
+        badge.setAttribute('class', 'port-badge-bg');
+        badge.setAttribute('fill', theme.bg);
+        badge.setAttribute('stroke', theme.border);
+        g.appendChild(badge);
+
+        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        text.setAttribute('x', p.x);
+        text.setAttribute('y', p.y + 0.5);
+        text.setAttribute('class', 'port-badge-text');
+        text.textContent = theme.label;
+        g.appendChild(text);
+
+        this.portsLayer.appendChild(g);
+        return;
+      }
+
+      // Edge midpoint
+      const mx = (v1.x + v2.x) / 2.0;
+      const my = (v1.y + v2.y) / 2.0;
+
+      // Find the adjacent land hex to determine the outward normal towards water
+      let nx = 0, ny = 0;
+      const sharedHexId = (v1.hexes || []).find(hId => (v2.hexes || []).includes(hId));
+      const landHex = sharedHexId && boardData?.hexes ? boardData.hexes[sharedHexId] : null;
+
+      if (landHex) {
+        const dx = mx - landHex.cx;
+        const dy = my - landHex.cy;
+        const len = Math.hypot(dx, dy) || 1;
+        nx = dx / len;
+        ny = dy / len;
+      } else {
+        const len = Math.hypot(mx, my) || 1;
+        nx = mx / len;
+        ny = my / len;
+      }
+
+      // Harbor badge coordinates floating in the water offshore
+      const badgeDist = 28;
+      const bx = mx + nx * badgeDist;
+      const by = my + ny * badgeDist;
+
+      // 1. Two wooden pier bridges from the two vertices (v1, v2) out to the badge
+      [v1, v2].forEach((v) => {
+        // Dark pier shadow for depth
+        const pierShadow = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        pierShadow.setAttribute('x1', v.x);
+        pierShadow.setAttribute('y1', v.y);
+        pierShadow.setAttribute('x2', bx);
+        pierShadow.setAttribute('y2', by);
+        pierShadow.setAttribute('stroke', '#09131d');
+        pierShadow.setAttribute('stroke-width', '6.5');
+        pierShadow.setAttribute('stroke-linecap', 'round');
+        g.appendChild(pierShadow);
+
+        // Wooden plank pier
+        const pier = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        pier.setAttribute('x1', v.x);
+        pier.setAttribute('y1', v.y);
+        pier.setAttribute('x2', bx);
+        pier.setAttribute('y2', by);
+        pier.setAttribute('class', 'port-dock-line');
+        g.appendChild(pier);
+      });
+
+      // 2. Mooring dock posts on the two vertices (indicates valid harbor settlement spots)
+      [v1, v2].forEach((v) => {
+        const post = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        post.setAttribute('cx', v.x);
+        post.setAttribute('cy', v.y);
+        post.setAttribute('r', '4.5');
+        post.setAttribute('class', 'port-post');
+        g.appendChild(post);
+      });
+
+      // 3. Harbor badge pill floating in water
+      const badgeW = 52;
+      const badgeH = 24;
+
       const badge = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-      badge.setAttribute('x', p.x - 22);
-      badge.setAttribute('y', p.y - 10);
-      badge.setAttribute('width', '44');
-      badge.setAttribute('height', '20');
-      badge.setAttribute('rx', '10');
+      badge.setAttribute('x', bx - badgeW / 2);
+      badge.setAttribute('y', by - badgeH / 2);
+      badge.setAttribute('width', badgeW);
+      badge.setAttribute('height', badgeH);
+      badge.setAttribute('rx', badgeH / 2);
       badge.setAttribute('class', 'port-badge-bg');
+      badge.setAttribute('fill', theme.bg);
+      badge.setAttribute('stroke', theme.border);
       g.appendChild(badge);
 
       const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      text.setAttribute('x', p.x);
-      text.setAttribute('y', p.y + 1);
+      text.setAttribute('x', bx);
+      text.setAttribute('y', by + 0.5);
       text.setAttribute('class', 'port-badge-text');
-      text.textContent = portLabels[p.type] || '3:1';
+      text.textContent = theme.label;
       g.appendChild(text);
 
       this.portsLayer.appendChild(g);
@@ -297,20 +400,38 @@ class BoardRenderer {
       const v = vertices[vid];
       if (!v) return;
 
-      const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-      circle.setAttribute('cx', v.x);
-      circle.setAttribute('cy', v.y);
-      circle.setAttribute('r', '18'); // Touch target radius
-      circle.setAttribute('class', 'touch-target-vertex');
+      const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      g.setAttribute('class', 'touch-vertex-group');
 
-      circle.addEventListener('click', (e) => {
+      // Visual indicator dot: crisp, elegant, completely static (r=7.5)
+      const visualDot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      visualDot.setAttribute('cx', v.x);
+      visualDot.setAttribute('cy', v.y);
+      visualDot.setAttribute('r', '7.5');
+      visualDot.setAttribute('class', 'touch-target-vertex');
+
+      // Large invisible touch hitbox (48px diameter for effortless mobile tapping)
+      const hitbox = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      hitbox.setAttribute('cx', v.x);
+      hitbox.setAttribute('cy', v.y);
+      hitbox.setAttribute('r', '24');
+      hitbox.setAttribute('fill', 'transparent');
+      hitbox.setAttribute('cursor', 'pointer');
+
+      const clickHandler = (e) => {
         e.stopPropagation();
         this.clearOverlay();
         if (window.soundEffects) window.soundEffects.playBuild();
         onSelect(vid);
-      });
+      };
 
-      this.overlayLayer.appendChild(circle);
+      g.addEventListener('click', clickHandler);
+      hitbox.addEventListener('click', clickHandler);
+      visualDot.addEventListener('click', clickHandler);
+
+      g.appendChild(visualDot);
+      g.appendChild(hitbox);
+      this.overlayLayer.appendChild(g);
     });
   }
 
@@ -325,6 +446,9 @@ class BoardRenderer {
       const v2 = vertices[ed.v2];
       if (!v1 || !v2) return;
 
+      const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      g.setAttribute('class', 'touch-edge-group');
+
       const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
       line.setAttribute('x1', v1.x);
       line.setAttribute('y1', v1.y);
@@ -332,14 +456,14 @@ class BoardRenderer {
       line.setAttribute('y2', v2.y);
       line.setAttribute('class', 'touch-target-edge');
 
-      // Transparent hit box for easy finger tapping
+      // Transparent hit box for easy finger tapping (32px wide)
       const hitbox = document.createElementNS('http://www.w3.org/2000/svg', 'line');
       hitbox.setAttribute('x1', v1.x);
       hitbox.setAttribute('y1', v1.y);
       hitbox.setAttribute('x2', v2.x);
       hitbox.setAttribute('y2', v2.y);
       hitbox.setAttribute('stroke', 'transparent');
-      hitbox.setAttribute('stroke-width', '28');
+      hitbox.setAttribute('stroke-width', '32');
       hitbox.setAttribute('cursor', 'pointer');
 
       const clickHandler = (e) => {
@@ -349,11 +473,13 @@ class BoardRenderer {
         onSelect(eid);
       };
 
+      g.addEventListener('click', clickHandler);
       line.addEventListener('click', clickHandler);
       hitbox.addEventListener('click', clickHandler);
 
-      this.overlayLayer.appendChild(line);
-      this.overlayLayer.appendChild(hitbox);
+      g.appendChild(line);
+      g.appendChild(hitbox);
+      this.overlayLayer.appendChild(g);
     });
   }
 

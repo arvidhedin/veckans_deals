@@ -305,7 +305,7 @@ class UIController {
 
       if (isMyTurn) {
         if (state.turn_phase === 'SETUP_SETTLEMENT') {
-          this.setInstruction('🏠 Tryck på en blinkande punkt för att bygga en startby!');
+          this.setInstruction('🏠 Tryck på en vit punkt för att bygga en startby!');
           this.setPrimaryButton('Placera By', '🏠', true);
         } else if (state.turn_phase === 'SETUP_ROAD') {
           this.setInstruction('🛤️ Tryck på en vägmarkering intill din by!');

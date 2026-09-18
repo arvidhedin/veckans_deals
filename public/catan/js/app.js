@@ -330,7 +330,7 @@ class CatanApp {
         return;
       }
 
-      this.ui.setInstruction('🏠 Tryck på en blinkande punkt för att bygga en by!');
+      this.ui.setInstruction('🏠 Tryck på en vit punkt för att bygga en by!');
       this.boardRenderer.showVertexTargets(validVertices, this.boardData.vertices, (vid) => {
         this.sendAction('build_settlement', { vertex_id: vid });
       });
