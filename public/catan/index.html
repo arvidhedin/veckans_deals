@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#0d233a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Katan - Upp till 8 Spelare (Colonist.io Edition)</title>
+  
+  <!-- Google Fonts: Outfit & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+    <!-- LOBBY VIEW -->
+    <div id="lobby-view" class="view active">
+      <div class="lobby-card">
+        <div class="lobby-header">
+          <div class="brand-logo">
+            <span class="logo-icon">🎲</span>
+            <h1>KATAN <span>8P</span></h1>
+          </div>
+          <p class="subtitle">Spela Katan för upp till 8 spelare – optimerat för mobilen</p>
+        </div>
+
+        <!-- MODE SELECTION: ONLINE MULTIPLAYER VS PASS & PLAY -->
+        <div class="mode-tabs">
+          <button id="tab-mode-online" class="mode-tab active">📱 Flera Mobiler (Wi-Fi)</button>
+          <button id="tab-mode-pass" class="mode-tab">👥 Pass & Play (Samma Skärm)</button>
+        </div>
+
+        <div id="lobby-join-form" class="lobby-section">
+          <!-- Online Mode Fields -->
+          <div id="online-fields">
+            <div class="input-group">
+              <label for="player-name-input">Ditt Spelarnamn</label>
+              <input type="text" id="player-name-input" placeholder="Ange ditt namn..." maxlength="15" value="Spelare 1">
+            </div>
+
+            <div class="input-group mt-2">
+              <label for="room-code-input">Rumskod</label>
+              <div class="room-input-row">
+                <input type="text" id="room-code-input" placeholder="T.ex. KATAN8" value="KATAN8" maxlength="12">
+                <button id="random-room-btn" class="btn btn-secondary btn-sm" title="Slumpa rum">🎲 Slumpa</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pass & Play Fields -->
+          <div id="pass-fields" style="display: none;">
+            <p class="text-muted" style="font-size: 0.85rem; line-height: 1.4;">
+              Spela tillsammans runt ett bord på samma mobil eller surfplatta. Skärmen anpassas automatiskt efter vem som har turen!
+            </p>
+          </div>
+
+          <div class="settings-grid">
+            <div class="input-group">
+              <label for="max-players-select">Antal Spelare</label>
+              <select id="max-players-select">
+                <option value="2">2 Spelare</option>
+                <option value="3">3 Spelare</option>
+                <option value="4">4 Spelare</option>
+                <option value="5">5 Spelare</option>
+                <option value="6">6 Spelare</option>
+                <option value="7">7 Spelare</option>
+                <option value="8" selected>8 Spelare (Mega Karta)</option>
+              </select>
+            </div>
+
+            <div class="input-group">
+              <label for="target-vp-select">Målpoäng för Vinst</label>
+              <select id="target-vp-select">
+                <option value="10" selected>10 Segerpoäng</option>
+                <option value="12">12 Segerpoäng (8P)</option>
+                <option value="14">14 Segerpoäng</option>
+              </select>
+            </div>
+          </div>
+
+          <button id="join-btn" class="btn btn-primary btn-lg btn-block">
+            <span id="join-btn-text" class="btn-text">Skapa / Gå med i Rum 🚀</span>
+          </button>
+        </div>
+
+        <!-- LOBBY ROOM WAITING ROOM -->
+        <div id="lobby-room" class="lobby-section" style="display: none;">
+          <div class="room-info-box">
+            <div class="room-tag">
+              <span class="tag-label">Rum:</span>
+              <strong id="active-room-id">CATAN8</strong>
+            </div>
+            <button id="copy-link-btn" class="btn btn-sm btn-outline">
+              📋 Kopiera Inbjudningslänk
+            </button>
+          </div>
+
+          <div id="mobile-ip-banner" class="mobile-ip-banner" style="display: none;">
+            <div class="ip-info">
+              <span class="mobile-icon">📱</span>
+              <div>
+                <strong>Dela med vänner på samma Wi-Fi:</strong>
+                <div id="mobile-join-url" class="ip-link">http://192.168.x.x:8888</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="players-list-header">
+            <h3>Spelare (<span id="player-count">1</span>/<span id="player-max">8</span>)</h3>
+            <button id="add-bot-btn" class="btn btn-sm btn-secondary">🤖 Lägg till Bot</button>
+          </div>
+
+          <div id="lobby-players-grid" class="players-grid">
+            <!-- Rendered dynamically -->
+          </div>
+
+          <div class="lobby-actions">
+            <button id="start-game-btn" class="btn btn-success btn-lg btn-block">
+              Starta Spel Nu 🎮
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GAME VIEW -->
+    <div id="game-view" class="view">
+      <!-- TOP NAVIGATION BAR (8 PLAYERS CAROUSEL) -->
+      <header id="game-header">
+        <div id="players-carousel" class="players-carousel">
+          <!-- Dynamically filled with player cards -->
+        </div>
+
+        <!-- QUICK CONTROL BUTTONS -->
+        <div class="header-controls">
+          <button id="btn-zoom-in" class="ctrl-btn" title="Zooma in">➕</button>
+          <button id="btn-zoom-out" class="ctrl-btn" title="Zooma ut">➖</button>
+          <button id="btn-reset-zoom" class="ctrl-btn" title="Centrera">🎯</button>
+          <button id="btn-toggle-log" class="ctrl-btn" title="Logg / Chatt">💬</button>
+          <button id="btn-toggle-audio" class="ctrl-btn" title="Ljud">🔊</button>
+        </div>
+      </header>
+
+      <!-- MAIN INTERACTIVE BOARD CONTAINER -->
+      <main id="board-container">
+        <svg id="catan-board-svg" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+          <defs>
+            <!-- Hex Textures & Gradients -->
+            <radialGradient id="ocean-gradient" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#144d7d"/>
+              <stop offset="70%" stop-color="#0a2f52"/>
+              <stop offset="100%" stop-color="#061c31"/>
+            </radialGradient>
+
+            <linearGradient id="wood-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#2d8039"/>
+              <stop offset="100%" stop-color="#1b5624"/>
+            </linearGradient>
+
+            <linearGradient id="brick-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#d45b36"/>
+              <stop offset="100%" stop-color="#a43a1a"/>
+            </linearGradient>
+
+            <linearGradient id="sheep-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#8bc34a"/>
+              <stop offset="100%" stop-color="#649929"/>
+            </linearGradient>
+
+            <linearGradient id="wheat-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#f4b428"/>
+              <stop offset="100%" stop-color="#ca8b0c"/>
+            </linearGradient>
+
+            <linearGradient id="ore-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#7e8c9b"/>
+              <stop offset="100%" stop-color="#546170"/>
+            </linearGradient>
+
+            <linearGradient id="desert-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#d7bf91"/>
+              <stop offset="100%" stop-color="#ab905c"/>
+            </linearGradient>
+
+            <!-- Drop shadow for buildings -->
+            <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+              <feDropShadow dx="1" dy="2" stdDeviation="2" flood-color="#000" flood-opacity="0.4"/>
+            </filter>
+            
+            <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+              <feGaussianBlur stdDeviation="3" result="blur"/>
+              <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+            </filter>
+          </defs>
+
+          <!-- Ocean background -->
+          <rect id="ocean-bg" width="100%" height="100%" fill="url(#ocean-gradient)"/>
+
+          <!-- Board transform group for smooth zoom & pan -->
+          <g id="board-root">
+            <g id="hexes-layer"></g>
+            <g id="ports-layer"></g>
+            <g id="number-tokens-layer"></g>
+            <g id="edges-layer"></g>
+            <g id="vertices-layer"></g>
+            <g id="robber-layer"></g>
+            <g id="interactive-overlay-layer"></g>
+          </g>
+        </svg>
+
+        <!-- FLOATING DICE DISPLAY -->
+        <div id="dice-banner" class="dice-banner" style="display: none;">
+          <div class="dice-box">
+            <div id="die-1" class="dice-cube die-val-1">1</div>
+            <div id="die-2" class="dice-cube die-val-1">1</div>
+          </div>
+          <div id="dice-sum-label" class="dice-sum">Summa: 2</div>
+        </div>
+
+        <!-- PROMPT / TURN INSTRUCTION BANNER -->
+        <div id="instruction-pill" class="instruction-pill">
+          <span id="instruction-icon">ℹ️</span>
+          <span id="instruction-text">Välkommen till Katan!</span>
+        </div>
+      </main>
+
+      <!-- BOTTOM MOBILE DOCK (COLONIST.IO STYLE) -->
+      <footer id="mobile-dock">
+        <!-- RESOURCE CARDS HAND -->
+        <div id="resources-ribbon" class="resources-ribbon">
+          <div class="res-card" data-res="wood" title="Trä (Skog)">
+            <div class="res-icon">🌲</div>
+            <div class="res-label">Trä</div>
+            <div id="res-count-wood" class="res-badge">0</div>
+          </div>
+          <div class="res-card" data-res="brick" title="Tegel (Lera)">
+            <div class="res-icon">🧱</div>
+            <div class="res-label">Tegel</div>
+            <div id="res-count-brick" class="res-badge">0</div>
+          </div>
+          <div class="res-card" data-res="sheep" title="Ull (Får)">
+            <div class="res-icon">🐑</div>
+            <div class="res-label">Ull</div>
+            <div id="res-count-sheep" class="res-badge">0</div>
+          </div>
+          <div class="res-card" data-res="wheat" title="Vete (Åker)">
+            <div class="res-icon">🌾</div>
+            <div class="res-label">Vete</div>
+            <div id="res-count-wheat" class="res-badge">0</div>
+          </div>
+          <div class="res-card" data-res="ore" title="Malm (Berg)">
+            <div class="res-icon">🪨</div>
+            <div class="res-label">Malm</div>
+            <div id="res-count-ore" class="res-badge">0</div>
+          </div>
+          <div class="res-card dev-card-hand" id="btn-open-dev-cards" title="Utvecklingskort">
+            <div class="res-icon">📜</div>
+            <div class="res-label">Kort</div>
+            <div id="res-count-dev" class="res-badge">0</div>
+          </div>
+        </div>
+
+        <!-- PRIMARY ACTION BUTTONS BAR -->
+        <div id="actions-bar" class="actions-bar">
+          <button id="btn-build" class="action-btn btn-build">
+            <span class="action-icon">🔨</span>
+            <span class="action-label">Bygg</span>
+          </button>
+          
+          <button id="btn-trade" class="action-btn btn-trade">
+            <span class="action-icon">🔄</span>
+            <span class="action-label">Handla</span>
+          </button>
+
+          <!-- Dynamic Primary button: Roll Dice or End Turn -->
+          <button id="btn-primary-turn" class="action-btn btn-primary-turn">
+            <span id="primary-btn-icon" class="action-icon">🎲</span>
+            <span id="primary-btn-label" class="action-label">Kasta Tärning</span>
+          </button>
+        </div>
+      </footer>
+
+      <!-- SLIDE-UP BOTTOM SHEET: BUILD MENU -->
+      <div id="build-sheet" class="bottom-sheet">
+        <div class="sheet-header">
+          <h3>Bygg Meny</h3>
+          <button class="sheet-close-btn" data-close="build-sheet">✕</button>
+        </div>
+        <div class="sheet-content">
+          <div class="build-grid">
+            <!-- Road -->
+            <div class="build-card" id="build-item-road">
+              <div class="build-card-info">
+                <div class="build-card-title">
+                  <span class="build-icon">🛤️</span>
+                  <strong>Väg</strong>
+                  <span class="build-remaining">(<span id="rem-road">15</span> kvar)</span>
+                </div>
+                <div class="cost-chips">
+                  <span class="cost-chip wood">1 🌲</span>
+                  <span class="cost-chip brick">1 🧱</span>
+                </div>
+              </div>
+              <button id="btn-buy-road" class="btn btn-sm btn-build-action">Bygg Väg</button>
+            </div>
+
+            <!-- Settlement -->
+            <div class="build-card" id="build-item-settlement">
+              <div class="build-card-info">
+                <div class="build-card-title">
+                  <span class="build-icon">🏠</span>
+                  <strong>By</strong>
+                  <span class="build-remaining">(<span id="rem-settlement">5</span> kvar)</span>
+                </div>
+                <div class="cost-chips">
+                  <span class="cost-chip wood">1 🌲</span>
+                  <span class="cost-chip brick">1 🧱</span>
+                  <span class="cost-chip sheep">1 🐑</span>
+                  <span class="cost-chip wheat">1 🌾</span>
+                </div>
+              </div>
+              <button id="btn-buy-settlement" class="btn btn-sm btn-build-action">Bygg By</button>
+            </div>
+
+            <!-- City -->
+            <div class="build-card" id="build-item-city">
+              <div class="build-card-info">
+                <div class="build-card-title">
+                  <span class="build-icon">🏰</span>
+                  <strong>Stad</strong>
+                  <span class="build-remaining">(<span id="rem-city">4</span> kvar)</span>
+                </div>
+                <div class="cost-chips">
+                  <span class="cost-chip wheat">2 🌾</span>
+                  <span class="cost-chip ore">3 🪨</span>
+                </div>
+              </div>
+              <button id="btn-buy-city" class="btn btn-sm btn-build-action">Uppgradera</button>
+            </div>
+
+            <!-- Dev Card -->
+            <div class="build-card" id="build-item-dev">
+              <div class="build-card-info">
+                <div class="build-card-title">
+                  <span class="build-icon">📜</span>
+                  <strong>Utvecklingskort</strong>
+                </div>
+                <div class="cost-chips">
+                  <span class="cost-chip sheep">1 🐑</span>
+                  <span class="cost-chip wheat">1 🌾</span>
+                  <span class="cost-chip ore">1 🪨</span>
+                </div>
+              </div>
+              <button id="btn-buy-dev-card" class="btn btn-sm btn-build-action">Köp Kort</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE-UP BOTTOM SHEET: TRADE MENU -->
+      <div id="trade-sheet" class="bottom-sheet">
+        <div class="sheet-header">
+          <h3>Handel</h3>
+          <div class="trade-tabs">
+            <button class="trade-tab active" data-tab="bank-trade">🏛️ Bank / Hamn</button>
+            <button class="trade-tab" data-tab="player-trade">👥 Spelarbyte</button>
+          </div>
+          <button class="sheet-close-btn" data-close="trade-sheet">✕</button>
+        </div>
+
+        <div class="sheet-content">
+          <!-- BANK / MARITIME TRADE TAB -->
+          <div id="tab-bank-trade" class="trade-tab-pane active">
+            <p class="trade-subtitle">Välj resurs du ger bort (kurs baseras på dina hamnar) och resurs du vill ha:</p>
+            <div class="bank-trade-container">
+              <div class="trade-col">
+                <h4>Ge bort:</h4>
+                <div class="trade-res-select" id="bank-give-select">
+                  <!-- Dynamically populated with rates e.g. "4x 🌲 Trä" or "2x 🌾 Vete" -->
+                </div>
+              </div>
+              <div class="trade-arrow">➡️</div>
+              <div class="trade-col">
+                <h4>Få 1x:</h4>
+                <div class="trade-res-select" id="bank-get-select">
+                  <!-- Dynamically populated -->
+                </div>
+              </div>
+            </div>
+            <button id="btn-execute-bank-trade" class="btn btn-primary btn-block mt-3" disabled>
+              Genomför Bankbyte 🤝
+            </button>
+          </div>
+
+          <!-- DOMESTIC PLAYER TRADE TAB -->
+          <div id="tab-player-trade" class="trade-tab-pane">
+            <div class="domestic-trade-grid">
+              <div class="domestic-col">
+                <h4>Jag Erbjuder:</h4>
+                <div class="domestic-stepper" id="trade-offer-steppers">
+                  <!-- Steppers for wood, brick, sheep, wheat, ore -->
+                </div>
+              </div>
+              <div class="domestic-col">
+                <h4>Jag Vill Ha:</h4>
+                <div class="domestic-stepper" id="trade-target-steppers">
+                  <!-- Steppers -->
+                </div>
+              </div>
+            </div>
+            <button id="btn-propose-trade" class="btn btn-success btn-block mt-3">
+              📢 Skicka Erbjudande till Alla
+            </button>
+
+            <!-- INCOMING TRADE OFFERS -->
+            <div id="incoming-trade-box" class="incoming-trade-box" style="display: none;">
+              <h4>Aktivt Byteserbjudande:</h4>
+              <div id="incoming-trade-details" class="trade-details"></div>
+              <div class="trade-action-btns mt-2">
+                <button id="btn-accept-trade" class="btn btn-sm btn-success">👍 Acceptera</button>
+                <button id="btn-decline-trade" class="btn btn-sm btn-danger">👎 Neka</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE-UP BOTTOM SHEET: DEV CARDS MODAL -->
+      <div id="dev-cards-sheet" class="bottom-sheet">
+        <div class="sheet-header">
+          <h3>Dina Utvecklingskort</h3>
+          <button class="sheet-close-btn" data-close="dev-cards-sheet">✕</button>
+        </div>
+        <div class="sheet-content">
+          <div id="dev-cards-list" class="dev-cards-list">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+      </div>
+
+      <!-- ROBBER DISCARD MODAL -->
+      <div id="discard-modal" class="modal-backdrop" style="display: none;">
+        <div class="modal-card">
+          <h3>⚠️ Tärningen visade 7!</h3>
+          <p>Du har för många kort och måste slänga <strong id="discard-needed-count">0</strong> kort:</p>
+          <div id="discard-steppers" class="domestic-stepper">
+            <!-- Steppers for each resource -->
+          </div>
+          <div class="mt-3 text-center">
+            Valda: <span id="discard-selected-count">0</span> / <span id="discard-target-count">0</span>
+          </div>
+          <button id="btn-confirm-discard" class="btn btn-danger btn-block mt-3" disabled>
+            Släng Valda Kort
+          </button>
+        </div>
+      </div>
+
+      <!-- ROBBER STEAL MODAL -->
+      <div id="steal-modal" class="modal-backdrop" style="display: none;">
+        <div class="modal-card">
+          <h3>🗡️ Stjäl ett kort!</h3>
+          <p>Välj vilken spelare du vill stjäla ett slumpmässigt resurskort från:</p>
+          <div id="steal-players-list" class="steal-players-list">
+            <!-- List of eligible victim players -->
+          </div>
+        </div>
+      </div>
+
+      <!-- GAME OVER MODAL -->
+      <div id="game-over-modal" class="modal-backdrop" style="display: none;">
+        <div class="modal-card text-center">
+          <div class="win-trophy">🏆</div>
+          <h2 id="winner-name-title">GRATTIS!</h2>
+          <p id="winner-desc-text">Spelaren vann spelet!</p>
+          <div id="final-scores-list" class="final-scores-list mt-3"></div>
+          <button id="btn-return-lobby" class="btn btn-primary btn-block mt-4">
+            Tillbaka till Lobyn
+          </button>
+        </div>
+      </div>
+
+      <!-- LOG & CHAT DRAWER -->
+      <aside id="chat-drawer" class="chat-drawer">
+        <div class="drawer-header">
+          <h3>Spellogg & Chatt</h3>
+          <button id="btn-close-log" class="sheet-close-btn">✕</button>
+        </div>
+        <div id="game-log-feed" class="game-log-feed">
+          <!-- Log lines -->
+        </div>
+        <form id="chat-form" class="chat-form">
+          <input type="text" id="chat-input" placeholder="Skriv ett meddelande..." autocomplete="off">
+          <button type="submit" class="btn btn-sm btn-primary">Skicka</button>
+        </form>
+      </aside>
+    </div>
+  </div>
+
+  <!-- Client-Side Scripts -->
+  <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+  <script src="js/sound_effects.js"></script>
+  <script src="js/touch_controls.js"></script>
+  <script src="js/board_renderer.js"></script>
+  <script src="js/game_engine.js"></script>
+  <script src="js/network_peer.js"></script>
+  <script src="js/ui_controller.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
