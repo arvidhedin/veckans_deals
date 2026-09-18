@@ -1,17 +1,17 @@
 {
-  "updated_at": "2026-09-17T07:20:56.963012+00:00",
-  "updated_at_readable": "2026-09-17 07:20 UTC",
-  "total_offers": 1113,
+  "updated_at": "2026-09-18T07:11:41.300000+00:00",
+  "updated_at_readable": "2026-09-18 07:11 UTC",
+  "total_offers": 1116,
   "store_counts": {
     "ICA Nära Råbyvägen": 40,
-    "ICA Supermarket Torgkassen": 49,
+    "ICA Supermarket Torgkassen": 50,
     "ICA Nära Rosendal": 46,
     "ICA Supermarket Väst": 35,
     "ICA Vretgränd": 42,
     "ICA Supermarket City": 6,
-    "ICA Supermarket Luthagens Livs": 49,
+    "ICA Supermarket Luthagens Livs": 50,
     "ICA Folkes Livs": 42,
-    "ICA Nära Hörnan": 40,
+    "ICA Nära Hörnan": 41,
     "Willys": 217,
     "Hemköp (Svava)": 66,
     "Hemköp (Rosendal)": 66,
@@ -21,7 +21,7 @@
   },
   "category_counts": {
     "Mejeri & Ägg": 128,
-    "Kött & Fågel": 114,
+    "Kött & Fågel": 117,
     "Dryck": 59,
     "Frukt & Grönt": 123,
     "Skafferi": 75,
@@ -183,7 +183,7 @@
       "price": "12 kr",
       "discount": "GENERAL",
       "description": "100g",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07340023809369_C1N1_s01",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07340023809369_C1N1_s02",
       "category": "Kött & Fågel",
       "restriction": "",
       "original_price": "24,55 kr",
@@ -196,7 +196,7 @@
       "price": "12 kr",
       "discount": "GENERAL",
       "description": "100g",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07340023809369_C1N1_s01",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07340023809369_C1N1_s02",
       "category": "Kött & Fågel",
       "restriction": "",
       "original_price": "24,55 kr",
@@ -424,6 +424,19 @@
       "discount_percentage": 47
     },
     {
+      "store": "ICA Supermarket Torgkassen",
+      "product": "Fläskfärs",
+      "brand": "ICA. Ursprung Sverige",
+      "price": "25:-",
+      "discount": "Ord.pris 46,10 kr",
+      "description": "500 g",
+      "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690509158.jpg",
+      "category": "Kött & Fågel",
+      "restriction": "Max 2 köp/hushåll",
+      "original_price": "46,10 kr",
+      "discount_percentage": 46
+    },
+    {
       "store": "ICA Supermarket Väst",
       "product": "Proteinbar Creamy coconut",
       "brand": "Nick´s",
@@ -629,6 +642,19 @@
       "category": "Övrigt",
       "restriction": "",
       "original_price": "59 kr",
+      "discount_percentage": 44
+    },
+    {
+      "store": "ICA Supermarket Luthagens Livs",
+      "product": "Fläskfärs",
+      "brand": "ICA. Ursprung Sverige",
+      "price": "25:-",
+      "discount": "Ord.pris 44,25 kr",
+      "description": "500 g",
+      "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690509158.jpg",
+      "category": "Kött & Fågel",
+      "restriction": "Max 2 köp/hushåll",
+      "original_price": "44,25 kr",
       "discount_percentage": 44
     },
     {
@@ -3857,19 +3883,6 @@
     },
     {
       "store": "Hemköp (Rosendal)",
-      "product": "Paj",
-      "brand": "Felix",
-      "price": "25 kr",
-      "discount": "LOYALTY",
-      "description": "210-220g",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310240079562_C1L1_s07",
-      "category": "Frys & Färdigmat",
-      "restriction": "",
-      "original_price": "34,02 kr",
-      "discount_percentage": 27
-    },
-    {
-      "store": "Hemköp (Rosendal)",
       "product": "Strimlad kycklingbröstfilé",
       "brand": "Garant",
       "price": "35 kr",
@@ -3892,6 +3905,19 @@
       "category": "Mejeri & Ägg",
       "restriction": "",
       "original_price": "45,00 kr",
+      "discount_percentage": 27
+    },
+    {
+      "store": "Hemköp (Rosendal)",
+      "product": "Paj",
+      "brand": "Felix",
+      "price": "25 kr",
+      "discount": "LOYALTY",
+      "description": "210-220g",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310240079562_C1L1_s07",
+      "category": "Frys & Färdigmat",
+      "restriction": "",
+      "original_price": "34,02 kr",
       "discount_percentage": 27
     },
     {
@@ -6600,6 +6626,19 @@
     },
     {
       "store": "Hemköp (Svava)",
+      "product": "Färskost",
+      "brand": "Philadelphia",
+      "price": "18 kr",
+      "discount": "LOYALTY",
+      "description": "145-200g",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/04000339697908_C1C1_s06",
+      "category": "Mejeri & Ägg",
+      "restriction": "",
+      "original_price": "22,00 kr",
+      "discount_percentage": 18
+    },
+    {
+      "store": "Hemköp (Svava)",
       "product": "Ekologisk vispgrädde",
       "brand": "Garant Eko",
       "price": "20 kr",
@@ -6626,19 +6665,6 @@
     },
     {
       "store": "Hemköp (Svava)",
-      "product": "Färskost",
-      "brand": "Philadelphia",
-      "price": "18 kr",
-      "discount": "LOYALTY",
-      "description": "145-200g",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/04000339697908_C1C1_s06",
-      "category": "Mejeri & Ägg",
-      "restriction": "",
-      "original_price": "22,00 kr",
-      "discount_percentage": 18
-    },
-    {
-      "store": "Hemköp (Svava)",
       "product": "Min Frukt",
       "brand": "Nestlé",
       "price": "10 kr",
@@ -6652,19 +6678,6 @@
     },
     {
       "store": "Hemköp (Rosendal)",
-      "product": "Ekologisk vispgrädde",
-      "brand": "Garant Eko",
-      "price": "20 kr",
-      "discount": "LOYALTY",
-      "description": "3dl",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083452567_C1L1_s04",
-      "category": "Mejeri & Ägg",
-      "restriction": "",
-      "original_price": "24,30 kr",
-      "discount_percentage": 18
-    },
-    {
-      "store": "Hemköp (Rosendal)",
       "product": "Färskost",
       "brand": "Philadelphia",
       "price": "18 kr",
@@ -6674,6 +6687,19 @@
       "category": "Mejeri & Ägg",
       "restriction": "",
       "original_price": "22,00 kr",
+      "discount_percentage": 18
+    },
+    {
+      "store": "Hemköp (Rosendal)",
+      "product": "Ekologisk vispgrädde",
+      "brand": "Garant Eko",
+      "price": "20 kr",
+      "discount": "LOYALTY",
+      "description": "3dl",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083452567_C1L1_s04",
+      "category": "Mejeri & Ägg",
+      "restriction": "",
+      "original_price": "24,30 kr",
       "discount_percentage": 18
     },
     {
@@ -9303,6 +9329,19 @@
       "discount_percentage": 0
     },
     {
+      "store": "ICA Nära Hörnan",
+      "product": "Färsk minutfilé",
+      "brand": "Kronfågel. Ursprung Sverige",
+      "price": "70:-",
+      "discount": "",
+      "description": "600 g",
+      "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7300328591000.jpg",
+      "category": "Kött & Fågel",
+      "restriction": "",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
       "store": "Willys",
       "product": "Karré",
       "brand": "SCAN",
@@ -9707,13 +9746,13 @@
     },
     {
       "store": "Coop (Centralhuset)",
-      "product": "Pan Pizza",
-      "brand": "Billys",
-      "price": "4 för 40:-",
+      "product": "Bacon",
+      "brand": "Sverige/Scan",
+      "price": "4 för 50:-",
       "discount": "Medlemspris",
-      "description": "170 g. Fryst. Välj mellan olika sorter.",
-      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1734535333/cloud/417235.png",
-      "category": "Frys & Färdigmat",
+      "description": "125-140 g. Kyld. Välj mellan skivat och tärnat.",
+      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1760709767/cloud/544555.png",
+      "category": "Kött & Fågel",
       "restriction": "",
       "original_price": "",
       "discount_percentage": 0
@@ -9733,6 +9772,19 @@
     },
     {
       "store": "Coop (Centralhuset)",
+      "product": "Pan Pizza",
+      "brand": "Billys",
+      "price": "4 för 40:-",
+      "discount": "Medlemspris",
+      "description": "170 g. Fryst. Välj mellan olika sorter.",
+      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1734535333/cloud/417235.png",
+      "category": "Frys & Färdigmat",
+      "restriction": "",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Coop (Centralhuset)",
       "product": "Rågbitar/Chiabröd",
       "brand": "Hatting",
       "price": "2 för 35:-",
@@ -9740,19 +9792,6 @@
       "description": "330-360 g. Välj mellan olika sorter.",
       "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1708535005/cloud/329632.png",
       "category": "Övrigt",
-      "restriction": "",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Coop (Centralhuset)",
-      "product": "Bacon",
-      "brand": "Sverige/Scan",
-      "price": "4 för 50:-",
-      "discount": "Medlemspris",
-      "description": "125-140 g. Kyld. Välj mellan skivat och tärnat.",
-      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1760709767/cloud/544555.png",
-      "category": "Kött & Fågel",
       "restriction": "",
       "original_price": "",
       "discount_percentage": 0
@@ -9772,19 +9811,6 @@
     },
     {
       "store": "Coop (Liljegatan)",
-      "product": "Pan Pizza",
-      "brand": "Billys",
-      "price": "4 för 40:-",
-      "discount": "Medlemspris",
-      "description": "170 g. Fryst. Välj mellan olika sorter.",
-      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1734535333/cloud/417235.png",
-      "category": "Frys & Färdigmat",
-      "restriction": "",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Coop (Liljegatan)",
       "product": "Bacon",
       "brand": "Sverige/Scan",
       "price": "4 för 50:-",
@@ -9792,32 +9818,6 @@
       "description": "125-140 g. Kyld. Välj mellan skivat och tärnat.",
       "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1760709767/cloud/544555.png",
       "category": "Kött & Fågel",
-      "restriction": "",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Coop (Liljegatan)",
-      "product": "Rågbitar/Chiabröd",
-      "brand": "Hatting",
-      "price": "2 för 35:-",
-      "discount": "",
-      "description": "330-360 g. Välj mellan olika sorter.",
-      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1708535005/cloud/329632.png",
-      "category": "Övrigt",
-      "restriction": "",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Coop (Liljegatan)",
-      "product": "Hushållsost/Götene Hushållsost",
-      "brand": "Arla",
-      "price": "75:-/kg",
-      "discount": "Medlemspris",
-      "description": "Ca 500-2200 g. Fetthalt 17-26%. Välj mellan olika sorter.",
-      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1759604548/cloud/533441.png",
-      "category": "Mejeri & Ägg",
       "restriction": "",
       "original_price": "",
       "discount_percentage": 0
@@ -9850,6 +9850,58 @@
     },
     {
       "store": "Coop (Liljegatan)",
+      "product": "Rågbitar/Chiabröd",
+      "brand": "Hatting",
+      "price": "2 för 35:-",
+      "discount": "",
+      "description": "330-360 g. Välj mellan olika sorter.",
+      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1708535005/cloud/329632.png",
+      "category": "Övrigt",
+      "restriction": "",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Coop (Liljegatan)",
+      "product": "Hushållsost/Götene Hushållsost",
+      "brand": "Arla",
+      "price": "75:-/kg",
+      "discount": "Medlemspris",
+      "description": "Ca 500-2200 g. Fetthalt 17-26%. Välj mellan olika sorter.",
+      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1759604548/cloud/533441.png",
+      "category": "Mejeri & Ägg",
+      "restriction": "",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Coop (Liljegatan)",
+      "product": "Pan Pizza",
+      "brand": "Billys",
+      "price": "4 för 40:-",
+      "discount": "Medlemspris",
+      "description": "170 g. Fryst. Välj mellan olika sorter.",
+      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1734535333/cloud/417235.png",
+      "category": "Frys & Färdigmat",
+      "restriction": "",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Coop (Liljegatan)",
+      "product": "Vispgrädde",
+      "brand": "Sverige/Coop",
+      "price": "25:-",
+      "discount": "Medlemspris",
+      "description": "5 dl.",
+      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1726580330/cloud/386442.png",
+      "category": "Mejeri & Ägg",
+      "restriction": "",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Coop (Liljegatan)",
       "product": "Gräddglass",
       "brand": "Triumfglass",
       "price": "2 för 69:-",
@@ -9869,19 +9921,6 @@
       "discount": "Medlemspris",
       "description": "1000 g. Välj mellan olika sorters original och mini. Gäller ej laktosfri.",
       "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1597388279/405157.png",
-      "category": "Mejeri & Ägg",
-      "restriction": "",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Coop (Liljegatan)",
-      "product": "Vispgrädde",
-      "brand": "Sverige/Coop",
-      "price": "25:-",
-      "discount": "Medlemspris",
-      "description": "5 dl.",
-      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1726580330/cloud/386442.png",
       "category": "Mejeri & Ägg",
       "restriction": "",
       "original_price": "",
@@ -9941,19 +9980,6 @@
     },
     {
       "store": "Coop (Liljegatan)",
-      "product": "Smaksatt crème fraiche",
-      "brand": "Arla Köket",
-      "price": "2 för 25:-",
-      "discount": "",
-      "description": "2 dl. Välj mellan olika sorters smaksatta lätt créme fraiche. Gäller ej laktosfri.",
-      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1664279475/cloud/259277.png",
-      "category": "Mejeri & Ägg",
-      "restriction": "",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Coop (Liljegatan)",
       "product": "Ekologisk smoothie i klämpåse",
       "brand": "Änglamark",
       "price": "5 för 35:-",
@@ -9961,6 +9987,19 @@
       "description": "90-120 g. Välj mellan olika sorter.",
       "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1738218768/cloud/429534.png",
       "category": "Dryck",
+      "restriction": "",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Coop (Liljegatan)",
+      "product": "Smaksatt crème fraiche",
+      "brand": "Arla Köket",
+      "price": "2 för 25:-",
+      "discount": "",
+      "description": "2 dl. Välj mellan olika sorters smaksatta lätt créme fraiche. Gäller ej laktosfri.",
+      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1664279475/cloud/259277.png",
+      "category": "Mejeri & Ägg",
       "restriction": "",
       "original_price": "",
       "discount_percentage": 0
@@ -10180,7 +10219,7 @@
       "price": "22,90/st",
       "discount": "",
       "description": "750 ml",
-      "image_url": "https://www.lidl.se/assets/gcp66653579d77d493fbff110cd9fe0b7af.png",
+      "image_url": "https://www.lidl.se/assets/gcpe0603aa16c0d4cc8bab62d403b26b2bc.png",
       "category": "Övrigt",
       "restriction": "I butik 21/09 - 27/09",
       "original_price": "",
@@ -12626,7 +12665,7 @@
       "description": "",
       "image_url": "https://www.lidl.se/assets/gcp3d3dbc2f7d1f499cb012823d42864f8c.png",
       "category": "Övrigt",
-      "restriction": "I butik 24/09 - 27/09",
+      "restriction": "I butik 24/09 - 30/09",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -12639,7 +12678,7 @@
       "description": "",
       "image_url": "https://www.lidl.se/assets/gcpc9446a6eab26404f8632c7a8f06803ff.png",
       "category": "Övrigt",
-      "restriction": "I butik 17/09 - 20/09",
+      "restriction": "I butik 17/09 - 28/09",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -13417,7 +13456,7 @@
       "price": "49,90/st",
       "discount": "",
       "description": "700 g",
-      "image_url": "https://www.lidl.se/assets/gcp13c1f3703613479bbe804855cebcb664.png",
+      "image_url": "https://www.lidl.se/assets/gcpc0c0677c49124663944c81618bc6008f.png",
       "category": "Kött & Fågel",
       "restriction": "I butik 21/09 - 27/09",
       "original_price": "",
@@ -13586,7 +13625,7 @@
       "price": "34,90/st",
       "discount": "",
       "description": "1,75 l",
-      "image_url": "https://www.lidl.se/assets/gcpcd45c585d27246af9204ea3959ca0d3a.png",
+      "image_url": "https://www.lidl.se/assets/gcp6276abb340904a839b33aef864bb374d.png",
       "category": "Dryck",
       "restriction": "I butik 21/09 - 27/09",
       "original_price": "",
@@ -14080,7 +14119,7 @@
       "price": "69,90/st",
       "discount": "",
       "description": "300 g",
-      "image_url": "https://www.lidl.se/assets/gcp8de7e464275d47a08c7ae41825ce5259.png",
+      "image_url": "https://www.lidl.se/assets/gcp760939fcd7d445798971db1b0aa2ceb8.png",
       "category": "Mejeri & Ägg",
       "restriction": "I butik 17/09 - 20/09",
       "original_price": "",
@@ -14420,7 +14459,7 @@
       "description": "",
       "image_url": "https://www.lidl.se/assets/gcp5eeb6b5d9ee84fcdaff4608f48ce4ec0.png",
       "category": "Övrigt",
-      "restriction": "I butik 24/09 - 27/09",
+      "restriction": "I butik 17/09 - 28/09",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -14433,7 +14472,7 @@
       "description": "",
       "image_url": "https://www.lidl.se/assets/gcp2389880196694393ab86fb441734efb5.png",
       "category": "Övrigt",
-      "restriction": "I butik 24/09 - 27/09",
+      "restriction": "I butik 17/09 - 30/09",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -14571,16 +14610,6 @@
       "price": "49,90 kr",
       "description": "700g | Jmf: 71,29 kr/kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083475962_C1N1_s01",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
-      "product": "Kycklinglår Fryst",
-      "brand": "Garant",
-      "price": "39,90 kr",
-      "description": "1kg | Jmf: 39,90 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083462238_C1N1_s01",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -14791,6 +14820,16 @@
       "price": "62,90 kr",
       "description": "500g | Jmf: 125,80 kr/kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07300321279004_C1N1_s01",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Kycklingfilé Bröstfilé Sverige",
+      "brand": "Garant",
+      "price": "125,00 kr",
+      "description": "ca: 850g | Jmf: 125,00 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/02359634700007_C1L1_s04",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -15076,46 +15115,6 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Salsicciafärs Naturell",
-      "brand": "Köttkultur",
-      "price": "56,68 kr",
-      "description": "400g | Jmf: 141,70 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07392055051520_C1N1_s01",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
-      "product": "Asiatisk Färs",
-      "brand": "Köttkultur",
-      "price": "49,90 kr",
-      "description": "350g | Jmf: 142,57 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07392055251296_C1N1_s01",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
-      "product": "Salsicciafärs Chili",
-      "brand": "Köttkultur",
-      "price": "56,68 kr",
-      "description": "400g | Jmf: 141,70 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07392055051506_C1N1_s01",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
-      "product": "Salsicciafärs Fänkål",
-      "brand": "Köttkultur",
-      "price": "56,68 kr",
-      "description": "400g | Jmf: 141,70 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07392055051537_C1N1_s01",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Högrevsfärs Oxbringa",
       "brand": "Garant Eko",
       "price": "119,00 kr",
@@ -15181,6 +15180,16 @@
       "price": "59,90 kr",
       "description": "500g | Jmf: 119,80 kr/kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043004508_C1N1_s04",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Salsicciafärs Naturell",
+      "brand": "Köttkultur",
+      "price": "56,68 kr",
+      "description": "400g | Jmf: 141,70 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07392055051520_C1N1_s01",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -16066,21 +16075,21 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Bacon Restaurang",
-      "brand": "Helmut Walch",
-      "price": "42,49 kr",
-      "description": "300g | Jmf: 141,63 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07340109307352_C1N1_s01",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Bacon Skivad",
       "brand": "Tulip",
       "price": "17,88 kr",
       "description": "125g | Jmf: 143,04 kr/kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/05707196031836_C1N1_s05",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Bacon Restaurang",
+      "brand": "Helmut Walch",
+      "price": "42,49 kr",
+      "description": "300g | Jmf: 141,63 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07340109307352_C1N1_s01",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -16536,21 +16545,21 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Chorizo",
-      "brand": "Scan",
-      "price": "31,50 kr",
-      "description": "300g | Jmf: 105,00 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07300208373009_C1N1_s04",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Grillkorv",
       "brand": "Garant",
       "price": "66,15 kr",
       "description": "800g | Jmf: 82,69 kr/kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083430077_C1N1_s02",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Chorizo",
+      "brand": "Scan",
+      "price": "31,50 kr",
+      "description": "300g | Jmf: 105,00 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07300208373009_C1N1_s04",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -16576,21 +16585,21 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Bratwurst",
-      "brand": "Scan",
-      "price": "31,50 kr",
-      "description": "300g | Jmf: 105,00 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07300206706007_C1N1_s03",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Tryffelkorv",
       "brand": "Garant",
       "price": "25,50 kr",
       "description": "270g | Jmf: 94,44 kr/kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043001255_C1N1_s02",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Bratwurst",
+      "brand": "Scan",
+      "price": "31,50 kr",
+      "description": "300g | Jmf: 105,00 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07300206706007_C1N1_s03",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -16876,21 +16885,21 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Smashburgare",
-      "brand": "Köttkultur",
-      "price": "69,90 kr",
-      "description": "320g | Jmf: 218,44 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07392055051490_C1L1_s01",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Angusburgare",
       "brand": "Köttkultur",
       "price": "69,90 kr",
       "description": "300g | Jmf: 233,00 kr/kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07392055051469_C1L1_s01",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Smashburgare",
+      "brand": "Köttkultur",
+      "price": "69,90 kr",
+      "description": "320g | Jmf: 218,44 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07392055051490_C1L1_s01",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -17456,21 +17465,21 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Lax Peppar Varmrökt",
-      "brand": "Mowi",
-      "price": "54,90 kr",
-      "description": "125g | Jmf: 439,20 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/05906259717551_C1N1_s01",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Kallrökt Lax",
       "brand": "Mowi",
       "price": "47,90 kr",
       "description": "100g | Jmf: 479,00 kr/kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/05906259717766_C1N1_s01",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Lax Peppar Varmrökt",
+      "brand": "Mowi",
+      "price": "54,90 kr",
+      "description": "125g | Jmf: 439,20 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/05906259717551_C1N1_s01",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -17866,21 +17875,21 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Inlagd Sill",
-      "brand": "Garant",
-      "price": "19,50 kr",
-      "description": "220/110g | Jmf: 177,27 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043008926_C1N1_s02",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Brantevikssill",
       "brand": "Garant",
       "price": "19,50 kr",
       "description": "220/110g | Jmf: 177,27 kr/kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043022373_C1N1_s01",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Inlagd Sill",
+      "brand": "Garant",
+      "price": "19,50 kr",
+      "description": "220/110g | Jmf: 177,27 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043008926_C1N1_s02",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -17916,21 +17925,21 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Sill Anjoviskryddad",
-      "brand": "Garant",
-      "price": "29,90 kr",
-      "description": "370/550g | Jmf: 80,81 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043022342_C1N1_s01",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Senapssill",
       "brand": "Garant",
       "price": "19,50 kr",
       "description": "220/110g | Jmf: 177,27 kr/kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043022304_C1N1_s01",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Sill Anjoviskryddad",
+      "brand": "Garant",
+      "price": "29,90 kr",
+      "description": "370/550g | Jmf: 80,81 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043022342_C1N1_s01",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -17966,21 +17975,21 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Sill Anjoviskr",
-      "brand": "Klädesholmen",
-      "price": "31,90 kr",
-      "description": "200/420g | Jmf: 159,50 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311360000207_C1N1_s01",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Kräftsill",
       "brand": "Garant",
       "price": "19,50 kr",
       "description": "220g | Jmf: 88,64 kr/kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043022250_C1N1_s01",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Sill Anjoviskr",
+      "brand": "Klädesholmen",
+      "price": "31,90 kr",
+      "description": "200/420g | Jmf: 159,50 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311360000207_C1N1_s01",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -18316,21 +18325,21 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Tonfisk Vatten Msc",
-      "brand": "Abba",
-      "price": "28,29 kr",
-      "description": "200/150g | Jmf: 188,60 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311171007013_C1C1_s02",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Tonfisk Olja",
       "brand": "Garant",
       "price": "17,90 kr",
       "description": "170g | Jmf: 105,29 kr/kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043029860_C1C1_s01",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Tonfisk Vatten Msc",
+      "brand": "Abba",
+      "price": "28,29 kr",
+      "description": "200/150g | Jmf: 188,60 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311171007013_C1C1_s02",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -18510,7 +18519,7 @@
       "brand": "Gårdens Guld",
       "price": "49,90 kr",
       "description": "500g | Jmf: 99,80 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/08719200322660_C1R1_s01",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/08719200322660_C1L1_s02",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -18948,9 +18957,9 @@
       "store": "Willys Ord.pris",
       "product": "Vispgrädde 40%",
       "brand": "Garant",
-      "price": "17,90 kr",
-      "description": "3dl | Jmf: 59,67 kr/l",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043032891_C1L1_s02",
+      "price": "26,90 kr",
+      "description": "5dl | Jmf: 53,80 kr/l",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043032907_C1L1_s02",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -18958,9 +18967,9 @@
       "store": "Willys Ord.pris",
       "product": "Vispgrädde 40%",
       "brand": "Garant",
-      "price": "26,90 kr",
-      "description": "5dl | Jmf: 53,80 kr/l",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043032907_C1L1_s02",
+      "price": "17,90 kr",
+      "description": "3dl | Jmf: 59,67 kr/l",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043032891_C1L1_s02",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -19346,21 +19355,21 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Mjölk Längre Hållbarhet  Ekologisk 3%",
-      "brand": "Garant Eko",
-      "price": "19,90 kr",
-      "description": "1,5l | Jmf: 13,27 kr/l",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083457609_C1L1_s03",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Lättmjölk Längre Hållbarhet 0,5%",
       "brand": "Garant",
       "price": "15,90 kr",
       "description": "1,5l | Jmf: 10,60 kr/l",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083495670_C1L1_s04",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Mjölk Längre Hållbarhet  Ekologisk 3%",
+      "brand": "Garant Eko",
+      "price": "19,90 kr",
+      "description": "1,5l | Jmf: 13,27 kr/l",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083457609_C1L1_s03",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -19636,16 +19645,6 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Ikaffe Light Havredryck",
-      "brand": "Oatly",
-      "price": "17,88 kr",
-      "description": "1l | Jmf: 17,88 kr/l",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07394376621994_C1R1_s04",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Barista Havredryck",
       "brand": "Oddlygood",
       "price": "16,50 kr",
@@ -19656,11 +19655,11 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Vanilla Ikaffe Havredryck",
+      "product": "Ikaffe Light Havredryck",
       "brand": "Oatly",
-      "price": "23,18 kr",
-      "description": "1l | Jmf: 23,18 kr/l",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07394376622809_C1R1_s01",
+      "price": "17,88 kr",
+      "description": "1l | Jmf: 17,88 kr/l",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07394376621994_C1R1_s04",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -19671,6 +19670,16 @@
       "price": "5,90 kr",
       "description": "250ml | Jmf: 23,60 kr/l",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07394376614804_C1R1_s01",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Vanilla Ikaffe Havredryck",
+      "brand": "Oatly",
+      "price": "23,18 kr",
+      "description": "1l | Jmf: 23,18 kr/l",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07394376622809_C1R1_s01",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -20560,7 +20569,7 @@
       "brand": "Valio",
       "price": "24,51 kr",
       "description": "1kg | Jmf: 24,51 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/06408432106569_C1R1_s07",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/06408432106569_C1N1_s05",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -20616,21 +20625,21 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Vanilj Yoghurt",
-      "brand": "Danonino",
-      "price": "7,90 kr",
-      "description": "70g | Jmf: 112,86 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07350000550351_C1N1_s05",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Mango Apelsin Passion Yoghurt 2%",
       "brand": "Yoggi",
       "price": "22,50 kr",
       "description": "1kg | Jmf: 22,50 kr/kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311870011700_C1L1_s01",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Vanilj Yoghurt",
+      "brand": "Danonino",
+      "price": "7,90 kr",
+      "description": "70g | Jmf: 112,86 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07350000550351_C1N1_s05",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -20646,21 +20655,21 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Päron Slät Vaniljyoghurt 2,2%",
-      "brand": "Valio",
-      "price": "24,51 kr",
-      "description": "1kg | Jmf: 24,51 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/06408432106545_C1R1_s08",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Mango Yoghurt",
       "brand": "Activia",
       "price": "24,90 kr",
       "description": "4x125g | Jmf: 49,80 kr/kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07350000553543_C1L1_s01",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Päron Slät Vaniljyoghurt 2,2%",
+      "brand": "Valio",
+      "price": "24,51 kr",
+      "description": "1kg | Jmf: 24,51 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/06408432106545_C1N1_s04",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -20680,7 +20689,7 @@
       "brand": "Valio",
       "price": "24,51 kr",
       "description": "1kg | Jmf: 24,51 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/06408432088933_C1R1_s07",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/06408432088933_C1N1_s05",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -20710,7 +20719,7 @@
       "brand": "Valio",
       "price": "24,51 kr",
       "description": "1kg | Jmf: 24,51 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/06408432088971_C1R1_s09",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/06408432088971_C1N1_s05",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -20776,6 +20785,16 @@
     },
     {
       "store": "Willys Ord.pris",
+      "product": "Passion Banan Mild Kvarg 0,2%",
+      "brand": "Arla",
+      "price": "11,90 kr",
+      "description": "200g | Jmf: 59,50 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/04016241051165_C1C1_s01",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
       "product": "Naturell Kvarg 0,2%",
       "brand": "Garant",
       "price": "28,90 kr",
@@ -20791,16 +20810,6 @@
       "price": "29,90 kr",
       "description": "900g | Jmf: 33,22 kr/kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043025312_C1C1_s01",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
-      "product": "Passion Banan Mild Kvarg 0,2%",
-      "brand": "Arla",
-      "price": "11,90 kr",
-      "description": "200g | Jmf: 59,50 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/04016241051165_C1C1_s01",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -20916,11 +20925,31 @@
     },
     {
       "store": "Willys Ord.pris",
+      "product": "Blåbär Vanilj Kvarg 0,2%",
+      "brand": "Lindahls",
+      "price": "9,90 kr",
+      "description": "150g | Jmf: 66,00 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07392672003773_C1C1_s04",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
       "product": "Mango/passion Kvarg",
       "brand": "Lindahls",
       "price": "9,90 kr",
       "description": "150g | Jmf: 66,00 kr/kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310867004831_C1C1_s01",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Crème Brûlée Kvarg 0,2%",
+      "brand": "Lindahls",
+      "price": "9,50 kr",
+      "description": "150g | Jmf: 63,33 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310867005487_C1C1_s01",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -21001,26 +21030,6 @@
       "price": "27,90 kr",
       "description": "500g | Jmf: 55,80 kr/kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083444814_C1N1_s02",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
-      "product": "Keso Naturell 4%",
-      "brand": "Keso",
-      "price": "28,90 kr",
-      "description": "500g | Jmf: 57,80 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310865008060_C1L1_s06",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
-      "product": "Chocolate Protein Pudding Lactose Free",
-      "brand": "Propud",
-      "price": "33,97 kr",
-      "description": "500g | Jmf: 67,94 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07350068291111_C1N1_s06",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -23376,21 +23385,21 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Paprika Färskost 23%",
-      "brand": "Arla",
-      "price": "17,90 kr",
-      "description": "150g | Jmf: 119,33 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/05711953029875_C1C1_s05",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Naturell Färskost 23%",
       "brand": "Arla",
       "price": "17,90 kr",
       "description": "150g | Jmf: 119,33 kr/kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/05711953029912_C1C1_s07",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Paprika Färskost 23%",
+      "brand": "Arla",
+      "price": "17,90 kr",
+      "description": "150g | Jmf: 119,33 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/05711953029875_C1C1_s05",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -23546,16 +23555,6 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Franskrost Extra Mörkrost Bryggkaffe",
-      "brand": "Arvidnordquist",
-      "price": "69,90 kr",
-      "description": "500g | Jmf: 139,80 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310760012902_C1L1_s02",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Gran Dia Mellanmörk Bryggkaffe",
       "brand": "Arvidnordquist",
       "price": "69,90 kr",
@@ -23656,21 +23655,21 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Solid Mellanrost Bryggkaffe",
-      "brand": "Arvidnordquist",
-      "price": "81,90 kr",
-      "description": "450g | Jmf: 182,00 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310760012506_C1L1_s01",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Koffeinfri Mellanrost Bryggkaffe",
       "brand": "Gevalia",
       "price": "73,90 kr",
       "description": "425g | Jmf: 173,88 kr/kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/08711000537497_C1N1_s04",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Solid Mellanrost Bryggkaffe",
+      "brand": "Arvidnordquist",
+      "price": "81,90 kr",
+      "description": "450g | Jmf: 182,00 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310760012506_C1L1_s01",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -23706,21 +23705,21 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Qualita Rossa Espresso Ground Coffee",
-      "brand": "Lavazza",
-      "price": "51,90 kr",
-      "description": "250g | Jmf: 207,60 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/08000070036116_C1C1_s06",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Volcanic Blend Mörkrost Bryggkaffe",
       "brand": "Cafégo",
       "price": "55,90 kr",
       "description": "450g | Jmf: 124,22 kr/kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07350085150033_C1L1_s03",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Qualita Rossa Espresso Ground Coffee",
+      "brand": "Lavazza",
+      "price": "51,90 kr",
+      "description": "250g | Jmf: 207,60 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/08000070036116_C1C1_s06",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -23811,6 +23810,16 @@
       "price": "59,90 kr",
       "description": "450g | Jmf: 133,11 kr/kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310050001975_C1L1_s05",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Mollbergs Mörkrost Bryggkaffe",
+      "brand": "Zoégas",
+      "price": "74,90 kr",
+      "description": "450g | Jmf: 166,44 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310731101666_C1L1_s01",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -24136,16 +24145,6 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Mollbergs Mörkrost Bryggkaffe",
-      "brand": "Zoégas",
-      "price": "74,90 kr",
-      "description": "450g | Jmf: 166,44 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310731101666_C1L1_s01",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Presso Grovmald Mörkrost Presskaffe",
       "brand": "Zoégas",
       "price": "74,90 kr",
@@ -24426,21 +24425,31 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Lakritstäppa Skandinavisk Twist Örtte Lakritsrot/cit",
-      "brand": "Arvidnordquist",
-      "price": "28,50 kr",
-      "description": "17p | Jmf: 1,68 kr/st",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310760534312_C1R1_s01",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Classic Matcha Latte",
       "brand": "Mokate",
       "price": "29,90 kr",
       "description": "6p | Jmf: 4,98 kr/st",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/05900649083097_C1C1_s01",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Classic Black Tea",
+      "brand": "Garant",
+      "price": "24,51 kr",
+      "description": "100p | Jmf: 0,25 kr/st",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083436444_C1L1_s02",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Lakritstäppa Skandinavisk Twist Örtte Lakritsrot/cit",
+      "brand": "Arvidnordquist",
+      "price": "28,50 kr",
+      "description": "17p | Jmf: 1,68 kr/st",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310760534312_C1R1_s01",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -24546,26 +24555,6 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Earl Grey Tea",
-      "brand": "Garant",
-      "price": "23,56 kr",
-      "description": "100p | Jmf: 0,24 kr/st",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083400452_C1L1_s02",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
-      "product": "Hallon Lakrits Svart Te",
-      "brand": "Garant",
-      "price": "13,90 kr",
-      "description": "20p | Jmf: 0,70 kr/st",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043017904_C1L1_s02",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Masala Chai Svart Te",
       "brand": "Garant",
       "price": "13,90 kr",
@@ -24586,6 +24575,16 @@
     },
     {
       "store": "Willys Ord.pris",
+      "product": "Hallon Lakrits Svart Te",
+      "brand": "Garant",
+      "price": "13,90 kr",
+      "description": "20p | Jmf: 0,70 kr/st",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043017904_C1L1_s02",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
       "product": "Ingefära Citro Te",
       "brand": "Garant",
       "price": "13,90 kr",
@@ -24596,11 +24595,41 @@
     },
     {
       "store": "Willys Ord.pris",
+      "product": "Earl Grey Tea",
+      "brand": "Garant",
+      "price": "23,56 kr",
+      "description": "100p | Jmf: 0,24 kr/st",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083400452_C1L1_s02",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Citrus & Äpple Grönt Te",
+      "brand": "Garant",
+      "price": "18,83 kr",
+      "description": "20p | Jmf: 0,94 kr/st",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043003235_C1L1_s01",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
       "product": "Gamla Söder Te",
       "brand": "Garant",
       "price": "22,90 kr",
       "description": "150g | Jmf: 152,67 kr/kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041059777_C1L1_s03",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Blodapelsin Svart Te",
+      "brand": "Garant",
+      "price": "13,90 kr",
+      "description": "20p | Jmf: 0,70 kr/st",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043017911_C1L1_s02",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -24626,41 +24655,11 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Citrus & Äpple Grönt Te",
-      "brand": "Garant",
-      "price": "18,83 kr",
-      "description": "20p | Jmf: 0,94 kr/st",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043003235_C1L1_s01",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Peach Mango Black Tea Pyramid",
       "brand": "Lipton",
       "price": "22,24 kr",
       "description": "20p | Jmf: 1,11 kr/st",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/05063270109854_C1R1_s01",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
-      "product": "Blodapelsin Svart Te",
-      "brand": "Garant",
-      "price": "13,90 kr",
-      "description": "20p | Jmf: 0,70 kr/st",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043017911_C1L1_s02",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
-      "product": "Kamomill Örtte",
-      "brand": "Garant",
-      "price": "13,90 kr",
-      "description": "20p | Jmf: 0,70 kr/st",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083488009_C1L1_s02",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -24676,11 +24675,11 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Rabarber Vanilj Te",
+      "product": "Kamomill Örtte",
       "brand": "Garant",
-      "price": "22,90 kr",
-      "description": "150g | Jmf: 152,67 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041059784_C1L1_s03",
+      "price": "13,90 kr",
+      "description": "20p | Jmf: 0,70 kr/st",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083488009_C1L1_s02",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -24691,6 +24690,16 @@
       "price": "22,90 kr",
       "description": "150g | Jmf: 152,67 kr/kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083450075_C1L1_s02",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Rabarber Vanilj Te",
+      "brand": "Garant",
+      "price": "22,90 kr",
+      "description": "150g | Jmf: 152,67 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041059784_C1L1_s03",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -24716,6 +24725,16 @@
     },
     {
       "store": "Willys Ord.pris",
+      "product": "Earl Grey Citron Svart Te",
+      "brand": "Garant",
+      "price": "18,83 kr",
+      "description": "20p | Jmf: 0,94 kr/st",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043003242_C1L1_s01",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
       "product": "Earl Grey",
       "brand": "Lipton",
       "price": "16,94 kr",
@@ -24731,16 +24750,6 @@
       "price": "13,90 kr",
       "description": "20p | Jmf: 0,70 kr/st",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083488016_C1L1_s02",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
-      "product": "Earl Grey Citron Svart Te",
-      "brand": "Garant",
-      "price": "18,83 kr",
-      "description": "20p | Jmf: 0,94 kr/st",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043003242_C1L1_s01",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -24996,21 +25005,21 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Penne Pasta",
-      "brand": "Garant",
-      "price": "23,56 kr",
-      "description": "1kg | Jmf: 23,56 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043016440_C1N1_s01",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Caserecce Pasta",
       "brand": "La Molisana",
       "price": "19,90 kr",
       "description": "500g | Jmf: 39,80 kr/kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/08004690052815_C1N1_s01",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Penne Pasta",
+      "brand": "Garant",
+      "price": "23,56 kr",
+      "description": "1kg | Jmf: 23,56 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043016440_C1N1_s01",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -25206,16 +25215,6 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Spaghetti Pasta",
-      "brand": "Kungsörnen",
-      "price": "18,83 kr",
-      "description": "1kg | Jmf: 18,83 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310130417405_C1R1_s02",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Spaghetti Klippt",
       "brand": "Kungsörnen",
       "price": "12,77 kr",
@@ -25231,6 +25230,16 @@
       "price": "19,90 kr",
       "description": "1kg | Jmf: 19,90 kr/kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043002139_C1N1_s01",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Spaghetti",
+      "brand": "Kungsörnen",
+      "price": "18,83 kr",
+      "description": "1kg | Jmf: 18,83 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310130013928_C1R1_s01",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -25686,21 +25695,21 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Basmatiris Boil-in-bag 4x125g",
-      "brand": "Eldorado",
-      "price": "23,56 kr",
-      "description": "500g | Jmf: 47,12 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083465277_C1L1_s01",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Långkorn 10min Ris",
       "brand": "Garant",
       "price": "28,29 kr",
       "description": "1kg | Jmf: 28,29 kr/kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043004980_C1L1_s01",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Basmatiris Boil-in-bag 4x125g",
+      "brand": "Eldorado",
+      "price": "23,56 kr",
+      "description": "500g | Jmf: 47,12 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083465277_C1L1_s01",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -26206,21 +26215,21 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Havrekli",
-      "brand": "Kungsörnen",
-      "price": "13,72 kr",
-      "description": "300g | Jmf: 45,73 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310130767036_C1R1_s03",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Kruskakli",
       "brand": "Kungsörnen",
       "price": "7,90 kr",
       "description": "300g | Jmf: 26,33 kr/kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310130011702_C1R1_s03",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Havrekli",
+      "brand": "Kungsörnen",
+      "price": "13,72 kr",
+      "description": "300g | Jmf: 45,73 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310130767036_C1R1_s03",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -26826,21 +26835,21 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Nut Müsli Gold",
-      "brand": "Axa",
-      "price": "39,90 kr",
-      "description": "640g | Jmf: 62,34 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310130004032_C1N1_s03",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Hasselnöt Müsli",
       "brand": "Axa",
       "price": "21,67 kr",
       "description": "600g | Jmf: 36,12 kr/kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310130012563_C1R1_s02",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Nut Müsli Gold",
+      "brand": "Axa",
+      "price": "39,90 kr",
+      "description": "640g | Jmf: 62,34 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310130004032_C1N1_s03",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -26866,21 +26875,21 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Berries Müsli Gold",
-      "brand": "Axa",
-      "price": "49,11 kr",
-      "description": "725g | Jmf: 67,74 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310130004469_C1R1_s03",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Frukt Musli",
       "brand": "Frebaco Kvarn",
       "price": "28,90 kr",
       "description": "550g | Jmf: 52,55 kr/kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07312560054861_C1L1_s01",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Berries Müsli Gold",
+      "brand": "Axa",
+      "price": "49,11 kr",
+      "description": "725g | Jmf: 67,74 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310130004469_C1R1_s03",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -26986,21 +26995,21 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Crunchy Yoghurt & Jordgubb",
-      "brand": "Garant",
-      "price": "34,92 kr",
-      "description": "725g | Jmf: 48,17 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043018000_C1L1_s01",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Crunchy Naturell",
       "brand": "Eldorado",
       "price": "25,45 kr",
       "description": "750g | Jmf: 33,93 kr/kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043018420_C1N1_s02",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Crunchy Yoghurt & Jordgubb",
+      "brand": "Garant",
+      "price": "34,92 kr",
+      "description": "725g | Jmf: 48,17 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043018000_C1L1_s01",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -27176,21 +27185,21 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Kanel Kardemum Granola Nötsmörsbakad",
-      "brand": "Paulúns",
-      "price": "51,95 kr",
-      "description": "430g | Jmf: 120,81 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310240407808_C1L1_s01",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Kakao Banan Granola",
       "brand": "Färsking",
       "price": "37,76 kr",
       "description": "375g | Jmf: 100,69 kr/kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07350060709065_C1N1_s04",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Kanel Kardemum Granola Nötsmörsbakad",
+      "brand": "Paulúns",
+      "price": "51,95 kr",
+      "description": "430g | Jmf: 120,81 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310240407808_C1L1_s01",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -27396,6 +27405,16 @@
     },
     {
       "store": "Willys Ord.pris",
+      "product": "Olivolja Classico Extra Virgin",
+      "brand": "Garant",
+      "price": "62,90 kr",
+      "description": "500ml | Jmf: 125,80 kr/l",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083474194_C1L1_s02",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
       "product": "Olivolja Extra Virgin",
       "brand": "Farchioni",
       "price": "94,54 kr",
@@ -27421,16 +27440,6 @@
       "price": "64,90 kr",
       "description": "1l | Jmf: 64,90 kr/l",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043029037_C1N1_s01",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
-      "product": "Olivolja Classico Extra Virgin",
-      "brand": "Garant",
-      "price": "62,90 kr",
-      "description": "500ml | Jmf: 125,80 kr/l",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083474194_C1L1_s02",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -27906,21 +27915,21 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Vita Bönor Stora Naturella",
-      "brand": "Garant",
-      "price": "9,90 kr",
-      "description": "380/230g | Jmf: 43,04 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043002702_C1L1_s02",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Svarta Bönor Naturella",
       "brand": "Garant",
       "price": "9,90 kr",
       "description": "380/230g | Jmf: 43,04 kr/kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083446962_C1L1_s02",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Vita Bönor Stora Naturella",
+      "brand": "Garant",
+      "price": "9,90 kr",
+      "description": "380/230g | Jmf: 43,04 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043002702_C1L1_s02",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -28276,21 +28285,21 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Pintobönor",
-      "brand": "Eldorado",
-      "price": "26,90 kr",
-      "description": "800g | Jmf: 33,63 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083450570_C1N1_s01",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Små Vita Bönor",
       "brand": "Eldorado",
       "price": "26,90 kr",
       "description": "800g | Jmf: 33,63 kr/kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083487606_C1N1_s01",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Pintobönor",
+      "brand": "Eldorado",
+      "price": "26,90 kr",
+      "description": "800g | Jmf: 33,63 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083450570_C1N1_s01",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -28506,21 +28515,21 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Chili Con Carne",
-      "brand": "Felix",
-      "price": "47,22 kr",
-      "description": "560g | Jmf: 84,32 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310240064346_C1N1_s01",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Ravioli Bolognese",
       "brand": "Fontana",
       "price": "28,29 kr",
       "description": "400g | Jmf: 70,73 kr/kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07316150470499_C1N1_s01",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Chili Con Carne",
+      "brand": "Felix",
+      "price": "47,22 kr",
+      "description": "560g | Jmf: 84,32 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310240064346_C1N1_s01",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -28536,16 +28545,6 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Köttbullar",
-      "brand": "Tulip",
-      "price": "32,08 kr",
-      "description": "400g | Jmf: 80,20 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/05707196361254_C1N1_s01",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Fläskfilégryta med Cocktailpølser Och Bacon",
       "brand": "Tulip",
       "price": "37,76 kr",
@@ -28556,11 +28555,11 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Majs 3-pack",
-      "brand": "Bonduelle",
-      "price": "27,35 kr",
-      "description": "450/420g | Jmf: 65,12 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/03083681127621_C1N1_s02",
+      "product": "Köttbullar",
+      "brand": "Tulip",
+      "price": "32,08 kr",
+      "description": "400g | Jmf: 80,20 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/05707196361254_C1N1_s01",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -28571,6 +28570,16 @@
       "price": "41,54 kr",
       "description": "340g | Jmf: 122,18 kr/kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/05762385078979_C1C1_s01",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Majs 3-pack",
+      "brand": "Bonduelle",
+      "price": "27,35 kr",
+      "description": "450/420g | Jmf: 65,12 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/03083681127621_C1N1_s02",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -28606,21 +28615,21 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Paté Gammaldags",
-      "brand": "Sokołów",
-      "price": "14,90 kr",
-      "description": "190g | Jmf: 78,42 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/05900562116643_C1N1_s01",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Vinbladsdolmar Bulgur",
       "brand": "Nasib",
       "price": "28,29 kr",
       "description": "400g | Jmf: 70,73 kr/kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07350005813130_C1C1_s02",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Paté Gammaldags",
+      "brand": "Sokołów",
+      "price": "14,90 kr",
+      "description": "190g | Jmf: 78,42 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/05900562116643_C1N1_s01",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -28646,21 +28655,21 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Lunchkorv Kyckling",
-      "brand": "El Maha",
-      "price": "63,31 kr",
-      "description": "850g | Jmf: 74,48 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/05705251192607_C1C1_s01",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Kycklingpastej Halal",
       "brand": "Argeta",
       "price": "12,50 kr",
       "description": "95g | Jmf: 131,58 kr/kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/03838975566675_C1N1_s02",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Lunchkorv Kyckling",
+      "brand": "El Maha",
+      "price": "63,31 kr",
+      "description": "850g | Jmf: 74,48 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/05705251192607_C1C1_s01",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -28696,26 +28705,6 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Lunchkorv Kyckling Halal",
-      "brand": "El Maha",
-      "price": "53,85 kr",
-      "description": "575g | Jmf: 93,65 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/05705251032576_C1C1_s01",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
-      "product": "Lunchkorv Kyckling Stark",
-      "brand": "El Maha",
-      "price": "63,31 kr",
-      "description": "850g | Jmf: 74,48 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/05705251192805_C1C1_s01",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Chicken Luncheon Hot Spicy",
       "brand": "Zwan",
       "price": "35,86 kr",
@@ -28726,11 +28715,31 @@
     },
     {
       "store": "Willys Ord.pris",
+      "product": "Lunchkorv Kyckling Halal",
+      "brand": "El Maha",
+      "price": "53,85 kr",
+      "description": "575g | Jmf: 93,65 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/05705251032576_C1C1_s01",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
       "product": "Kycklingpastej Pikant",
       "brand": "Argeta",
       "price": "12,50 kr",
       "description": "95g | Jmf: 131,58 kr/kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/03838471007443_C1N1_s03",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Lunchkorv Kyckling Stark",
+      "brand": "El Maha",
+      "price": "63,31 kr",
+      "description": "850g | Jmf: 74,48 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/05705251192805_C1C1_s01",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -29366,21 +29375,21 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Tortilla Original Large 6-pack",
-      "brand": "Santa Maria",
-      "price": "19,90 kr",
-      "description": "371g | Jmf: 53,64 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311311021169_C1N1_s02",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Tortilla Original Medium 8-pack",
       "brand": "Garant",
       "price": "12,20 kr",
       "description": "320g | Jmf: 38,13 kr/kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041069790_C1N1_s01",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Tortilla Original Large 6-pack",
+      "brand": "Santa Maria",
+      "price": "19,90 kr",
+      "description": "371g | Jmf: 53,64 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311311021169_C1N1_s02",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -29416,21 +29425,21 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Tortilla Vete Extra Tunn 8p",
-      "brand": "Santa Maria",
-      "price": "19,90 kr",
-      "description": "244g | Jmf: 81,56 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311312009753_C1N1_s02",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Sweet Chili Tortilla Strips",
       "brand": "Santa Maria",
       "price": "12,77 kr",
       "description": "185g | Jmf: 69,03 kr/kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311312007834_C1N1_s01",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Tortilla Vete Extra Tunn 8p",
+      "brand": "Santa Maria",
+      "price": "19,90 kr",
+      "description": "244g | Jmf: 81,56 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311312009753_C1N1_s02",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -29486,16 +29495,6 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Tortilla Chips Cheese Jalapeño",
-      "brand": "Santa Maria",
-      "price": "12,50 kr",
-      "description": "185g | Jmf: 67,57 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311312008190_C1N1_s01",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Tortilla Chips Cheese",
       "brand": "Santa Maria",
       "price": "15,90 kr",
@@ -29506,11 +29505,11 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Tortilla Chips Giant Salsa",
+      "product": "Tortilla Chips Cheese Jalapeño",
       "brand": "Santa Maria",
-      "price": "19,90 kr",
-      "description": "160g | Jmf: 124,38 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311312009197_C1N1_s01",
+      "price": "12,50 kr",
+      "description": "185g | Jmf: 67,57 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311312008190_C1N1_s01",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -29521,6 +29520,16 @@
       "price": "15,90 kr",
       "description": "220g | Jmf: 72,27 kr/kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311312008763_C1N1_s01",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Tortilla Chips Giant Salsa",
+      "brand": "Santa Maria",
+      "price": "19,90 kr",
+      "description": "160g | Jmf: 124,38 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311312009197_C1N1_s01",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -29896,21 +29905,21 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Guldkorn",
-      "brand": "Pågen",
-      "price": "24,90 kr",
-      "description": "500g | Jmf: 49,80 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311070330328_C1L1_s05",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Varsågod Skivad",
       "brand": "Skogaholm",
       "price": "23,90 kr",
       "description": "715g | Jmf: 33,43 kr/kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07312200016945_C1L1_s01",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Guldkorn",
+      "brand": "Pågen",
+      "price": "24,90 kr",
+      "description": "500g | Jmf: 49,80 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311070330328_C1L1_s05",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -30186,21 +30195,21 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Roast'n Toast",
-      "brand": "Pågen",
-      "price": "31,90 kr",
-      "description": "800g | Jmf: 39,88 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311070336160_C1L1_s06",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Originalrost Skivad",
       "brand": "Skogaholm",
       "price": "26,90 kr",
       "description": "1kg | Jmf: 26,90 kr/kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07312200040803_C1L1_s03",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Roast'n Toast",
+      "brand": "Pågen",
+      "price": "31,90 kr",
+      "description": "800g | Jmf: 39,88 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311070336160_C1L1_s06",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -31156,21 +31165,21 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Shortbread Pure Butter",
-      "brand": "Walkers",
-      "price": "23,56 kr",
-      "description": "160g | Jmf: 147,25 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/00039047001138_C1N1_s01",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Choco Moment",
       "brand": "Marabou",
       "price": "29,90 kr",
       "description": "180g | Jmf: 166,11 kr/kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07622300750053_C1N1_s03",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Shortbread Pure Butter",
+      "brand": "Walkers",
+      "price": "23,56 kr",
+      "description": "160g | Jmf: 147,25 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/00039047001138_C1N1_s01",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -31236,6 +31245,16 @@
     },
     {
       "store": "Willys Ord.pris",
+      "product": "Chokoflarn",
+      "brand": "Eldorado",
+      "price": "29,90 kr",
+      "description": "600g | Jmf: 49,83 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043015078_C1L1_s01",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
       "product": "Choco Brownie",
       "brand": "Oreo",
       "price": "18,83 kr",
@@ -31271,16 +31290,6 @@
       "price": "13,90 kr",
       "description": "77g | Jmf: 180,52 kr/kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/08690504036258_C1N1_s01",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
-      "product": "Chokoflarn",
-      "brand": "Eldorado",
-      "price": "29,90 kr",
-      "description": "600g | Jmf: 49,83 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043015078_C1L1_s01",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -31341,6 +31350,16 @@
       "price": "28,29 kr",
       "description": "420g | Jmf: 67,36 kr/kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083498459_C1N1_s02",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Släta Bullar 10-pack",
+      "brand": "Dahls Bageri",
+      "price": "47,22 kr",
+      "description": "500g | Jmf: 94,44 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07350029734824_C1R1_s01",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -31776,6 +31795,16 @@
     },
     {
       "store": "Willys Ord.pris",
+      "product": "Äpple Rubinola Klass 1",
+      "brand": null,
+      "price": "34,90 kr",
+      "description": "ca: 150g | Jmf: 34,90 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042005148_C1C0_s01",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
       "product": "Äpple Royal Gala Eko Klass 1",
       "brand": "Garant Eko",
       "price": "34,90 kr",
@@ -31951,16 +31980,6 @@
       "price": "37,50 kr",
       "description": "2l | Jmf: 18,75 kr/l",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310867561013_C1L1_s02",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
-      "product": "Äpplejuice med Fruktkött",
-      "brand": "Garant",
-      "price": "29,90 kr",
-      "description": "1l | Jmf: 29,90 kr/l",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043019007_C1N1_s01",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -33076,6 +33095,16 @@
     },
     {
       "store": "Willys Ord.pris",
+      "product": "Tomat Runda Import Klass 1",
+      "brand": null,
+      "price": "39,90 kr",
+      "description": "ca: 125g | Jmf: 39,90 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/02359738200007_C1C0_s01",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
       "product": "Tomat Kumato Klass 1",
       "brand": null,
       "price": "27,90 kr",
@@ -33266,16 +33295,6 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Soltorkade Tomater Original",
-      "brand": "Fontana",
-      "price": "28,29 kr",
-      "description": "180g | Jmf: 157,17 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07316150376487_C1N1_s03",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Rossorotomater & Parmigiano Pastasås",
       "brand": "Mutti",
       "price": "28,29 kr",
@@ -33351,16 +33370,6 @@
       "price": "18,83 kr",
       "description": "390g | Jmf: 48,28 kr/kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083480997_C1L1_s02",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
-      "product": "Tomater Passerade Ekologiska",
-      "brand": "Garant Eko",
-      "price": "13,90 kr",
-      "description": "390g | Jmf: 35,64 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083469619_C1L1_s02",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -33846,6 +33855,16 @@
     },
     {
       "store": "Willys Ord.pris",
+      "product": "Romansallad Ekologisk Klass 1",
+      "brand": null,
+      "price": "23,90 kr",
+      "description": "160g | Jmf: 149,38 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042005261_C1L1_s01",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
       "product": "Frisé Mache Klass 1",
       "brand": "Garant",
       "price": "19,90 kr",
@@ -33856,11 +33875,11 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Romansallad Ekologisk Klass 1",
+      "product": "Brysselkål Klass 1",
       "brand": null,
-      "price": "23,90 kr",
-      "description": "160g | Jmf: 149,38 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042005261_C1L1_s01",
+      "price": "19,90 kr",
+      "description": "400g | Jmf: 49,75 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042004318_C1N1_s01",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -33881,16 +33900,6 @@
       "price": "24,90 kr",
       "description": "ca: 1.1kg | Jmf: 24,90 kr/kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042001201_C1N0_s01",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
-      "product": "Brysselkål Klass 1",
-      "brand": null,
-      "price": "19,90 kr",
-      "description": "400g | Jmf: 49,75 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042004318_C1N1_s01",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -34536,21 +34545,21 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Pepperoni Pizza Fryst",
-      "brand": "Tony's Pizza",
-      "price": "47,22 kr",
-      "description": "500g | Jmf: 94,44 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07350076361486_C1L1_s01",
+      "product": "Pizzadeg Napoli",
+      "brand": "Pop! Bakery",
+      "price": "29,90 kr",
+      "description": "500g | Jmf: 59,80 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/03392590205987_C1N1_s01",
       "original_price": "",
       "discount_percentage": 0
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Pinsa",
-      "brand": "Pop! Bakery",
-      "price": "37,76 kr",
-      "description": "260g | Jmf: 145,23 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/03392590206007_C1N1_s01",
+      "product": "Pepperoni Pizza Fryst",
+      "brand": "Tony's Pizza",
+      "price": "47,22 kr",
+      "description": "500g | Jmf: 94,44 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07350076361486_C1L1_s01",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -34566,11 +34575,21 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Smördeg Glutenfri",
+      "product": "Pinsa",
       "brand": "Pop! Bakery",
-      "price": "28,29 kr",
-      "description": "280g | Jmf: 101,03 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/03392590203983_C1L1_s01",
+      "price": "37,76 kr",
+      "description": "260g | Jmf: 145,23 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/03392590206007_C1N1_s01",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Holy Pepperoni X-tra Allt Pizza Fryst",
+      "brand": "Grandiosa",
+      "price": "36,90 kr",
+      "description": "350g | Jmf: 105,43 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310240072167_C1L1_s03",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -34586,31 +34605,21 @@
     },
     {
       "store": "Willys Ord.pris",
+      "product": "Smördeg Glutenfri",
+      "brand": "Pop! Bakery",
+      "price": "28,29 kr",
+      "description": "280g | Jmf: 101,03 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/03392590203983_C1L1_s01",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
       "product": "Margherita Pizza Fryst",
       "brand": "Monte Castello",
       "price": "18,83 kr",
       "description": "300g | Jmf: 62,77 kr/kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07611612140874_C1L1_s01",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
-      "product": "Pizzadeg Napoli",
-      "brand": "Pop! Bakery",
-      "price": "29,90 kr",
-      "description": "500g | Jmf: 59,80 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/03392590205987_C1N1_s01",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
-      "product": "Holy Pepperoni X-tra Allt Pizza Fryst",
-      "brand": "Grandiosa",
-      "price": "36,90 kr",
-      "description": "350g | Jmf: 105,43 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310240072167_C1L1_s03",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -34647,10 +34656,10 @@
     {
       "store": "Willys Ord.pris",
       "product": "Pizzadeg",
-      "brand": "Garant",
-      "price": "19,90 kr",
-      "description": "300g | Jmf: 66,33 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083481123_C1N1_s02",
+      "brand": "Monte Castello",
+      "price": "15,90 kr",
+      "description": "400g | Jmf: 39,75 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07611612142595_C1N1_s02",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -34756,21 +34765,21 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Bikarbonat",
-      "brand": "Dr Oetker",
-      "price": "13,90 kr",
-      "description": "200g | Jmf: 69,50 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/05701073061039_C1C1_s02",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Vaniljkräm",
       "brand": "Dr Oetker",
       "price": "12,50 kr",
       "description": "100g | Jmf: 125,00 kr/kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/05701073023983_C1N1_s02",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Blue Colour Gel Concentrated",
+      "brand": "Dr Oetker",
+      "price": "19,90 kr",
+      "description": "15g | Jmf: 1 326,67 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/05701073041413_C1N1_s01",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -34806,11 +34815,11 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Hearts",
+      "product": "Bikarbonat",
       "brand": "Dr Oetker",
-      "price": "12,90 kr",
-      "description": "40g | Jmf: 322,50 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/05701073061176_C1C1_s01",
+      "price": "13,90 kr",
+      "description": "200g | Jmf: 69,50 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/05701073061039_C1C1_s02",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -34826,11 +34835,11 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Vaniljarom",
+      "product": "Red Colour Gel Concentrated",
       "brand": "Dr Oetker",
-      "price": "17,90 kr",
-      "description": "30ml | Jmf: 596,67 kr/l",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/05701073064740_C1C1_s01",
+      "price": "19,90 kr",
+      "description": "15g | Jmf: 1 326,67 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/05701073041390_C1N1_s01",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -34856,21 +34865,21 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Blue Colour Gel Concentrated",
+      "product": "Hearts",
       "brand": "Dr Oetker",
-      "price": "19,90 kr",
-      "description": "15g | Jmf: 1 326,67 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/05701073041413_C1N1_s01",
+      "price": "12,90 kr",
+      "description": "40g | Jmf: 322,50 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/05701073061176_C1C1_s01",
       "original_price": "",
       "discount_percentage": 0
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Red Colour Gel Concentrated",
+      "product": "Vaniljarom",
       "brand": "Dr Oetker",
-      "price": "19,90 kr",
-      "description": "15g | Jmf: 1 326,67 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/05701073041390_C1N1_s01",
+      "price": "17,90 kr",
+      "description": "30ml | Jmf: 596,67 kr/l",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/05701073064740_C1C1_s01",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -34886,16 +34895,6 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Pink Colour Gel Concentrated",
-      "brand": "Dr Oetker",
-      "price": "19,90 kr",
-      "description": "15g | Jmf: 1 326,67 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/05701073041451_C1C1_s01",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Colour Red Hushållsfärg Röd",
       "brand": "Dr Oetker",
       "price": "18,50 kr",
@@ -34906,11 +34905,41 @@
     },
     {
       "store": "Willys Ord.pris",
+      "product": "Sweetheart Strösselmix",
+      "brand": "Dr Oetker",
+      "price": "39,90 kr",
+      "description": "78g | Jmf: 511,54 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/05701073061268_C1C1_s01",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
       "product": "Unicorn Sugar Faces",
       "brand": "Dr Oetker",
       "price": "39,90 kr",
       "description": "10g | Jmf: 3 990,00 kr/kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/05701073020487_C1R1_s01",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Pink Colour Gel Concentrated",
+      "brand": "Dr Oetker",
+      "price": "19,90 kr",
+      "description": "15g | Jmf: 1 326,67 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/05701073041451_C1C1_s01",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Colour Green Hushållsfärg Grön",
+      "brand": "Dr Oetker",
+      "price": "18,50 kr",
+      "description": "30ml | Jmf: 616,67 kr/l",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/05701073064658_C1N1_s01",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -34936,11 +34965,11 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Sweetheart Strösselmix",
+      "product": "Violet Colour Gel Concentrated",
       "brand": "Dr Oetker",
-      "price": "39,90 kr",
-      "description": "78g | Jmf: 511,54 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/05701073061268_C1C1_s01",
+      "price": "19,90 kr",
+      "description": "15g | Jmf: 1 326,67 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/05701073041437_C1N1_s01",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -34956,31 +34985,11 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Colour Green Hushållsfärg Grön",
+      "product": "Pink Roses Sockerrosor med Blad Dekoration",
       "brand": "Dr Oetker",
-      "price": "18,50 kr",
-      "description": "30ml | Jmf: 616,67 kr/l",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/05701073064658_C1N1_s01",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
-      "product": "Violet Colour Gel Concentrated",
-      "brand": "Dr Oetker",
-      "price": "19,90 kr",
-      "description": "15g | Jmf: 1 326,67 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/05701073041437_C1N1_s01",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
-      "product": "Bakpulver",
-      "brand": "Dr Oetker",
-      "price": "15,90 kr",
-      "description": "160 g | Jmf: 99,38 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/05701073066485_C1C1_s01",
+      "price": "29,90 kr",
+      "description": "50g | Jmf: 598,00 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/05701073062357_C1N1_s01",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -35216,21 +35225,21 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Sandwich Original Glass",
-      "brand": "Gb Glace",
-      "price": "46,90 kr",
-      "description": "6p | Jmf: 7,82 kr/st",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/08722700132523_C1N1_s02",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Mini Glass Klassisk Glasspinnar",
       "brand": "Dazzley",
       "price": "44,38 kr",
       "description": "12p | Jmf: 3,70 kr/st",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043024872_C1L1_s01",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Sandwich Original Glass",
+      "brand": "Gb Glace",
+      "price": "46,90 kr",
+      "description": "6p | Jmf: 7,82 kr/st",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/08722700132523_C1N1_s02",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -35416,21 +35425,21 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Spinner Glass",
-      "brand": "Dazzley",
-      "price": "28,29 kr",
-      "description": "5p | Jmf: 5,66 kr/st",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043018192_C1L1_s01",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Mini Almond Glasspinnar",
       "brand": "Magnum",
       "price": "46,90 kr",
       "description": "6p | Jmf: 7,82 kr/st",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/08711327611924_C1L1_s01",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Spinner Glass",
+      "brand": "Dazzley",
+      "price": "28,29 kr",
+      "description": "5p | Jmf: 5,66 kr/st",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043018192_C1L1_s01",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -35446,21 +35455,21 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Nogger Glass",
-      "brand": "Gb Glace",
-      "price": "46,90 kr",
-      "description": "6p | Jmf: 7,82 kr/st",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/08712100639739_C1N1_s01",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Daimstrut Mini Glasstrut",
       "brand": "Daim",
       "price": "51,50 kr",
       "description": "6p | Jmf: 8,59 kr/st",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/08606018619580_C1L1_s01",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Nogger Glass",
+      "brand": "Gb Glace",
+      "price": "46,90 kr",
+      "description": "6p | Jmf: 7,82 kr/st",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/08712100639739_C1N1_s01",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -35491,6 +35500,16 @@
       "price": "42,90 kr",
       "description": "6p | Jmf: 7,15 kr/st",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07312690800024_C1L1_s03",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Sandwich Glass Laktosfri",
+      "brand": "Sia Glass",
+      "price": "42,49 kr",
+      "description": "6st | Jmf: 7,08 kr/st",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07312690800345_C1L1_s01",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -35596,21 +35615,21 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Solero Glass",
-      "brand": "Gb Favorites",
-      "price": "35,86 kr",
-      "description": "0,825l | Jmf: 43,47 kr/l",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/08711327618190_C1L1_s02",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Vanilj Gammaldags Gräddglass",
       "brand": "Gb Glace",
       "price": "41,54 kr",
       "description": "1800 ml | Jmf: 23,08 kr/l",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/08711327680425_C3N1_s01",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Solero Glass",
+      "brand": "Gb Favorites",
+      "price": "35,86 kr",
+      "description": "0,825l | Jmf: 43,47 kr/l",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/08711327618190_C1L1_s02",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -35636,16 +35655,6 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Rocky Road Glass",
-      "brand": "Gb Favorites",
-      "price": "35,86 kr",
-      "description": "0,825l | Jmf: 43,47 kr/l",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/08711327623460_C3N1_s02",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Cookie Crumble Glass",
       "brand": "Gb Glace",
       "price": "35,86 kr",
@@ -35666,21 +35675,11 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Mjölkchoklad Gräddglass",
-      "brand": "Gb Gräddglass",
-      "price": "41,54 kr",
-      "description": "1800 ml | Jmf: 23,08 kr/l",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/08721274823349_C1N1_s01",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
-      "product": "Vanilla Glass",
+      "product": "Rocky Road Glass",
       "brand": "Gb Favorites",
-      "price": "29,90 kr",
-      "description": "0,9l | Jmf: 33,22 kr/l",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/08711327637092_C3N1_s02",
+      "price": "35,86 kr",
+      "description": "0,825l | Jmf: 43,47 kr/l",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/08711327623460_C3N1_s02",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -35706,6 +35705,26 @@
     },
     {
       "store": "Willys Ord.pris",
+      "product": "Piggelin Glasspinne",
+      "brand": "Gb Glace",
+      "price": "9,46 kr",
+      "description": "55ml | Jmf: 9,46 kr/st",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310290002961_C1N1_s01",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Minecraft Glasstrut",
+      "brand": "Gb Glace",
+      "price": "26,50 kr",
+      "description": "115ml | Jmf: 26,50 kr/st",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/08721274829143_C1C1_s01",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
       "product": "Sandwich Glass",
       "brand": "Gb Glace",
       "price": "18,93 kr",
@@ -35716,11 +35735,11 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Piggelin Glasspinne",
-      "brand": "Gb Glace",
-      "price": "9,46 kr",
-      "description": "55ml | Jmf: 9,46 kr/st",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310290002961_C1N1_s01",
+      "product": "Mjölkchoklad Gräddglass",
+      "brand": "Gb Gräddglass",
+      "price": "41,54 kr",
+      "description": "1800 ml | Jmf: 23,08 kr/l",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/08721274823349_C1N1_s01",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -35736,11 +35755,11 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Minecraft Glasstrut",
-      "brand": "Gb Glace",
-      "price": "26,50 kr",
-      "description": "115ml | Jmf: 26,50 kr/st",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/08721274829143_C1C1_s01",
+      "product": "Vanilla Glass",
+      "brand": "Gb Favorites",
+      "price": "29,90 kr",
+      "description": "0,9l | Jmf: 33,22 kr/l",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/08711327637092_C3N1_s02",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -35886,6 +35905,16 @@
     },
     {
       "store": "Willys Ord.pris",
+      "product": "Orange Zero Läsk Pet",
+      "brand": "Fanta",
+      "price": "15,04 kr",
+      "description": "50cl | Jmf: 30,08 kr/l",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/05000112624083_C1N1_s08",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
       "product": "Aranciata Ross Sparkling Läsk Burk",
       "brand": "San Pellegrino",
       "price": "59,90 kr",
@@ -35896,21 +35925,21 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Grape Läsk Burk",
-      "brand": "Premier",
-      "price": "6,53 kr",
-      "description": "33cl | Jmf: 19,79 kr/l",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07611612404822_C1N1_s01",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Orange Fanta Läsk, Burk",
       "brand": "Fanta",
       "price": "41,90 kr",
       "description": "6x33cl | Jmf: 21,16 kr/l",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/05000112667660_C1L1_s02",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Grape Läsk Burk",
+      "brand": "Premier",
+      "price": "6,53 kr",
+      "description": "33cl | Jmf: 19,79 kr/l",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07611612404822_C1N1_s01",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -35976,6 +36005,16 @@
     },
     {
       "store": "Willys Ord.pris",
+      "product": "Lemon Zero Läsk Burk",
+      "brand": "Fanta Zero",
+      "price": "9,90 kr",
+      "description": "33cl | Jmf: 30,00 kr/l",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/05000112650402_C1N1_s03",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
       "product": "Coca-cola Zero Läsk Burk",
       "brand": "Coca-cola Zero",
       "price": "99,90 kr",
@@ -36016,31 +36055,11 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Trocadero Läsk Pet",
-      "brand": "Trocadero",
-      "price": "11,26 kr",
-      "description": "50cl | Jmf: 22,52 kr/l",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310401024844_C1N1_s05",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Cuba Cola Zero Läsk Burk",
       "brand": "Cuba Cola",
       "price": "6,90 kr",
       "description": "33cl | Jmf: 20,91 kr/l",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310401059778_C1N1_s01",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
-      "product": "Coca-cola Läsk Burk",
-      "brand": "Coca-cola",
-      "price": "39,90 kr",
-      "description": "6p 20cl | Jmf: 33,25 kr/l",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/05000112690262_C1L1_s02",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -36106,6 +36125,16 @@
     },
     {
       "store": "Willys Ord.pris",
+      "product": "Coca-cola Läsk Burk",
+      "brand": "Coca-cola",
+      "price": "39,90 kr",
+      "description": "6p 20cl | Jmf: 33,25 kr/l",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/05000112690262_C1L1_s02",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
       "product": "Coca-cola Zero Läsk Burk",
       "brand": "Coca-cola Zero",
       "price": "9,90 kr",
@@ -36139,7 +36168,7 @@
       "product": "Coca-cola Zero Läsk Burk",
       "brand": "Coca-cola Zero",
       "price": "41,90 kr",
-      "description": "6p/33cl | Jmf: 21,21 kr/l",
+      "description": "6p/33cl | Jmf: 21,16 kr/l",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/05000112697643_C1L1_s02",
       "original_price": "",
       "discount_percentage": 0
@@ -36161,6 +36190,16 @@
       "price": "15,04 kr",
       "description": "50cl | Jmf: 30,08 kr/l",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/05000112690729_C1N1_s02",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Cherry Coca Cola Zero Läsk, Burk",
+      "brand": "Coca-cola Zero",
+      "price": "9,90 kr",
+      "description": "33cl | Jmf: 30,00 kr/l",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/05000112672053_C1N1_s02",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -36786,21 +36825,21 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Jordgubb Blanddryck Dunk",
-      "brand": "Eldorado",
-      "price": "21,67 kr",
-      "description": "2,5/12,5 | Jmf: 1,73 kr/l",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041062364_C1L1_s02",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Svartvinbär Sockerfri Blanddryck Pet",
       "brand": "Fun Light",
       "price": "24,90 kr",
       "description": "1l/10l | Jmf: 2,49 kr/l",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07316110002555_C1N1_s01",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Jordgubb Blanddryck Dunk",
+      "brand": "Eldorado",
+      "price": "21,67 kr",
+      "description": "2,5/12,5 | Jmf: 1,73 kr/l",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041062364_C1L1_s02",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -36986,16 +37025,6 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Apelsin Blanddryck Dunk",
-      "brand": "Eldorado",
-      "price": "21,67 kr",
-      "description": "2,5/12,5 | Jmf: 1,73 kr/l",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041062340_C1L1_s03",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Strawbe Kiwi Vitamin Boost Blanddryck Pet",
       "brand": "Fun Light",
       "price": "24,90 kr",
@@ -37011,6 +37040,16 @@
       "price": "28,29 kr",
       "description": "80cl/6,4 | Jmf: 4,42 kr/l",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07611612202138_C1N1_s01",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Apelsin Blanddryck Dunk",
+      "brand": "Eldorado",
+      "price": "21,67 kr",
+      "description": "2,5/12,5 | Jmf: 1,73 kr/l",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041062340_C1L1_s03",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -37156,81 +37195,11 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Cheese Jalapeno Mild Chips",
-      "brand": "Estrella",
-      "price": "27,90 kr",
-      "description": "275g | Jmf: 101,46 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310532305812_C1N1_s01",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
-      "product": "Peppar Chips",
-      "brand": "Estrella",
-      "price": "27,90 kr",
-      "description": "275g | Jmf: 101,46 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310532106648_C1N1_s04",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
-      "product": "Paprika Havs Salt Chips",
-      "brand": "Estrella",
-      "price": "27,90 kr",
-      "description": "275g | Jmf: 101,46 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310532304716_C1N1_s02",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Sourcream Onion Rustika Chips",
       "brand": "Eldorado",
       "price": "16,94 kr",
       "description": "150g | Jmf: 112,93 kr/kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043000562_C1N1_s01",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
-      "product": "Salt&vinäger Chips",
-      "brand": "Estrella",
-      "price": "27,90 kr",
-      "description": "275g | Jmf: 101,46 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310532106662_C1N1_s05",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
-      "product": "Färskost Svartpeppar Chips Västkust",
-      "brand": "Estrella",
-      "price": "24,90 kr",
-      "description": "180g | Jmf: 138,33 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310532305836_C1N1_s01",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
-      "product": "Dillchips",
-      "brand": "Estrella",
-      "price": "27,90 kr",
-      "description": "275g | Jmf: 101,46 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310532106471_C1N1_s04",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
-      "product": "Lättsaltade Chips",
-      "brand": "Svenska Lantch",
-      "price": "21,67 kr",
-      "description": "200g | Jmf: 108,35 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07392659002416_C1N1_s01",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -37246,6 +37215,36 @@
     },
     {
       "store": "Willys Ord.pris",
+      "product": "Cheese Jalapeno Mild Chips",
+      "brand": "Estrella",
+      "price": "27,90 kr",
+      "description": "275g | Jmf: 101,46 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310532305812_C1N1_s01",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Paprika Havs Salt Chips",
+      "brand": "Estrella",
+      "price": "27,90 kr",
+      "description": "275g | Jmf: 101,46 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310532304716_C1N1_s02",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Lättsaltade Chips",
+      "brand": "Svenska Lantch",
+      "price": "21,67 kr",
+      "description": "200g | Jmf: 108,35 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07392659002416_C1N1_s01",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
       "product": "Gräddfil Chips",
       "brand": "Svenska Lantch",
       "price": "21,67 kr",
@@ -37256,11 +37255,31 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Vickningschips",
+      "product": "Peppar Chips",
       "brand": "Estrella",
       "price": "27,90 kr",
       "description": "275g | Jmf: 101,46 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310532106518_C1N1_s05",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310532106648_C1N1_s04",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Färskost Svartpeppar Chips Västkust",
+      "brand": "Estrella",
+      "price": "24,90 kr",
+      "description": "180g | Jmf: 138,33 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310532305836_C1N1_s01",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Salt&vinäger Chips",
+      "brand": "Estrella",
+      "price": "27,90 kr",
+      "description": "275g | Jmf: 101,46 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310532106662_C1N1_s05",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -37276,16 +37295,6 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Sourcream Onion Chips",
-      "brand": "Estrella",
-      "price": "9,36 kr",
-      "description": "40g | Jmf: 234,00 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310531027906_C1N1_s02",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Sourcream & Onion Chips",
       "brand": "Pringles",
       "price": "29,90 kr",
@@ -37296,11 +37305,21 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Saltade Chips",
+      "product": "Dillchips",
       "brand": "Estrella",
-      "price": "9,36 kr",
-      "description": "40g | Jmf: 234,00 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310531020907_C1N1_s03",
+      "price": "27,90 kr",
+      "description": "275g | Jmf: 101,46 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310532106471_C1N1_s04",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Vickningschips",
+      "brand": "Estrella",
+      "price": "27,90 kr",
+      "description": "275g | Jmf: 101,46 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310532106518_C1N1_s05",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -37316,11 +37335,31 @@
     },
     {
       "store": "Willys Ord.pris",
+      "product": "Sourcream Onion Chips",
+      "brand": "Estrella",
+      "price": "9,36 kr",
+      "description": "40g | Jmf: 234,00 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310531027906_C1N1_s02",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
       "product": "Parmesan Chips",
       "brand": "Gårdschips",
       "price": "24,51 kr",
       "description": "150g | Jmf: 163,40 kr/kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07350045591258_C1R1_s01",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Saltade Chips",
+      "brand": "Estrella",
+      "price": "9,36 kr",
+      "description": "40g | Jmf: 234,00 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310531020907_C1N1_s03",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -37446,21 +37485,21 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Jordnötsringar Originalet",
+      "product": "Sourcream & Onion Chips",
       "brand": "Estrella",
-      "price": "24,90 kr",
-      "description": "250g | Jmf: 99,60 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310532113950_C1N1_s03",
+      "price": "19,90 kr",
+      "description": "160g | Jmf: 124,38 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310532305942_C1N1_s01",
       "original_price": "",
       "discount_percentage": 0
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Ostringar Chili Cheese",
+      "product": "Jordnötsringar Originalet",
       "brand": "Estrella",
-      "price": "27,90 kr",
-      "description": "200g | Jmf: 139,50 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310532115442_C1N1_s02",
+      "price": "24,90 kr",
+      "description": "250g | Jmf: 99,60 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310532113950_C1N1_s03",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -37486,6 +37525,16 @@
     },
     {
       "store": "Willys Ord.pris",
+      "product": "Paprika & Havssalt Chips",
+      "brand": "Olw",
+      "price": "25,90 kr",
+      "description": "275g | Jmf: 94,18 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07340005407422_C1N1_s01",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
       "product": "Smör& Havssalt Chips",
       "brand": "Olw",
       "price": "25,90 kr",
@@ -37501,16 +37550,6 @@
       "price": "25,90 kr",
       "description": "275g | Jmf: 94,18 kr/kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07340005407088_C1N1_s01",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
-      "product": "Paprika & Havssalt Chips",
-      "brand": "Olw",
-      "price": "25,90 kr",
-      "description": "275g | Jmf: 94,18 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07340005407422_C1N1_s01",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -37726,11 +37765,11 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Cashewnötter Rostade Saltade",
+      "product": "Nötmix Sött & Salt",
       "brand": "Garant",
-      "price": "18,83 kr",
-      "description": "110g | Jmf: 171,18 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043010745_C1N1_s03",
+      "price": "24,90 kr",
+      "description": "175g | Jmf: 142,29 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043010868_C1N1_s01",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -37746,11 +37785,11 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Nötmix Sött & Salt",
+      "product": "Cashewnötter Rostade Saltade",
       "brand": "Garant",
-      "price": "24,90 kr",
-      "description": "175g | Jmf: 142,29 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043010868_C1N1_s01",
+      "price": "18,83 kr",
+      "description": "110g | Jmf: 171,18 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043010745_C1N1_s03",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -37786,21 +37825,21 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Jordnötter Salta",
-      "brand": "Olw",
-      "price": "21,50 kr",
-      "description": "300g | Jmf: 71,67 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07300400293501_C1N1_s03",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Valnötter Naturella",
       "brand": "Exotic Snacks",
       "price": "29,90 kr",
       "description": "250g | Jmf: 119,60 kr/kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07391814009109_C1L1_s01",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Jordnötter Salta",
+      "brand": "Olw",
+      "price": "21,50 kr",
+      "description": "300g | Jmf: 71,67 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07300400293501_C1N1_s03",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -38076,21 +38115,21 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Jordgubb Mjölkchoklad",
-      "brand": "Marabou",
-      "price": "23,90 kr",
-      "description": "160g | Jmf: 149,38 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07622202293719_C1N1_s01",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Smooth Vegan Chocolate Choklad",
       "brand": "Green Star",
       "price": "41,50 kr",
       "description": "90g | Jmf: 461,11 kr/kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/04000194332112_C1N1_s01",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Jordgubb Mjölkchoklad",
+      "brand": "Marabou",
+      "price": "23,90 kr",
+      "description": "160g | Jmf: 149,38 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07622202293719_C1N1_s01",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -38126,21 +38165,21 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Sea Salt Dark Excellence Chokladkaka",
-      "brand": "Lindt",
-      "price": "37,90 kr",
-      "description": "100g | Jmf: 379,00 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/03046920029674_C1N1_s02",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Japp Mjölkchoklad Chokladkaka",
       "brand": "Marabou",
       "price": "23,90 kr",
       "description": "160g | Jmf: 149,38 kr/kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07622202276934_C1C1_s01",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Sea Salt Dark Excellence Chokladkaka",
+      "brand": "Lindt",
+      "price": "37,90 kr",
+      "description": "100g | Jmf: 379,00 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/03046920029674_C1N1_s02",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -38156,21 +38195,21 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Japp Dubbel",
-      "brand": "Marabou",
-      "price": "9,90 kr",
-      "description": "60g | Jmf: 165,00 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07040110663200_C1N1_s04",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Frukt Mandel Mjölkchoklad",
       "brand": "Marabou",
       "price": "23,90 kr",
       "description": "160g | Jmf: 149,38 kr/kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07622202238574_C1N1_s01",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Japp Dubbel",
+      "brand": "Marabou",
+      "price": "9,90 kr",
+      "description": "60g | Jmf: 165,00 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07040110663200_C1N1_s04",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -38216,21 +38255,21 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Co-co Dubbel",
-      "brand": "Marabou",
-      "price": "9,90 kr",
-      "description": "60g | Jmf: 165,00 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310511251406_C1N1_s04",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Snickers",
       "brand": "Snickers",
       "price": "11,26 kr",
       "description": "50g | Jmf: 225,20 kr/kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/05900951311505_C1N1_s01",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Co-co Dubbel",
+      "brand": "Marabou",
+      "price": "9,90 kr",
+      "description": "60g | Jmf: 165,00 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310511251406_C1N1_s04",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -38356,11 +38395,11 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Fin 70% Kakao Premium Chokladkaka",
+      "product": "Daim Mjölkchoklad",
       "brand": "Marabou",
-      "price": "33,02 kr",
-      "description": "100g | Jmf: 330,20 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07622400624520_C1N1_s03",
+      "price": "17,90 kr",
+      "description": "90g | Jmf: 198,89 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07622202277764_C1N1_s01",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -38376,11 +38415,11 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Daim Mjölkchoklad",
+      "product": "Fin 70% Kakao Premium Chokladkaka",
       "brand": "Marabou",
-      "price": "17,90 kr",
-      "description": "90g | Jmf: 198,89 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07622202277764_C1N1_s01",
+      "price": "33,02 kr",
+      "description": "100g | Jmf: 330,20 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07622400624520_C1N1_s03",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -38476,21 +38515,21 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Sour Tutti Frutti",
-      "brand": "Fazer",
-      "price": "15,90 kr",
-      "description": "180g | Jmf: 88,33 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/06416453036413_C1N1_s01",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Surt Skum S-märke",
       "brand": "Candy People",
       "price": "9,36 kr",
       "description": "70g | Jmf: 133,71 kr/kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07350039457607_C1N1_s02",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Sour Tutti Frutti",
+      "brand": "Fazer",
+      "price": "15,90 kr",
+      "description": "180g | Jmf: 88,33 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/06416453036413_C1N1_s01",
       "original_price": "",
       "discount_percentage": 0
     },
