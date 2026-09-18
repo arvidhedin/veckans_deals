@@ -142,6 +142,9 @@ class NetworkPeer {
 
     this._saveHostState();
 
+    // Render immediately on host resume so no blank screen during re-binding
+    this._broadcastLocalState();
+
     const cleanCode = this._cleanCode(this.roomId);
     const peerId = `catan8_${cleanCode}`;
     this._initHostPeer(peerId);
@@ -202,14 +205,14 @@ class NetworkPeer {
       this.peer.on('error', (err) => {
         console.error('Host peer error:', err);
         if (err.type === 'unavailable-id') {
-          // If unavailable-id occurs during a reload, wait 1.5s and retry
+          // If unavailable-id occurs during a reload, wait 1.2s and retry
           setTimeout(() => {
-            if (this.mode === 'webrtc_host' && !this.peer.destroyed) {
+            if (this.mode === 'webrtc_host') {
               console.log('Retrying host peer binding...');
-              try { this.peer.destroy(); } catch (e) {}
+              try { if (this.peer) this.peer.destroy(); } catch (e) {}
               this._initHostPeer(peerId);
             }
-          }, 1500);
+          }, 1200);
         }
       });
     } catch (e) {
@@ -342,7 +345,7 @@ class NetworkPeer {
       this.peer.on('error', (err) => {
         console.error('Guest peer error:', err);
         if (err.type === 'peer-unavailable') {
-          if (this.reconnectAttempts > 0) {
+          if (isReconnect || this.reconnectAttempts > 0) {
             // Reconnect attempt failed, retry
             this._attemptGuestReconnect(roomId, playerName);
           } else {
@@ -476,6 +479,13 @@ class NetworkPeer {
 
   removePlayer(targetId) {
     if (this.localGame && this.localGame.status === 'LOBBY') {
+      if (this.connections[targetId]) {
+        try {
+          this.connections[targetId].send({ type: 'room_closed', message: 'Du togs bort från rummet av värden.' });
+          this.connections[targetId].close();
+        } catch (e) {}
+        delete this.connections[targetId];
+      }
       this.localGame.players = this.localGame.players.filter(p => p.id !== targetId);
       for (let i = 0; i < this.localGame.players.length; i++) {
         this.localGame.players[i].id = i;

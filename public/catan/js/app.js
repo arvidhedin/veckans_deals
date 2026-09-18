@@ -127,12 +127,37 @@ class CatanApp {
         this.network.leaveRoom();
       });
     }
+
+    // Enter key shortcuts for lobby forms
+    const joinNameInput = document.getElementById('join-player-name');
+    const joinCodeInput = document.getElementById('join-room-code');
+    const createNameInput = document.getElementById('create-player-name');
+
+    [joinNameInput, joinCodeInput].forEach(el => {
+      if (el) {
+        el.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            btnJoinRoom.click();
+          }
+        });
+      }
+    });
+
+    if (createNameInput) {
+      createNameInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          btnCreateRoom.click();
+        }
+      });
+    }
   }
 
   generateRandomRoomCode() {
-    const prefixes = ['KATA', 'ISLA', 'BERG', 'HAV', 'NORD', 'SOL', 'SKOG', 'VIND'];
+    const prefixes = ['KATA', 'ISLA', 'BERG', 'HAV', 'NORD', 'SOL', 'SKOG', 'VIND', 'MALM', 'VETE', 'ULL', 'TRAD', 'BY', 'STAD', 'GULD', 'RUM'];
     const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
-    const num = Math.floor(Math.random() * 90 + 10);
+    const num = Math.floor(Math.random() * 900 + 100);
     return `${prefix}${num}`;
   }
 
@@ -181,6 +206,8 @@ class CatanApp {
       const joinPane = document.getElementById('join-room-pane');
       const joinInput = document.getElementById('join-room-code');
       const joinNameInput = document.getElementById('join-player-name');
+      const inviteBanner = document.getElementById('join-invite-banner');
+      const invitedRoomLabel = document.getElementById('invited-room-label');
 
       if (tabJoin && joinInput) {
         tabJoin.classList.add('active');
@@ -189,6 +216,13 @@ class CatanApp {
         if (joinPane) joinPane.style.display = 'block';
         joinInput.value = cleanRoom;
         if (savedName && joinNameInput) joinNameInput.value = savedName;
+        if (inviteBanner && invitedRoomLabel) {
+          invitedRoomLabel.textContent = cleanRoom;
+          inviteBanner.style.display = 'block';
+        }
+        if (joinNameInput) {
+          setTimeout(() => joinNameInput.focus(), 100);
+        }
       }
     }
   }
@@ -267,15 +301,17 @@ class CatanApp {
       const slot = document.createElement('div');
       slot.className = 'player-slot';
       const isYou = (p.id === this.playerId);
+      const isOffline = (p.connected === false && !p.is_bot);
 
       slot.innerHTML = `
         <div class="slot-left">
           <div class="color-dot" style="background-color:${p.color}"></div>
           <span class="slot-name">${p.name}</span>
         </div>
-        <div>
+        <div style="display:flex;align-items:center;gap:6px;">
+          ${isOffline ? '<span class="slot-badge offline">Frånkopplad</span>' : ''}
           <span class="slot-badge ${isYou ? 'you' : ''}">${isYou ? 'Du' : (p.is_bot ? 'Bot' : 'Spelare')}</span>
-          ${(p.is_bot && this.playerId === 0) ? `<button class="slot-remove-btn" data-id="${p.id}">✕</button>` : ''}
+          ${(this.playerId === 0 && p.id !== 0) ? `<button class="slot-remove-btn" data-id="${p.id}" title="Ta bort">✕</button>` : ''}
         </div>
       `;
       grid.appendChild(slot);

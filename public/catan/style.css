@@ -416,6 +416,12 @@ select option {
   font-weight: 700;
 }
 
+.slot-badge.offline {
+  background: rgba(239, 68, 68, 0.25);
+  color: #fca5a5;
+  border: 1px solid rgba(239, 68, 68, 0.4);
+}
+
 .slot-remove-btn {
   background: none;
   border: none;
