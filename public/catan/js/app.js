@@ -63,15 +63,19 @@ class CatanApp {
     });
 
     // Random room code generator
+    const createRoomInput = document.getElementById('create-room-code');
+    if (createRoomInput && (!createRoomInput.value || createRoomInput.value === 'KATA8')) {
+      createRoomInput.value = this.generateRandomRoomCode();
+    }
+
     randomBtn.addEventListener('click', () => {
-      const code = 'KATA' + Math.floor(10 + Math.random() * 90);
-      document.getElementById('create-room-code').value = code;
+      if (createRoomInput) createRoomInput.value = this.generateRandomRoomCode();
     });
 
     // Create Room action
     btnCreateRoom.addEventListener('click', () => {
       const name = document.getElementById('create-player-name').value.trim() || 'Spelare 1';
-      const room = document.getElementById('create-room-code').value.trim().toUpperCase() || 'KATA8';
+      const room = (createRoomInput ? createRoomInput.value.trim().toUpperCase() : '') || this.generateRandomRoomCode();
       const maxPlayers = parseInt(document.getElementById('max-players-select').value) || 8;
       const targetVP = parseInt(document.getElementById('target-vp-select').value) || 10;
 
@@ -109,25 +113,82 @@ class CatanApp {
         setTimeout(() => copyLinkBtn.textContent = '📋 Kopiera Länk', 2000);
       });
     });
+
+    const leaveLobbyBtn = document.getElementById('leave-lobby-btn');
+    if (leaveLobbyBtn) {
+      leaveLobbyBtn.addEventListener('click', () => {
+        this.network.leaveRoom();
+      });
+    }
+
+    const leaveGameBtn = document.getElementById('btn-leave-game');
+    if (leaveGameBtn) {
+      leaveGameBtn.addEventListener('click', () => {
+        this.network.leaveRoom();
+      });
+    }
+  }
+
+  generateRandomRoomCode() {
+    const prefixes = ['KATA', 'ISLA', 'BERG', 'HAV', 'NORD', 'SOL', 'SKOG', 'VIND'];
+    const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
+    const num = Math.floor(Math.random() * 90 + 10);
+    return `${prefix}${num}`;
+  }
+
+  returnToLobby() {
+    this.gameState = null;
+    this.boardData = null;
+    this.playerId = null;
+    this.gameView.classList.remove('active');
+    this.lobbyRoom.style.display = 'none';
+    this.lobbyJoinForm.style.display = 'block';
+    this.lobbyView.classList.add('active');
+
+    const createRoomInput = document.getElementById('create-room-code');
+    if (createRoomInput) {
+      createRoomInput.value = this.generateRandomRoomCode();
+    }
   }
 
   _checkUrlRoomCode() {
     const params = new URLSearchParams(window.location.search);
-    const room = params.get('room');
-    if (room) {
-      // Auto-switch to join tab
+    const roomParam = params.get('room');
+    const savedRoom = sessionStorage.getItem('catan_active_room');
+    const savedRole = sessionStorage.getItem('catan_role');
+    const savedName = sessionStorage.getItem('catan_player_name');
+
+    if (roomParam) {
+      const cleanRoom = roomParam.trim().toUpperCase();
+
+      // Check if user is REFRESHING an active session in this room
+      if (savedRoom && savedRoom.toUpperCase() === cleanRoom && savedName) {
+        console.log('Restoring active room session for:', cleanRoom, savedRole);
+        this.roomId = cleanRoom;
+        if (savedRole === 'webrtc_host') {
+          this.network.resumeHostRoom(cleanRoom, savedName);
+          return;
+        } else if (savedRole === 'webrtc_guest') {
+          this.network.joinOnlineRoom(cleanRoom, savedName, true);
+          return;
+        }
+      }
+
+      // If new visitor with a room link: pre-fill Join tab
       const tabJoin = document.getElementById('tab-mode-join');
       const tabCreate = document.getElementById('tab-mode-create');
       const createPane = document.getElementById('create-room-pane');
       const joinPane = document.getElementById('join-room-pane');
       const joinInput = document.getElementById('join-room-code');
+      const joinNameInput = document.getElementById('join-player-name');
 
       if (tabJoin && joinInput) {
         tabJoin.classList.add('active');
         if (tabCreate) tabCreate.classList.remove('active');
         if (createPane) createPane.style.display = 'none';
         if (joinPane) joinPane.style.display = 'block';
-        joinInput.value = room.toUpperCase();
+        joinInput.value = cleanRoom;
+        if (savedName && joinNameInput) joinNameInput.value = savedName;
       }
     }
   }

@@ -1138,6 +1138,67 @@ class ClientGameState {
       log: this.log.slice(-30)
     };
   }
+
+  toFullDict() {
+    return {
+      room_id: this.room_id,
+      max_players: this.max_players,
+      board_type: this.board_type,
+      target_vp: this.target_vp,
+      special_build: this.special_build,
+      is_pass_and_play: this.is_pass_and_play,
+      players: this.players,
+      board: this.board ? this.board.toDict() : null,
+      status: this.status,
+      current_turn_idx: this.current_turn_idx,
+      turn_phase: this.turn_phase,
+      sub_turn_players: this.sub_turn_players,
+      dice: this.dice,
+      dice_rolled: this.dice_rolled,
+      longest_road_player_id: this.longest_road_player_id,
+      longest_road_count: this.longest_road_count,
+      largest_army_player_id: this.largest_army_player_id,
+      largest_army_count: this.largest_army_count,
+      dev_deck: this.dev_deck,
+      winner_id: this.winner_id,
+      current_trade: this.current_trade,
+      log: this.log,
+      last_placed_setup_vertex: this.last_placed_setup_vertex
+    };
+  }
+
+  static fromFullDict(data) {
+    if (!data) return null;
+    const game = new ClientGameState(data.room_id, data.max_players, data.board_type, data.target_vp, data.special_build);
+    game.is_pass_and_play = data.is_pass_and_play;
+    game.players = data.players || [];
+    if (data.board) {
+      game.board = Object.create(Board.prototype);
+      game.board.boardType = data.board.board_type;
+      game.board.numPlayers = data.max_players;
+      game.board.hexes = data.board.hexes;
+      game.board.vertices = data.board.vertices;
+      game.board.edges = data.board.edges;
+      game.board.ports = data.board.ports;
+      game.board.robber_hex_id = data.board.robber_hex_id;
+    }
+    game.status = data.status;
+    game.current_turn_idx = data.current_turn_idx;
+    game.turn_phase = data.turn_phase;
+    game.sub_turn_players = data.sub_turn_players || [];
+    game.dice = data.dice || [1, 1];
+    game.dice_rolled = !!data.dice_rolled;
+    game.longest_road_player_id = data.longest_road_player_id;
+    game.longest_road_count = data.longest_road_count || 0;
+    game.largest_army_player_id = data.largest_army_player_id;
+    game.largest_army_count = data.largest_army_count || 0;
+    game.dev_deck = data.dev_deck || [];
+    game.winner_id = data.winner_id;
+    game.current_trade = data.current_trade;
+    game.log = data.log || [];
+    game.last_placed_setup_vertex = data.last_placed_setup_vertex;
+    return game;
+  }
 }
 
 window.ClientGameState = ClientGameState;
