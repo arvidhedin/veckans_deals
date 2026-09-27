@@ -1,0 +1,50 @@
+name: Build CSS
+
+# Rebuilds public/tailwind.css when the page, its script or the Tailwind config changes,
+# so new Tailwind classes work without building anything locally.
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'public/index.html'
+      - 'public/app.js'
+      - 'tailwind.config.js'
+      - 'src/tailwind.css'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-css
+  cancel-in-progress: true
+
+jobs:
+  build-css:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Build Tailwind CSS
+        run: npx --yes tailwindcss@3.4.19 -c tailwind.config.js -i src/tailwind.css -o public/tailwind.css --minify
+
+      - name: Commit and push public/tailwind.css if it changed
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add public/tailwind.css
+
+          if git diff --staged --quiet; then
+            echo "tailwind.css is up to date."
+          else
+            git commit -m "Rebuild Tailwind CSS"
+            git pull --rebase
+            git push
+          fi

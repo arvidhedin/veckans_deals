@@ -2,12 +2,20 @@ name: Scrape Offers and Deploy Data
 
 on:
   schedule:
-    # Run every day at 02:00 UTC
-    - cron: '0 2 * * *'
+    # GitHub often starts scheduled runs hours late, especially on the hour (the old
+    # 02:00 UTC run started at 07–09 UTC). Two runs at odd minutes, both after midnight
+    # Swedish time (UTC+2 in summer, UTC+1 in winter), so the data is fresh by morning:
+    - cron: '17 23 * * *'  # 01:17 summer time / 00:17 winter time
+    - cron: '47 1 * * *'   # 03:47 summer time / 02:47 winter time
   workflow_dispatch: # Allows manual trigger from GitHub Actions tab
 
 permissions:
   contents: write
+
+# Never run two scrapes at the same time (a late run could overlap the next one)
+concurrency:
+  group: scrape-and-deploy
+  cancel-in-progress: false
 
 jobs:
   scrape-and-build:
@@ -36,12 +44,14 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add public/deals.json
-          
-          # Only commit and push if public/deals.json has changes
+          git add public/deals.json public/product_info.json
+
+          # Only commit and push if the data files have changes
           if git diff --staged --quiet; then
             echo "No changes in deals.json to commit."
           else
             git commit -m "Update deals data"
+            # Someone may have pushed while the scrape was running
+            git pull --rebase
             git push
           fi
