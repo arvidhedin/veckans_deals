@@ -8,7 +8,7 @@ import os
 import json
 import datetime
 import traceback
-from scrapers import ica, coop, willys, lidl, hemkop, willys_search
+from scrapers import ica, coop, willys, lidl, hemkop, willys_search, product_info
 from scrapers.categorizer import categorize_offer
 
 
@@ -99,6 +99,28 @@ def main():
     # Write formatted JSON to public/deals.json
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(payload, f, ensure_ascii=False, indent=2)
+
+    # Ingredients & nutrition from Willys/Hemköp -> public/product_info.json
+    # (Axfood's API blocks direct browser requests, so it is fetched here instead)
+    print("Fetching product info (ingredients)...")
+    info_path = os.path.join("public", "product_info.json")
+    previous_info = {}
+    try:
+        with open(info_path, encoding="utf-8") as f:
+            previous_info = json.load(f)
+    except (OSError, ValueError):
+        pass
+
+    info = {"products": previous_info.get("products", {}), "eans": previous_info.get("eans", {})}
+    try:
+        info = product_info.build_product_info(all_offers, previous_info)
+    except Exception as e:
+        print(f"   [FAIL] Product info: Failed with error: {e}")
+        traceback.print_exc()
+
+    # Always write the file so the workflow's `git add` finds it
+    with open(info_path, "w", encoding="utf-8") as f:
+        json.dump(info, f, ensure_ascii=False, indent=2)
 
     print("-" * 60)
     print(f"Build complete! Total offers collected: {len(all_offers)}")

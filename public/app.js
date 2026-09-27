@@ -780,40 +780,80 @@ function updateActiveModalCartButton() {
   }
 }
 
-// --- Helper for Kött & Fågel < 80 kr/kg Filter ---
-function isMeatUnder80PerKg(offer) {
-  const cat = offer.category || categorizeOfferJS(offer);
-  if (cat !== 'Kött & Fågel') return false;
-
-  const text = `${offer.product || ''} ${offer.brand || ''} ${offer.description || ''}`.toLowerCase();
-  
-  // Allow minces ("färs") even if they contain salsiccia/chorizo
-  const isFars = text.includes('färs') || text.includes('fars');
-  if (!isFars) {
-    const excludedKeywords = ['korv', 'blodpudding', 'cabanoss', 'hotdog', 'hot dog', 'salsiccia', 'chorizo'];
-    if (excludedKeywords.some(kw => text.includes(kw))) {
-      return false;
-    }
+// --- Price per kg ---
+// Prefer the store's own comparison price (price_per_kg from the scrapers). Otherwise estimate it
+// from the price and the package weight. Returns { min, max } – min is when choosing the variant
+// with the best value (e.g. the biggest package) – or null when it can't be determined.
+function getPricePerKg(offer) {
+  if (typeof offer.price_per_kg === 'number') {
+    return { min: offer.price_per_kg, max: offer.price_per_kg_max ?? offer.price_per_kg };
   }
 
   const { pricePerUnit, isExplicitPerKg } = extractPerUnitDealPriceJS(offer.price);
-  if (pricePerUnit <= 0) return false;
+  if (pricePerUnit <= 0) return null;
+  if (isExplicitPerKg) return { min: pricePerUnit, max: pricePerUnit };
 
-  // Case 1: Explicit per kg price string (e.g. "64,90/kg", "79,90 kr/kg")
-  if (isExplicitPerKg) {
-    return pricePerUnit <= 80.0;
-  }
-
-  // Case 2: Calculate exact price per kg from package weight
   const textForWeight = `${offer.product || ''} ${offer.description || ''} ${offer.price || ''}`;
   const weightKg = extractPackageWeightInKgJS(textForWeight);
+  if (weightKg <= 0) return null;
+  return { min: pricePerUnit / weightKg, max: pricePerUnit / weightKg };
+}
 
-  if (weightKg > 0) {
-    const calculatedPricePerKg = pricePerUnit / weightKg;
-    return calculatedPricePerKg <= 80.0;
-  }
+function formatKr(value) {
+  return Number.isInteger(value) ? String(value) : value.toFixed(2).replace('.', ',');
+}
 
-  return false;
+function formatPricePerKg(perKg) {
+  if (!perKg) return '';
+  const min = Math.round(perKg.min * 100) / 100;
+  const max = Math.round(perKg.max * 100) / 100;
+  return max > min ? `${formatKr(min)}–${formatKr(max)} kr/kg` : `${formatKr(min)} kr/kg`;
+}
+
+function isPricePerKgUnder(offer, limit) {
+  const perKg = getPricePerKg(offer);
+  return !!perKg && perKg.min < limit;
+}
+
+// --- Product groups used by the special filters and "Veckans bästa deal" ---
+function getOfferText(offer) {
+  return `${offer.product || ''} ${offer.brand || ''} ${offer.description || ''}`.toLowerCase();
+}
+
+function isQualifyingMeat(offer) {
+  const cat = offer.category || categorizeOfferJS(offer);
+  if (cat !== 'Kött & Fågel') return false;
+
+  // Allow minces ("färs") even if they contain salsiccia/chorizo
+  const text = getOfferText(offer);
+  const isFars = text.includes('färs') || text.includes('fars');
+  const excludedKeywords = ['korv', 'blodpudding', 'cabanoss', 'hotdog', 'hot dog', 'salsiccia', 'chorizo'];
+  return isFars || !excludedKeywords.some(kw => text.includes(kw));
+}
+
+// Coffee: the word "kaffe" (not compounds like "kaffekapslar" or "snabbkaffe") or a coffee brand
+const COFFEE_RE = /(?:^|[^a-zåäöé])(?:kaffe|bryggkaffe|pressokaffe|kokkaffe|mellanrost|mörkrost|ljusrost|espressobönor|kaffebönor|gevalia|zoégas|zoegas|löfbergs|arvid nordquist|lavazza)(?![a-zåäöé])/i;
+
+function isCoffee(offer) {
+  return COFFEE_RE.test(getOfferText(offer));
+}
+
+// Hard and semi-hard cheese like prästost, herrgård and grevé
+const HARD_CHEESE_RE = /(?:^|[^a-zåäöé])(?:prästost|präst|herrgårdsost|herrgård|grevé|greve|svecia|gouda|cheddar|västerbottensost|västerbotten|hushållsost|lagrad ost|långlagrad|mellanlagrad|port salut|havarti|edamer|emmentaler|gruyère|parmesan|parmigiano|grana padano|pecorino|manchego)(?![a-zåäöé])/i;
+
+function isHardCheese(offer) {
+  const cat = offer.category || categorizeOfferJS(offer);
+  return cat === 'Mejeri & Ägg' && HARD_CHEESE_RE.test(getOfferText(offer));
+}
+
+// --- Helper for Kött & Fågel < 80 kr/kg Filter ---
+function isMeatUnder80PerKg(offer) {
+  return isQualifyingMeat(offer) && isPricePerKgUnder(offer, 80);
+}
+
+// --- Helper for Kaffe < 100 kr/kg Filter ---
+function isCoffeeUnder100PerKg(offer) {
+  return isCoffee(offer) && isPricePerKgUnder(offer, 100);
 }
 
 // --- Helper for Ost från Arla < 80 kr/kg Filter ---
@@ -832,25 +872,8 @@ function isArlaCheeseUnder80PerKg(offer) {
   const cheesePattern = /\b(?:ost|ostar|ostskivor|skivost|skivad ost|rivost|riven ost|hushållsost|prästost|präst|herrgård|herrgårdsost|grevé|greve|svecia|gräddost|gouda|edamer|port salut|havarti|mozzarella|feta|färskost|brie|camembert|kvibille|ädelost|blåmögelost|vitmögelost|cheddar|västerbottensost|parmesan|parmigiano|halloumi|norrloumi|grillost|smältost|mjukost|flödeost|familjefavoriter|familjefavorit|billinge)\b/i;
   if (!cheesePattern.test(textWithoutFrukost)) return false;
 
-  // 3. Price per kg calculation
-  const { pricePerUnit, isExplicitPerKg } = extractPerUnitDealPriceJS(offer.price);
-  if (pricePerUnit <= 0) return false;
-
-  // Explicit per kg price
-  if (isExplicitPerKg) {
-    return pricePerUnit <= 80.0;
-  }
-
-  // Calculated per kg price from package weight
-  const textForWeight = `${offer.product || ''} ${offer.description || ''} ${offer.price || ''}`;
-  const weightKg = extractPackageWeightInKgJS(textForWeight);
-
-  if (weightKg > 0) {
-    const calculatedPricePerKg = pricePerUnit / weightKg;
-    return calculatedPricePerKg <= 80.0;
-  }
-
-  return false;
+  // 3. Price per kg
+  return isPricePerKgUnder(offer, 80);
 }
 
 // --- Helper for Fun Light Extrapris Filter ---
@@ -864,37 +887,185 @@ function isFunLightDeal(offer) {
   return text.includes('fun light') || text.includes('funlight') || /\bfun\s*light\b/i.test(text);
 }
 
+// Special filter pills: label -> matcher
+const SPECIAL_FILTERS = {
+  'Kött & Fågel <80 kr/kg': isMeatUnder80PerKg,
+  'Arla ost <80 kr/kg': isArlaCheeseUnder80PerKg,
+  'Kaffe <100 kr/kg': isCoffeeUnder100PerKg,
+  'Fun Light extrapris': isFunLightDeal
+};
+
 // Compute Category Counts based on active store filter
 function computeCategoryCounts() {
   state.categoryCounts = {};
   for (const cat of ALL_CATEGORIES) {
     state.categoryCounts[cat] = 0;
   }
-  state.categoryCounts['Kött & Fågel <80 kr/kg'] = 0;
-  state.categoryCounts['Arla ost <80 kr/kg'] = 0;
-  state.categoryCounts['Fun Light extrapris'] = 0;
+  for (const label of Object.keys(SPECIAL_FILTERS)) {
+    state.categoryCounts[label] = 0;
+  }
 
-  for (const offer of state.allOffers) {
-    const store = (offer.store || '').trim();
-    const isStoreSelected = store === 'Lidl' 
-      ? state.selectedStores.has('Lidl') 
-      : state.selectedStores.has(store);
-    
-    if (!isStoreSelected) continue;
-
+  for (const offer of getStoreFilteredOffers()) {
     const cat = offer.category || categorizeOfferJS(offer);
     state.categoryCounts[cat] = (state.categoryCounts[cat] || 0) + 1;
 
-    if (isMeatUnder80PerKg(offer)) {
-      state.categoryCounts['Kött & Fågel <80 kr/kg']++;
-    }
-    if (isArlaCheeseUnder80PerKg(offer)) {
-      state.categoryCounts['Arla ost <80 kr/kg']++;
-    }
-    if (isFunLightDeal(offer)) {
-      state.categoryCounts['Fun Light extrapris']++;
+    for (const [label, matches] of Object.entries(SPECIAL_FILTERS)) {
+      if (matches(offer)) state.categoryCounts[label]++;
     }
   }
+}
+
+// --- Veckans bästa deal ---
+// Usually expensive staples at a really good price. A deal must be under its group's
+// price per kg limit. The best one has the biggest discount (compared with the normal
+// price), with a bonus for being far below the limit.
+const BEST_DEAL_GROUPS = [
+  { label: 'Kött', maxPerKg: 80, minPerKg: 20, matches: isQualifyingMeat },
+  { label: 'Kaffe', maxPerKg: 100, minPerKg: 40, matches: isCoffee },
+  { label: 'Ost', maxPerKg: 80, minPerKg: 30, matches: isHardCheese }
+];
+const BEST_DEAL_RUNNER_UPS = 4;
+
+let bestDeals = [];
+
+function getChainName(store) {
+  return String(store || '').trim().split(/[\s(]/)[0];
+}
+
+function describePricePerKg(offer) {
+  const perKg = getPricePerKg(offer);
+  if (!perKg) return '';
+  // Without the store's comparison price it's an estimate from the package weight
+  return `${typeof offer.price_per_kg === 'number' ? '' : '≈ '}${formatPricePerKg(perKg)}`;
+}
+
+function findBestDeals() {
+  const deals = new Map();
+  for (const offer of getStoreFilteredOffers()) {
+    const group = BEST_DEAL_GROUPS.find(g => g.matches(offer));
+    if (!group) continue;
+    const perKg = getPricePerKg(offer);
+    // minPerKg filters out obviously broken prices
+    if (!perKg || perKg.min >= group.maxPerKg || perKg.min < group.minPerKg) continue;
+
+    // Discounts above 60 % are capped – they are usually data errors
+    const discount = Math.min(parseFloat(offer.discount_percentage) || 0, 60);
+    const belowLimit = 1 - perKg.min / group.maxPerKg;
+    const score = discount + belowLimit * 20;
+
+    // The same deal in several stores of a chain (e.g. ICA) is shown once. The stores have
+    // different normal prices, so the store with the smallest discount represents the deal.
+    const chain = getChainName(offer.store);
+    const key = `${chain}|${(offer.product || '').toLowerCase()}|${(offer.brand || '').toLowerCase()}|${offer.price}`;
+    const existing = deals.get(key);
+    if (existing) {
+      existing.stores.push(offer.store);
+      if (score < existing.score) Object.assign(existing, { offer, perKg, score });
+      continue;
+    }
+    deals.set(key, { offer, group, perKg, chain, stores: [offer.store], score });
+  }
+  return [...deals.values()].sort((a, b) => b.score - a.score);
+}
+
+// Two deals from the same chain and brand (e.g. chicken legs and wings) are too similar to show both
+function isSimilarDeal(a, b) {
+  return a.chain === b.chain && !!a.offer.brand && a.offer.brand === b.offer.brand;
+}
+
+// The best deal plus runner-ups: first the best in each group, then the next best overall
+function pickBestDeals(ranked) {
+  if (ranked.length === 0) return [];
+  const picked = [ranked[0]];
+  const canPick = (deal) => !picked.includes(deal) && !picked.some(p => isSimilarDeal(p, deal));
+
+  for (const group of BEST_DEAL_GROUPS) {
+    const best = ranked.find(d => d.group === group && canPick(d));
+    if (best) picked.push(best);
+  }
+  for (const deal of ranked) {
+    if (picked.length > BEST_DEAL_RUNNER_UPS) break;
+    if (canPick(deal)) picked.push(deal);
+  }
+  const runners = picked.slice(1, BEST_DEAL_RUNNER_UPS + 1).sort((a, b) => b.score - a.score);
+  return [picked[0], ...runners];
+}
+
+function formatDealStores(deal) {
+  return deal.stores.length > 1 ? `${deal.chain} · ${deal.stores.length} butiker` : getShortStoreName(deal.offer.store);
+}
+
+function createBestDealHeroHtml(deal) {
+  const { offer, group } = deal;
+  const discountPct = Math.round(parseFloat(offer.discount_percentage) || 0);
+  const details = [offer.brand, offer.description].filter(Boolean).join(' · ');
+
+  return `
+    <article data-best-deal="0" role="button" tabindex="0" class="cursor-pointer group h-full flex flex-col sm:flex-row overflow-hidden rounded-2xl sm:rounded-3xl bg-zinc-900 text-white shadow-lg hover:shadow-xl transition focus:outline-none focus:ring-2 focus:ring-rose-500">
+      <div class="relative sm:w-2/5 shrink-0 bg-white flex items-center justify-center p-4 sm:p-6 h-44 sm:h-auto">
+        <img src="${escapeHtml(offer.image_url || DEFAULT_IMG)}" alt="${escapeHtml(offer.product || '')}" onerror="this.onerror=null; this.src='${DEFAULT_IMG}';" class="max-h-full sm:max-h-56 max-w-full object-contain transition-transform duration-200 group-hover:scale-105">
+        <span class="absolute top-3 left-3 px-2 py-0.5 rounded text-[10px] sm:text-[11px] font-bold uppercase tracking-wide text-white shadow-sm" style="background-color: ${getStoreColor(offer.store)};">${escapeHtml(formatDealStores(deal))}</span>
+        ${discountPct > 0 ? `<span class="absolute top-3 right-3 bg-rose-600 text-white font-extrabold text-xs px-2 py-0.5 rounded shadow-sm">-${discountPct}%</span>` : ''}
+      </div>
+      <div class="flex-1 min-w-0 p-5 sm:p-6 flex flex-col justify-between gap-4">
+        <div>
+          <span class="text-[11px] font-bold uppercase tracking-wider text-amber-300">Veckans bästa deal · ${escapeHtml(group.label)}</span>
+          <h3 class="mt-1 text-xl sm:text-2xl font-extrabold leading-tight">${escapeHtml(offer.product || '')}</h3>
+          ${details ? `<p class="mt-1 text-xs sm:text-sm text-zinc-400 line-clamp-2">${escapeHtml(details)}</p>` : ''}
+        </div>
+        <div class="flex items-end justify-between gap-3 flex-wrap">
+          <div>
+            <div class="text-3xl sm:text-4xl font-black tracking-tight leading-none">${escapeHtml(offer.price || '')}</div>
+            ${offer.original_price ? `<div class="mt-1.5 text-xs text-zinc-400">Ord.pris <span class="line-through">${escapeHtml(offer.original_price)}</span></div>` : ''}
+          </div>
+          <div class="text-right">
+            <div class="inline-block rounded-lg bg-emerald-400/15 text-emerald-300 px-2.5 py-1 text-sm font-extrabold whitespace-nowrap">${escapeHtml(describePricePerKg(offer))}</div>
+            <div class="mt-1 text-[11px] text-zinc-400">Bra pris: under ${group.maxPerKg} kr/kg</div>
+          </div>
+        </div>
+        <span class="inline-flex items-center justify-center w-full sm:w-fit px-4 py-2.5 rounded-xl bg-white text-zinc-900 text-xs sm:text-sm font-bold group-hover:bg-zinc-100 transition">Visa innehåll &amp; pris</span>
+      </div>
+    </article>
+  `;
+}
+
+function createBestDealCardHtml(deal, index) {
+  const { offer, group } = deal;
+  const discountPct = Math.round(parseFloat(offer.discount_percentage) || 0);
+
+  return `
+    <article data-best-deal="${index}" role="button" tabindex="0" class="cursor-pointer group flex flex-col overflow-hidden rounded-xl sm:rounded-2xl bg-white border border-zinc-200/80 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition focus:outline-none focus:ring-2 focus:ring-rose-500">
+      <div class="relative h-24 sm:h-28 bg-zinc-50/70 flex items-center justify-center p-2 border-b border-zinc-100">
+        <img src="${escapeHtml(offer.image_url || DEFAULT_IMG)}" alt="${escapeHtml(offer.product || '')}" loading="lazy" onerror="this.onerror=null; this.src='${DEFAULT_IMG}';" class="max-h-full max-w-full object-contain">
+        <span class="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded text-[9px] sm:text-[10px] font-bold uppercase tracking-wide text-white max-w-[calc(100%-44px)] truncate" style="background-color: ${getStoreColor(offer.store)};">${escapeHtml(formatDealStores(deal))}</span>
+        ${discountPct > 0 ? `<span class="absolute top-1.5 right-1.5 bg-rose-600 text-white font-extrabold text-[9px] sm:text-[10px] px-1.5 py-0.5 rounded">-${discountPct}%</span>` : ''}
+      </div>
+      <div class="p-2.5 sm:p-3 flex flex-col gap-1 flex-grow">
+        <span class="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-zinc-400">${escapeHtml(group.label)}</span>
+        <h4 class="text-xs sm:text-sm font-bold text-zinc-900 leading-tight line-clamp-2">${escapeHtml(offer.product || '')}</h4>
+        <div class="mt-auto pt-1 flex items-end justify-between gap-1 flex-wrap">
+          <span class="text-sm sm:text-base font-black text-rose-600 leading-none">${escapeHtml(offer.price || '')}</span>
+          <span class="text-[10px] sm:text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/70 rounded px-1.5 py-0.5 whitespace-nowrap">${escapeHtml(describePricePerKg(offer))}</span>
+        </div>
+      </div>
+    </article>
+  `;
+}
+
+function renderBestDeals() {
+  const section = document.getElementById('best-deal-section');
+  const heroEl = document.getElementById('best-deal-hero');
+  const runnersEl = document.getElementById('best-deal-runners');
+  if (!section || !heroEl || !runnersEl) return;
+
+  bestDeals = pickBestDeals(findBestDeals());
+  section.classList.toggle('hidden', bestDeals.length === 0);
+  if (bestDeals.length === 0) return;
+
+  const [top, ...runners] = bestDeals;
+  heroEl.innerHTML = createBestDealHeroHtml(top);
+  runnersEl.innerHTML = runners.map((deal, i) => createBestDealCardHtml(deal, i + 1)).join('');
+  runnersEl.classList.toggle('hidden', runners.length === 0);
 }
 
 // Render horizontal Category Quick-Filter Pills
@@ -902,7 +1073,8 @@ function renderCategoryPills() {
   const container = document.getElementById('category-pills-container');
   if (!container) return;
 
-  const totalStoreOffers = Object.values(state.categoryCounts).reduce((a, b) => a + b, 0);
+  // Only the real categories – the special filters overlap them
+  const totalStoreOffers = ALL_CATEGORIES.reduce((sum, cat) => sum + (state.categoryCounts[cat] || 0), 0);
 
   let html = `
     <button 
@@ -986,6 +1158,30 @@ function renderCategoryPills() {
             <span class="px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
               isArlaCheeseActive ? 'bg-amber-800 text-amber-100' : 'bg-amber-200/80 text-amber-900'
             }">${arlaCheeseCount}</span>
+          </button>
+        `;
+      }
+    }
+
+    // Render Kaffe <100 kr/kg right after Skafferi
+    if (cat === 'Skafferi') {
+      const coffeeCount = state.categoryCounts['Kaffe <100 kr/kg'] || 0;
+      if (coffeeCount > 0 || state.activeCategoryPill === 'Kaffe <100 kr/kg') {
+        const isCoffeeActive = state.activeCategoryPill === 'Kaffe <100 kr/kg';
+        html += `
+          <button
+            type="button"
+            data-cat="Kaffe <100 kr/kg"
+            class="cat-pill cursor-pointer select-none px-3 py-1.5 rounded-full text-xs font-bold border transition-all duration-150 flex items-center gap-1.5 ${
+              isCoffeeActive
+                ? 'bg-orange-800 text-white border-orange-800 shadow-sm'
+                : 'bg-orange-50 text-orange-950 border-orange-200/90 hover:bg-orange-100 hover:border-orange-300'
+            }"
+          >
+            <span>Kaffe &lt;100 kr/kg</span>
+            <span class="px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
+              isCoffeeActive ? 'bg-orange-950 text-orange-100' : 'bg-orange-200/80 text-orange-900'
+            }">${coffeeCount}</span>
           </button>
         `;
       }
@@ -1148,38 +1344,29 @@ function filterLidlOffers(lidlOffers, period) {
 }
 
 // --- Filtering & Sorting Core ---
-function applyFilters() {
-  let result = [];
-
-  // 1. Filter by selected store
-  for (const offer of state.allOffers) {
+// Offers from the selected stores (Lidl also limited to the chosen period)
+function getStoreFilteredOffers() {
+  const result = state.allOffers.filter(offer => {
     const store = (offer.store || '').trim();
-    if (store === 'Lidl') {
-      continue;
-    }
+    return store !== 'Lidl' && state.selectedStores.has(store);
+  });
 
-    if (state.selectedStores.has(store)) {
-      result.push(offer);
-    }
-  }
-
-  // 2. Lidl Store & Date Filtering
   if (state.selectedStores.has('Lidl')) {
     const lidlOffers = state.allOffers.filter(o => o.store === 'Lidl');
-    const filteredLidl = filterLidlOffers(lidlOffers, state.lidlPeriod);
-    result.push(...filteredLidl);
+    result.push(...filterLidlOffers(lidlOffers, state.lidlPeriod));
   }
+  return result;
+}
+
+function applyFilters() {
+  // 1-2. Filter by selected store and Lidl period
+  let result = getStoreFilteredOffers();
 
   // 3. Filter by Category
   result = result.filter(offer => {
-    if (state.activeCategoryPill === 'Kött & Fågel <80 kr/kg') {
-      return isMeatUnder80PerKg(offer);
-    }
-    if (state.activeCategoryPill === 'Arla ost <80 kr/kg') {
-      return isArlaCheeseUnder80PerKg(offer);
-    }
-    if (state.activeCategoryPill === 'Fun Light extrapris') {
-      return isFunLightDeal(offer);
+    const specialFilter = SPECIAL_FILTERS[state.activeCategoryPill];
+    if (specialFilter) {
+      return specialFilter(offer);
     }
     const cat = offer.category || categorizeOfferJS(offer);
     if (!state.selectedCategories.has(cat)) return false;
@@ -1213,6 +1400,7 @@ function applyFilters() {
 
   // 6. Compute counts and render UI
   computeCategoryCounts();
+  renderBestDeals();
   renderCategoryPills();
   renderCategoryCheckboxes();
   renderDeals();
@@ -1238,10 +1426,10 @@ function sortOffers(offers, sortBy) {
       return pctB - pctA;
     }
     if (sortBy === 'price-asc') {
-      return parsePriceNumeric(a.price) - parsePriceNumeric(b.price);
+      return extractPerUnitDealPriceJS(a.price).pricePerUnit - extractPerUnitDealPriceJS(b.price).pricePerUnit;
     }
     if (sortBy === 'price-desc') {
-      return parsePriceNumeric(b.price) - parsePriceNumeric(a.price);
+      return extractPerUnitDealPriceJS(b.price).pricePerUnit - extractPerUnitDealPriceJS(a.price).pricePerUnit;
     }
     if (sortBy === 'name-asc') {
       return (a.product || '').localeCompare(b.product || '', 'sv');
@@ -1254,8 +1442,8 @@ function sortOffers(offers, sortBy) {
 }
 
 // --- Willys Reference Box Logic ---
-const willysSearchCache = new Map();
-let currentWillysSearchToken = 0;
+// Matches come from deals.json (Willys offers + regular assortment). Willys' own API
+// can't be called from the browser – it answers 403 to requests from other sites.
 
 // Common Swedish grocery descriptors / stopwords that shouldn't trigger standalone matches
 const SWEDISH_GROCERY_STOPWORDS = new Set([
@@ -1342,108 +1530,9 @@ function getLocalWillysMatches(query) {
   return scoredMatches.map(m => m.item).slice(0, 5);
 }
 
-async function fetchWillysReferenceItems(query) {
-  if (!query || query.trim().length < 2) return [];
-  
-  const q = query.trim().toLowerCase();
-  if (willysSearchCache.has(q)) {
-    return willysSearchCache.get(q);
-  }
-
-  try {
-    const url = `https://www.willys.se/axfood/rest/v1/search?q=${encodeURIComponent(q)}&page=0&size=6`;
-    const response = await fetch(url, {
-      headers: {
-        'Accept': 'application/json'
-      }
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
-    }
-
-    const data = await response.json();
-    const results = data.results || [];
-
-    const mapped = results.map(item => {
-      const priceVal = String(item.price || '').replace('kr', '').trim();
-      const priceStr = priceVal ? `${priceVal} kr` : '';
-
-      const compPrice = String(item.comparePrice || '').replace('kr', '').replace('.', ',').trim();
-      const compUnit = item.comparePriceUnit || '';
-      const displayVol = item.displayVolume || '';
-      
-      const descParts = [];
-      if (displayVol) descParts.push(displayVol);
-      if (compPrice && compUnit) descParts.push(`Jmf: ${compPrice} kr/${compUnit}`);
-      else if (compPrice) descParts.push(`Jmf: ${compPrice} kr`);
-
-      let imgUrl = '';
-      if (item.image && item.image.url) {
-        const u = item.image.url;
-        imgUrl = u.startsWith('http') 
-          ? u 
-          : `https://assets.axfood.se/image/upload/f_auto,t_200/${u.replace(/^\//, '')}`;
-      }
-
-      return {
-        product: item.name || 'Okänd produkt',
-        brand: item.manufacturer || '',
-        price: priceStr,
-        description: descParts.join(' | '),
-        image_url: imgUrl
-      };
-    });
-
-    willysSearchCache.set(q, mapped);
-    return mapped;
-  } catch (err) {
-    console.warn('Direct Willys API search failed, falling back to local dataset:', err);
-    return [];
-  }
-}
-
-async function updateWillysReferenceBox(query) {
-  const token = ++currentWillysSearchToken;
-  const box = document.getElementById('willys-reference-box');
-  const container = document.getElementById('willys-reference-items');
-  if (!box || !container) return;
-
+function updateWillysReferenceBox(query) {
   const q = (query || '').trim();
-
-  if (!q || q.length < 2) {
-    box.classList.add('hidden');
-    container.innerHTML = '';
-    return;
-  }
-
-  const localMatches = getLocalWillysMatches(q);
-  if (localMatches.length > 0) {
-    renderReferenceBox(localMatches, q);
-  }
-
-  try {
-    const apiMatches = await fetchWillysReferenceItems(q);
-    if (token !== currentWillysSearchToken) return;
-
-    if (apiMatches && apiMatches.length > 0) {
-      renderReferenceBox(apiMatches, q);
-    } else if (localMatches.length > 0) {
-      renderReferenceBox(localMatches, q);
-    } else {
-      box.classList.add('hidden');
-      container.innerHTML = '';
-    }
-  } catch (e) {
-    if (token === currentWillysSearchToken) {
-      if (localMatches.length > 0) {
-        renderReferenceBox(localMatches, q);
-      } else {
-        box.classList.add('hidden');
-        container.innerHTML = '';
-      }
-    }
-  }
+  renderReferenceBox(q.length >= 2 ? getLocalWillysMatches(q) : [], q);
 }
 
 function renderReferenceBox(matches, query) {
@@ -1745,65 +1834,15 @@ function toggleDesktopSidebar(forceState) {
 }
 
 // --- Product Detail Modal Logic ---
-async function renderModalWillysReference(productName) {
+function renderModalWillysReference(productName) {
   const refBox = document.getElementById('modal-willys-ref-box');
   const refItemsContainer = document.getElementById('modal-willys-ref-items');
   if (!refBox || !refItemsContainer) return;
 
-  refBox.classList.add('hidden');
-  refItemsContainer.innerHTML = '';
+  // Local dataset with strict relevance score
+  const matches = productName ? getLocalWillysMatches(productName) : [];
 
-  if (!productName) return;
-
-  // 1. Check local dataset with strict relevance score
-  let matches = getLocalWillysMatches(productName);
-
-  // 2. If no local match, query Willys API using core keywords (e.g. "majskolv")
-  if (matches.length === 0) {
-    const coreTokens = extractCoreKeywords(productName);
-    const searchPhrase = coreTokens.join(' ');
-
-    if (searchPhrase && searchPhrase.length >= 2) {
-      try {
-        const apiResults = await fetchWillysReferenceItems(searchPhrase);
-        if (apiResults && apiResults.length > 0) {
-          const scored = [];
-          const seen = new Set();
-
-          for (const item of apiResults) {
-            const itemProd = (item.product || '').toLowerCase();
-            let score = 0;
-
-            if (itemProd === productName.toLowerCase()) {
-              score = 100;
-            } else if (itemProd.includes(searchPhrase)) {
-              score = 60;
-            } else if (coreTokens.every(t => itemProd.includes(t))) {
-              score = 50;
-            } else if (coreTokens.some(t => t.length >= 4 && itemProd.includes(t))) {
-              score = 25;
-            }
-
-            if (score >= 20) {
-              const key = item.product.toLowerCase();
-              if (!seen.has(key)) {
-                seen.add(key);
-                scored.push({ item, score });
-              }
-            }
-          }
-
-          scored.sort((a, b) => b.score - a.score);
-          matches = scored.map(s => s.item);
-        }
-      } catch (err) {
-        console.warn('Modal Willys API reference search error:', err);
-      }
-    }
-  }
-
-  // 3. Render only if relevant matches exist
-  if (matches && matches.length > 0) {
+  if (matches.length > 0) {
     refItemsContainer.innerHTML = matches.slice(0, 3).map(ref => `
       <div class="flex items-center justify-between gap-2 border-b border-emerald-200/50 pb-1.5 last:border-0 text-emerald-950">
         <div class="truncate font-medium text-xs">
@@ -1819,6 +1858,297 @@ async function renderModalWillysReference(productName) {
     refBox.classList.add('hidden');
     refItemsContainer.innerHTML = '';
   }
+}
+
+// --- Ingredients (Innehållsförteckning) in Product Modal ---
+// Willys/Hemköp: fetched at build time into product_info.json (Axfood's API rejects requests from other sites)
+// ICA/Coop: the offer's EAN codes are matched against Willys at build time (product_info.json "eans"),
+//           otherwise looked up in Open Food Facts directly from the browser
+// Lidl: publishes no ingredients online, so we only link to the product page
+const PRODUCT_INFO_URL = 'product_info.json';
+const OPEN_FOOD_FACTS_FIELDS = 'lang,product_name,brands,quantity,ingredients_text_sv,ingredients_text_en,ingredients_text,nutriments';
+const OPEN_FOOD_FACTS_NUTRIENTS = [
+  ['Fett', 'fat'],
+  ['Varav mättat fett', 'saturated-fat'],
+  ['Kolhydrat', 'carbohydrates'],
+  ['Varav sockerarter', 'sugars'],
+  ['Fiber', 'fiber'],
+  ['Protein', 'proteins'],
+  ['Salt', 'salt']
+];
+const NON_FOOD_CATEGORIES = new Set(['Övrigt', 'Hushåll & Hygien']);
+
+// Allergens are written in CAPITALS by the stores, also inside words like "VETEmjöl"
+// (and as _underscored_ text in Open Food Facts)
+const UPPERCASE_WORDS_RE = /(^|[^A-Za-zÀ-ÖØ-öø-ÿ])([A-ZÀ-ÖØ-Þ]{3,}(?:[\s-]+[A-ZÀ-ÖØ-Þ]{2,})*)/g;
+const ALLERGEN_TAG_OPEN = '<strong class="font-bold text-zinc-900">';
+
+let productInfoPromise = null;
+const openFoodFactsCache = new Map();
+let ingredientsRequestToken = 0;
+
+function loadProductInfo() {
+  if (!productInfoPromise) {
+    productInfoPromise = fetch(`${PRODUCT_INFO_URL}?v=${Date.now()}`)
+      .then(response => {
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        return response.json();
+      })
+      .then(data => ({ products: data.products || {}, eans: data.eans || {} }))
+      .catch(err => {
+        productInfoPromise = null; // Retry next time a product is opened
+        throw err;
+      });
+  }
+  return productInfoPromise;
+}
+
+function formatNutrientNumber(value) {
+  const num = Number(value);
+  if (!isFinite(num)) return String(value);
+  const rounded = num >= 10 ? Math.round(num) : (num >= 1 ? Math.round(num * 10) / 10 : Math.round(num * 100) / 100);
+  return String(rounded).replace('.', ',');
+}
+
+function normalizeOpenFoodFactsProduct(product, ean) {
+  const n = product.nutriments || {};
+  const nutrition = {};
+
+  const energy = [];
+  const kj = n['energy-kj_100g'] ?? n['energy_100g'];
+  if (kj != null) energy.push(`${formatNutrientNumber(kj)} kJ`);
+  if (n['energy-kcal_100g'] != null) energy.push(`${formatNutrientNumber(n['energy-kcal_100g'])} kcal`);
+  if (energy.length > 0) nutrition['Energi'] = energy.join(' / ');
+
+  for (const [label, key] of OPEN_FOOD_FACTS_NUTRIENTS) {
+    const value = n[`${key}_100g`];
+    if (value != null && value !== '') nutrition[label] = `${formatNutrientNumber(value)} g`;
+  }
+
+  // Swedish first, English as fallback – skip other languages (e.g. Finnish for Fazer products)
+  const swedish = (product.ingredients_text_sv || (product.lang === 'sv' ? product.ingredients_text : '') || '').trim();
+  const english = (product.ingredients_text_en || (product.lang === 'en' ? product.ingredients_text : '') || '').trim();
+
+  return {
+    name: product.product_name || '',
+    details: [product.brands, product.quantity].filter(Boolean).join(', '),
+    ingredients: swedish || english,
+    language_note: swedish ? '' : (english
+      ? 'Finns bara på engelska i Open Food Facts:'
+      : (product.ingredients_text ? 'Innehållsförteckningen finns bara på ett annat språk i Open Food Facts.' : '')),
+    nutrition_basis: 'per 100 g/ml',
+    nutrition,
+    origin: '',
+    source: 'Open Food Facts',
+    url: `https://world.openfoodfacts.org/product/${encodeURIComponent(ean)}`
+  };
+}
+
+function fetchOpenFoodFactsProduct(ean) {
+  if (!openFoodFactsCache.has(ean)) {
+    const url = `https://world.openfoodfacts.org/api/v2/product/${encodeURIComponent(ean)}.json?fields=${OPEN_FOOD_FACTS_FIELDS}`;
+    const request = fetch(url)
+      .then(response => {
+        if (response.status === 404) return null;
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        return response.json();
+      })
+      .then(data => (data && data.status === 1 && data.product) ? normalizeOpenFoodFactsProduct(data.product, ean) : null)
+      .catch(err => {
+        openFoodFactsCache.delete(ean); // Network error – retry next time
+        throw err;
+      });
+    openFoodFactsCache.set(ean, request);
+  }
+  return openFoodFactsCache.get(ean);
+}
+
+function formatIngredientsHtml(text) {
+  let html = escapeHtml(text).replace(/_([^_]+)_/g, `${ALLERGEN_TAG_OPEN}$1</strong>`);
+
+  // Bold words in CAPITALS – unless the whole text is written in capitals
+  const letterCount = (text.match(/[A-Za-zÀ-ÖØ-öø-ÿ]/g) || []).length;
+  const upperCount = (text.match(/[A-ZÀ-ÖØ-Þ]/g) || []).length;
+  if (letterCount > 0 && upperCount / letterCount < 0.5) {
+    html = html.replace(UPPERCASE_WORDS_RE, `$1${ALLERGEN_TAG_OPEN}$2</strong>`);
+  }
+  return html;
+}
+
+function setIngredientsContent(html) {
+  const content = document.getElementById('modal-ingredients-content');
+  if (content) content.innerHTML = html;
+}
+
+function renderIngredientsLoading() {
+  setIngredientsContent(`
+    <div class="space-y-2 animate-pulse" aria-label="Laddar innehållsförteckning">
+      <div class="h-2.5 bg-zinc-200 rounded w-full"></div>
+      <div class="h-2.5 bg-zinc-200 rounded w-11/12"></div>
+      <div class="h-2.5 bg-zinc-200 rounded w-3/4"></div>
+    </div>
+  `);
+}
+
+function renderIngredientsMessage(text, linkHtml = '') {
+  setIngredientsContent(`<p class="text-zinc-500 leading-relaxed">${escapeHtml(text)}${linkHtml ? ` ${linkHtml}` : ''}</p>`);
+}
+
+function renderIngredientsProduct(product, offer, { showName, sourceHtml }) {
+  const nutritionRows = Object.entries(product.nutrition || {});
+  if (!product.ingredients && nutritionRows.length === 0) {
+    renderIngredientsMessage(`${product.source} har ingen innehållsförteckning för den här varan.`);
+    return;
+  }
+
+  const parts = [];
+
+  // Show which product the data is for when the offer has a generic name (e.g. "Chips, ostsnacks")
+  if (showName && product.name && product.name.toLowerCase() !== String(offer.product || '').toLowerCase()) {
+    const details = product.details ? ` <span class="text-zinc-400">(${escapeHtml(product.details)})</span>` : '';
+    parts.push(`<p class="text-zinc-500">Gäller: <span class="font-semibold text-zinc-700">${escapeHtml(product.name)}</span>${details}</p>`);
+  }
+
+  if (product.ingredients) {
+    if (product.language_note) {
+      parts.push(`<p class="text-zinc-400 italic">${escapeHtml(product.language_note)}</p>`);
+    }
+    parts.push(`<p class="text-zinc-700 leading-relaxed">${formatIngredientsHtml(product.ingredients)}</p>`);
+  } else {
+    parts.push(`<p class="text-zinc-500">${escapeHtml(product.language_note || 'Ingen innehållsförteckning angiven.')}</p>`);
+  }
+
+  if (product.origin) {
+    parts.push(`<p class="text-zinc-600">${escapeHtml(product.origin)}</p>`);
+  }
+
+  if (nutritionRows.length > 0) {
+    parts.push(`
+      <details class="border-t border-zinc-100 pt-2.5">
+        <summary class="cursor-pointer select-none font-semibold text-zinc-700">Näringsvärde ${escapeHtml(product.nutrition_basis || '')}</summary>
+        <table class="w-full mt-1.5 text-zinc-700">
+          <tbody class="divide-y divide-zinc-100">
+            ${nutritionRows.map(([label, value]) => `
+              <tr>
+                <td class="py-1 pr-3">${escapeHtml(label)}</td>
+                <td class="py-1 text-right font-semibold whitespace-nowrap">${escapeHtml(value)}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </details>
+    `);
+  }
+
+  parts.push(`<p class="text-[11px] text-zinc-400 leading-snug">Källa: ${sourceHtml}. Kontrollera alltid förpackningen om du har allergier.</p>`);
+  setIngredientsContent(parts.join(''));
+}
+
+// ICA/Coop variant that Willys also sells (matched on EAN code at build time)
+function getMatchedStoreProduct(info, ean) {
+  const code = info && info.eans[ean];
+  const product = code && info.products[code];
+  return product && (product.ingredients || Object.keys(product.nutrition || {}).length > 0) ? product : null;
+}
+
+async function showVariantIngredients(offer, variant, hasVariantPicker) {
+  const token = ++ingredientsRequestToken;
+  renderIngredientsLoading();
+  try {
+    const info = await loadProductInfo().catch(() => null);
+    const storeProduct = getMatchedStoreProduct(info, variant.ean);
+    const offProduct = storeProduct ? null : await fetchOpenFoodFactsProduct(variant.ean);
+    if (token !== ingredientsRequestToken) return;
+
+    if (storeProduct) {
+      const sameChain = getChainName(offer.store) === storeProduct.source;
+      const sourceHtml = escapeHtml(sameChain ? storeProduct.source : `${storeProduct.source}, som säljer samma vara`);
+      renderIngredientsProduct(storeProduct, offer, { showName: !hasVariantPicker, sourceHtml });
+    } else if (offProduct && (offProduct.ingredients || Object.keys(offProduct.nutrition).length > 0)) {
+      const sourceHtml = `<a href="${escapeHtml(offProduct.url)}" target="_blank" rel="noopener noreferrer" class="underline hover:text-zinc-600">Open Food Facts</a> (öppen databas där användare bidrar – kan innehålla fel)`;
+      renderIngredientsProduct(offProduct, offer, { showName: !hasVariantPicker, sourceHtml });
+    } else {
+      renderIngredientsMessage(hasVariantPicker
+        ? 'Ingen innehållsförteckning hittades för den här varianten – prova en annan i listan.'
+        : 'Ingen innehållsförteckning hittades för den här varan.');
+    }
+  } catch (err) {
+    if (token === ingredientsRequestToken) {
+      renderIngredientsMessage('Kunde inte hämta innehållsförteckningen just nu. Försök igen om en stund.');
+    }
+  }
+}
+
+async function renderModalIngredients(offer) {
+  const box = document.getElementById('modal-ingredients-box');
+  const select = document.getElementById('modal-ingredients-variant');
+  if (!box || !select) return;
+
+  const token = ++ingredientsRequestToken;
+  select.classList.add('hidden');
+  select.innerHTML = '';
+  select.onchange = null;
+
+  const variants = Array.isArray(offer.eans) ? offer.eans.filter(v => v && v.ean) : [];
+  const cat = offer.category || categorizeOfferJS(offer);
+
+  // 1. Willys/Hemköp: product_info.json
+  if (offer.product_code) {
+    box.classList.remove('hidden');
+    renderIngredientsLoading();
+    try {
+      const info = await loadProductInfo();
+      if (token !== ingredientsRequestToken) return;
+      const product = info.products[offer.product_code];
+      if (product) {
+        renderIngredientsProduct(product, offer, { showName: true, sourceHtml: escapeHtml(product.source) });
+      } else {
+        renderIngredientsMessage('Innehållsförteckningen för den här varan har inte hämtats än. Den läggs till vid nästa uppdatering.');
+      }
+    } catch (err) {
+      if (token === ingredientsRequestToken) {
+        renderIngredientsMessage('Kunde inte ladda innehållsförteckningen just nu. Försök igen om en stund.');
+      }
+    }
+    return;
+  }
+
+  // 2. ICA/Coop: EAN codes -> same product at Willys, else Open Food Facts.
+  //    With a picker when the offer covers several variants.
+  if (variants.length > 0) {
+    box.classList.remove('hidden');
+    const hasVariantPicker = variants.length > 1;
+    if (hasVariantPicker) {
+      select.innerHTML = variants.map((v, i) => `<option value="${i}">${escapeHtml(v.name || `EAN ${v.ean}`)}</option>`).join('');
+      select.classList.remove('hidden');
+      select.onchange = () => showVariantIngredients(offer, variants[Number(select.value)], true);
+    }
+
+    // Preselect the first variant with ingredients: Willys matches first,
+    // otherwise the first four variants are checked in Open Food Facts in parallel
+    renderIngredientsLoading();
+    const info = await loadProductInfo().catch(() => null);
+    if (token !== ingredientsRequestToken) return;
+    let index = variants.findIndex(v => getMatchedStoreProduct(info, v.ean)?.ingredients);
+    if (index === -1) {
+      const results = await Promise.all(variants.slice(0, 4).map(v => fetchOpenFoodFactsProduct(v.ean).catch(() => null)));
+      if (token !== ingredientsRequestToken) return;
+      index = Math.max(0, results.findIndex(p => p && p.ingredients));
+    }
+    select.value = String(index);
+    showVariantIngredients(offer, variants[index], hasVariantPicker);
+    return;
+  }
+
+  // 3. Lidl (food only): no ingredients online, link to the product page instead
+  if (offer.product_url && !NON_FOOD_CATEGORIES.has(cat)) {
+    box.classList.remove('hidden');
+    const link = `<a href="${escapeHtml(offer.product_url)}" target="_blank" rel="noopener noreferrer" class="font-semibold text-zinc-700 underline hover:text-zinc-900">Visa varan på lidl.se</a>`;
+    renderIngredientsMessage('Lidl publicerar inte innehållsförteckningar på sin webbplats.', link);
+    return;
+  }
+
+  box.classList.add('hidden');
 }
 
 function openProductModal(offer) {
@@ -1910,7 +2240,9 @@ function openProductModal(offer) {
   const origPriceEl = document.getElementById('modal-original-price');
   const savingsEl = document.getElementById('modal-savings-amount');
 
-  const parsedDealPrice = parsePriceNumeric(priceText);
+  // Per item for "3 för 99" offers, per kg for kilo prices
+  const { pricePerUnit: parsedDealPrice, isExplicitPerKg } = extractPerUnitDealPriceJS(priceText);
+  const isMultiBuy = /\d+\s*(?:st)?\s*f[öo]r/i.test(priceText);
   const parsedOrigPrice = parsePriceNumeric(origPriceText);
   let savingsSek = 0;
 
@@ -1926,10 +2258,19 @@ function openProductModal(offer) {
   }
 
   if (savingsSek > 0 && savingsEl) {
-    savingsEl.textContent = `Du sparar ${savingsSek.toString().replace('.', ',')} kr!`;
+    const savingsUnit = isExplicitPerKg ? ' kr/kg' : (isMultiBuy ? ' kr/st' : ' kr');
+    savingsEl.textContent = `Du sparar ${formatKr(savingsSek)}${savingsUnit}!`;
     savingsEl.classList.remove('hidden');
   } else if (savingsEl) {
     savingsEl.classList.add('hidden');
+  }
+
+  // Comparison price per kg
+  const comparePriceEl = document.getElementById('modal-compare-price');
+  if (comparePriceEl) {
+    const comparePrice = describePricePerKg(offer);
+    comparePriceEl.textContent = comparePrice ? `Jmf-pris ${comparePrice}` : '';
+    comparePriceEl.classList.toggle('hidden', !comparePrice);
   }
 
   // Restrictions / Terms Box
@@ -1943,6 +2284,9 @@ function openProductModal(offer) {
       restrictionBox.classList.add('hidden');
     }
   }
+
+  // Ingredients (Async: product_info.json or Open Food Facts)
+  renderModalIngredients(offer);
 
   // Willys Reference Price Box inside Modal (Async & strict score matching)
   renderModalWillysReference(productName);
@@ -2119,6 +2463,34 @@ function setupEventListeners() {
       const index = parseInt(card.dataset.dealIndex, 10);
       if (!isNaN(index) && state.filteredOffers[index]) {
         openProductModal(state.filteredOffers[index]);
+      }
+    });
+  }
+
+  // Veckans bästa deal: open the product, or show all deals in a group
+  const bestDealSection = document.getElementById('best-deal-section');
+  if (bestDealSection) {
+    const openBestDeal = (target) => {
+      const card = target.closest('[data-best-deal]');
+      const deal = card && bestDeals[parseInt(card.dataset.bestDeal, 10)];
+      if (deal) openProductModal(deal.offer);
+    };
+
+    bestDealSection.addEventListener('click', (e) => {
+      const pillBtn = e.target.closest('[data-best-deal-pill]');
+      if (pillBtn) {
+        state.activeCategoryPill = pillBtn.dataset.bestDealPill;
+        applyFilters();
+        document.getElementById('category-pills-container')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        return;
+      }
+      openBestDeal(e.target);
+    });
+
+    bestDealSection.addEventListener('keydown', (e) => {
+      if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('[data-best-deal]')) {
+        e.preventDefault();
+        openBestDeal(e.target);
       }
     });
   }

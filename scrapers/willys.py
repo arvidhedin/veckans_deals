@@ -1,10 +1,17 @@
+import re
+
 import requests
+
+from scrapers.pricing import parse_number, parse_price_per_kg, price_per_kg_fields
 
 
 # Willys butik att hämta erbjudanden för
 # Uppsala Björkgatan store code is 2110
 STORE_ID = "2110"
 STORE_NAME = "Willys"
+
+# Etikett per kampanjtyp ("GENERAL" = vanligt erbjudande, visas inte)
+CAMPAIGN_LABELS = {"LOYALTY": "Willys Plus"}
 
 API_URL = "https://www.willys.se/axfood/rest/v1/search/campaigns/offline"
 
@@ -27,42 +34,51 @@ def _parse_offer(item: dict) -> dict:
     condition = ""
     original_price = ""
     discount_percentage = 0
+    product_code = ""
+    restriction = ""
+    per_kg = None
 
     if promos:
         promo = promos[0]
-        reward = promo.get("rewardLabel", "")
+        # Produktkod för att hämta innehållsförteckning (se product_info.py)
+        product_code = promo.get("mainProductCode") or ""
+        reward = promo.get("rewardLabel") or ""
         cond = promo.get("conditionLabelFormatted", "") or promo.get("conditionLabel", "")
         if cond and reward:
             price_str = f"{cond} {reward}"
         elif reward:
             price_str = reward
 
-        condition = promo.get("campaignType", "")
+        # Kampanjtypen är en intern kod ("GENERAL", "LOYALTY") – visa bara medlemspriser
+        condition = CAMPAIGN_LABELS.get(promo.get("campaignType", ""), "")
+        restriction = promo.get("redeemLimitLabel") or ""
 
-        # Originalpris från item.priceNoUnit
+        # Originalpris från item.priceNoUnit (kilopris för varor som säljs per kg)
         price_no_unit = item.get("priceNoUnit", "")
+        is_per_kg = item.get("priceUnit") == "kr/kg"
         if price_no_unit:
-            original_price = f"{price_no_unit} kr"
+            original_price = f"{price_no_unit} kr/kg" if is_per_kg else f"{price_no_unit} kr"
+
+        # Kampanjpris – för kilovaror saknas "price", då står priset i rewardLabel ("274,80/kg")
+        deal = promo.get("price")
+        if deal is None and reward.endswith("/kg"):
+            deal = parse_number(reward)
+
+        # Jämförpris per kg, t.ex. "99:78 kr/kg"
+        per_kg = parse_price_per_kg(promo.get("comparePrice"))
+        if not per_kg and deal and reward.endswith("/kg"):
+            per_kg = (deal, deal)
 
         # Beräkna rabattprocent
-        promo_price = promo.get("price")
         cond_label = promo.get("conditionLabel", "") or ""
-        if price_no_unit and promo_price is not None:
-            try:
-                orig = float(str(price_no_unit).replace(",", "."))
-                deal = float(promo_price)
-                # Hantera "2 för" erbjudanden
-                import re
-                multi_match = re.search(r'(\d+)\s*för', cond_label)
-                if multi_match:
-                    qty = int(multi_match.group(1))
-                    deal_per_unit = deal / qty
-                else:
-                    deal_per_unit = deal
-                if orig > 0 and deal_per_unit < orig:
-                    discount_percentage = round((1 - deal_per_unit / orig) * 100)
-            except (ValueError, TypeError, ZeroDivisionError):
-                pass
+        orig = parse_number(price_no_unit)
+        if orig and deal:
+            # Hantera "2 för" erbjudanden
+            multi_match = re.search(r'(\d+)\s*för', cond_label)
+            quantity = int(multi_match.group(1)) if multi_match else 1
+            deal_per_unit = deal / max(quantity, 1)
+            if deal_per_unit < orig:
+                discount_percentage = round((1 - deal_per_unit / orig) * 100)
 
     # Bild-URL
     image_url = ""
@@ -83,9 +99,11 @@ def _parse_offer(item: dict) -> dict:
         "description": item.get("displayVolume", ""),
         "image_url": image_url,
         "category": "",
-        "restriction": "",
+        "restriction": restriction,
         "original_price": original_price,
         "discount_percentage": discount_percentage,
+        "product_code": product_code,
+        **price_per_kg_fields(per_kg),
     }
 
 

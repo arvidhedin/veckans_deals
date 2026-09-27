@@ -3,11 +3,22 @@ from bs4 import BeautifulSoup
 import json
 import re
 
+from scrapers.pricing import format_kr, parse_price_per_kg, price_per_kg_fields
+
 # Coop butiker att hämta erbjudanden för
 STORES = {
     "Coop (Centralhuset)": "036910",
     "Coop (Liljegatan)": "036002"
 }
+
+# Coops webbutik – erbjudande-API:et saknar ordinarie pris, så det hämtas härifrån
+# (tillsammans med innehållsförteckningen). Webbutikens priser kan skilja något
+# från hyllpriserna i de enskilda butikerna.
+SEARCH_URL = "https://external.api.coop.se/personalization/search/products"
+ONLINE_STORE_ID = "251300"
+
+_headers_cache = {}
+_search_cache = {}
 
 # Fallback keys if dynamic retrieval fails
 FALLBACK_KEYS = [
@@ -45,6 +56,65 @@ def _get_headers() -> dict:
 
     headers["Ocp-Apim-Subscription-Key"] = FALLBACK_KEYS[0]
     return headers
+
+def _search_products(query: str, headers: dict) -> list[dict]:
+    """Söker i Coops webbutik (cachas, så samma sökning görs bara en gång per körning)."""
+    if query not in _search_cache:
+        params = {"api-version": "v1", "store": ONLINE_STORE_ID, "groups": "CUSTOMER_PRIVATE",
+                  "device": "desktop", "direct": "false"}
+        body = {"query": query, "resultsOptions": {"skip": 0, "take": 30, "sortBy": [], "facets": []},
+                "relatedResultsOptions": {"skip": 0, "take": 0}}
+        response = requests.post(SEARCH_URL, params=params, headers={**headers, "Accept": "application/json"},
+                                 json=body, timeout=10)
+        response.raise_for_status()
+        _search_cache[query] = (response.json().get("results") or {}).get("items") or []
+    return _search_cache[query]
+
+def find_products(offer: dict) -> dict:
+    """Hittar erbjudandets varor i Coops webbutik via EAN-koderna: {ean: produkt}."""
+    wanted = [v["ean"] for v in offer.get("eans", [])]
+    if not wanted:
+        return {}
+    if "headers" not in _headers_cache:
+        _headers_cache["headers"] = _get_headers()
+
+    # Sök först på namnet (ger alla varianter på en gång), annars direkt på EAN-koderna
+    found = {}
+    for query in [offer.get("product", "")] + wanted[:2]:
+        for product in _search_products(query, _headers_cache["headers"]):
+            if product.get("ean") in wanted:
+                found[product["ean"]] = product
+        if found:
+            break
+    return found
+
+def _add_ordinary_price(offer: dict, item: dict) -> None:
+    """Sätter ordinarie pris och rabattprocent utifrån webbutikens pris för samma varor."""
+    price_info = item.get("priceInformation", {})
+    deal = price_info.get("discountValue")
+    if not deal:
+        return
+    deal_per_unit = deal / (price_info.get("minimumAmount") or 1)
+    is_per_kg = price_info.get("unit") == "kg"
+
+    ordinary = []
+    for product in find_products(offer).values():
+        if is_per_kg:
+            # Kilovara: jämför med ordinarie jämförpris per kg
+            if (product.get("comparativePriceUnit") or {}).get("unit") == "kg":
+                ordinary.append((product.get("comparativePriceData") or {}).get("b2cPrice"))
+        else:
+            ordinary.append((product.get("salesPriceData") or {}).get("b2cPrice"))
+    ordinary = [p for p in ordinary if p]
+    if not ordinary:
+        return
+
+    # Lägsta ordinarie priset bland varianterna, som för ICA
+    low, high = min(ordinary), max(ordinary)
+    price_range = format_kr(low) if low == high else f"{format_kr(low)}-{format_kr(high)}"
+    offer["original_price"] = f"{price_range} kr/kg" if is_per_kg else f"{price_range} kr"
+    if deal_per_unit < low:
+        offer["discount_percentage"] = round((1 - deal_per_unit / low) * 100)
 
 def _parse_offer(item: dict, store_name: str) -> dict:
     """Konvertera ett Coop-erbjudande till vårt standardformat."""
@@ -94,6 +164,22 @@ def _parse_offer(item: dict, store_name: str) -> dict:
     original_price = ""
     discount_percentage = 0
 
+    # Jämförpris per kg: kilopriset självt, annars Coops jämförpris (t.ex. "79,80-114kr/kg.")
+    if price_info.get("unit") == "kg" and price_info.get("discountValue"):
+        per_kg = (price_info["discountValue"], price_info["discountValue"])
+    else:
+        per_kg = parse_price_per_kg(content.get("comparativePriceText"))
+
+    # EAN-koder för erbjudandets varianter – används för att hitta
+    # innehållsförteckningen (se product_info.py)
+    variant_eans = []
+    for variant in [item] + (item.get("clusterInteriorOffers") or []):
+        ean = str(variant.get("externalId") or "")
+        if ean.isdigit() and ean not in [v["ean"] for v in variant_eans]:
+            variant_content = variant.get("content", {})
+            name = variant_content.get("onlineProductName") or variant_content.get("title", "")
+            variant_eans.append({"ean": ean, "name": name})
+
     return {
         "store": store_name,
         "product": content.get("title", "Okänd produkt"),
@@ -106,6 +192,8 @@ def _parse_offer(item: dict, store_name: str) -> dict:
         "restriction": "",
         "original_price": original_price,
         "discount_percentage": discount_percentage,
+        "eans": variant_eans,
+        **price_per_kg_fields(per_kg),
     }
 
 def get_offers() -> list[dict]:
@@ -114,6 +202,7 @@ def get_offers() -> list[dict]:
     
     # Vi hämtar API-nyckeln en gång för alla butiker
     headers = _get_headers()
+    _headers_cache["headers"] = headers
 
     for store_name, store_id in STORES.items():
         # Återställ set:et med id:n per butik, annars missar vi produkter 
@@ -146,6 +235,10 @@ def get_offers() -> list[dict]:
                         seen_ids.add(offer_id)
                     
                     parsed = _parse_offer(offer, store_name)
+                    try:
+                        _add_ordinary_price(parsed, offer)
+                    except Exception as e:
+                        print(f"Kunde inte hämta ordinarie pris för {parsed['product']} ({store_name}): {e}")
                     all_offers.append(parsed)
 
         except Exception as e:

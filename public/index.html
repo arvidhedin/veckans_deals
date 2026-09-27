@@ -15,31 +15,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
-  <!-- Tailwind CSS via CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['"Plus Jakarta Sans"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
-          },
-          colors: {
-            brand: {
-              deal: '#E11D48',
-            },
-            store: {
-              ica: '#E21936',
-              willys: '#009345',
-              hemkop: '#D31115',
-              coop: '#007A33',
-              lidl: '#00509E',
-            },
-          }
-        }
-      }
-    }
-  </script>
+  <!-- Tailwind CSS (built from tailwind.config.js by .github/workflows/build_css.yml) -->
+  <link rel="stylesheet" href="tailwind.css?v=20260927_1200">
 
   <!-- Custom Styles for Store Badge Colors & Utilities -->
   <style>
@@ -125,6 +102,24 @@
         <span id="cart-header-count" class="bg-rose-500 text-white text-[11px] font-bold px-2 py-0.5 rounded-full min-w-[20px] text-center">0</span>
       </button>
     </header>
+
+    <!-- Veckans bästa deal (rendered by app.js, hidden when nothing qualifies) -->
+    <section id="best-deal-section" class="hidden mb-6 sm:mb-8" aria-labelledby="best-deal-title">
+      <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2 sm:gap-4 mb-3 sm:mb-4">
+        <div>
+          <h2 id="best-deal-title" class="text-lg sm:text-xl font-extrabold tracking-tight text-zinc-900">Veckans bästa deal</h2>
+          <p class="text-xs sm:text-sm text-zinc-500">Dyra basvaror till riktigt bra pris: kött under 80 kr/kg, kaffe under 100 kr/kg och ost under 80 kr/kg.</p>
+        </div>
+        <div class="flex gap-2 shrink-0">
+          <button type="button" data-best-deal-pill="Kött &amp; Fågel &lt;80 kr/kg" class="px-3 py-1.5 rounded-full text-xs font-bold border bg-rose-50 text-rose-900 border-rose-200/90 hover:bg-rose-100 hover:border-rose-300 transition cursor-pointer">Allt kött &lt;80 kr/kg</button>
+          <button type="button" data-best-deal-pill="Kaffe &lt;100 kr/kg" class="px-3 py-1.5 rounded-full text-xs font-bold border bg-orange-50 text-orange-950 border-orange-200/90 hover:bg-orange-100 hover:border-orange-300 transition cursor-pointer">Allt kaffe &lt;100 kr/kg</button>
+        </div>
+      </div>
+      <div class="grid grid-cols-1 lg:grid-cols-5 gap-3 sm:gap-4">
+        <div id="best-deal-hero" class="lg:col-span-3"></div>
+        <div id="best-deal-runners" class="lg:col-span-2 grid grid-cols-2 gap-3 sm:gap-4"></div>
+      </div>
+    </section>
 
     <!-- Main Content Layout (Sidebar + Results) -->
     <div class="flex flex-col lg:flex-row gap-6 lg:gap-8 items-start">
@@ -567,6 +562,9 @@
             <div id="modal-savings-amount" class="text-xs font-extrabold text-emerald-700 bg-emerald-100/90 px-2.5 py-1 rounded-lg border border-emerald-200 inline-block">
               Du sparar X kr!
             </div>
+            <div id="modal-compare-price" class="hidden text-[11px] font-semibold text-zinc-500">
+              Jmf-pris
+            </div>
           </div>
         </div>
 
@@ -578,6 +576,22 @@
           <div>
             <span class="font-bold block mb-0.5">Villkor & Begränsningar</span>
             <span id="modal-restriction-text">Max 2 köp/hushåll</span>
+          </div>
+        </div>
+
+        <!-- Ingredients Box (loaded when the modal opens) -->
+        <div id="modal-ingredients-box" class="hidden bg-white border border-zinc-200/80 rounded-2xl p-4 text-xs space-y-3">
+          <span class="font-bold text-zinc-900 flex items-center gap-1.5 text-xs">
+            <svg class="w-4 h-4 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+            </svg>
+            Innehållsförteckning
+          </span>
+          <select id="modal-ingredients-variant" aria-label="Välj variant" class="hidden w-full bg-zinc-50 border border-zinc-200 rounded-xl px-3 py-2 text-xs font-medium text-zinc-800 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent">
+            <!-- Variants populated via JS -->
+          </select>
+          <div id="modal-ingredients-content" class="space-y-3">
+            <!-- Populated via JS -->
           </div>
         </div>
 
@@ -694,7 +708,7 @@
   </div>
 
   <!-- Application Logic -->
-  <script src="app.js?v=20260822_2004"></script>
+  <script src="app.js?v=20260927_1200"></script>
 </body>
 </html>
 

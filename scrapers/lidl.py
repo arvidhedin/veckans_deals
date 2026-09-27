@@ -1,6 +1,8 @@
 import requests
 import re
 
+from scrapers.pricing import format_kr, parse_price_per_kg, price_per_kg_fields
+
 API_URL = "https://www.lidl.se/q/api/search"
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
@@ -97,45 +99,45 @@ def get_offers() -> list[dict]:
                 elif isinstance(brand_obj, str):
                     brand = brand_obj
                     
-                # 4. discount & price & description (packaging)
-                price_dict = data_dict.get("price", {})
-                price_num = price_dict.get("price") if isinstance(price_dict, dict) else None
-                normal_price_num = price_num
-                
-                discount = ""
-                original_price = ""
-                discount_percentage = 0
+                # 4. Pris och rabatt. Med Lidl Plus är Lidl Plus-priset dealpriset
+                #    och det vanliga priset ordinarie pris.
+                price_dict = data_dict.get("price") or {}
+                normal_price = price_dict.get("price")
                 lidl_plus = data_dict.get("lidlPlus")
-                if lidl_plus and isinstance(lidl_plus, list):
-                    discount = "Lidl Plus"
-                    if price_num is None and len(lidl_plus) > 0:
-                        lp_price_dict = lidl_plus[0].get("price", {})
-                        price_num = lp_price_dict.get("price")
-                        price_dict = lp_price_dict
-                    
-                    if len(lidl_plus) > 0:
-                        highlight = lidl_plus[0].get("highlightText", "")
-                        pct_match = re.search(r'(\d+)\s*%', highlight)
-                        if pct_match:
-                            discount_percentage = int(pct_match.group(1))
-                        
-                        if discount_percentage == 0 and normal_price_num is not None:
-                            lp_price = lidl_plus[0].get("price", {}).get("price")
-                            if lp_price is not None:
-                                try:
-                                    orig = float(normal_price_num)
-                                    deal = float(lp_price)
-                                    if orig > 0 and deal < orig:
-                                        discount_percentage = round((1 - deal / orig) * 100)
-                                except (ValueError, TypeError, ZeroDivisionError):
-                                    pass
+                lp = lidl_plus[0] if isinstance(lidl_plus, list) and lidl_plus else {}
+                lp_price_dict = lp.get("price") or {}
 
-                pkg_info = price_dict.get("packaging", {}) if isinstance(price_dict, dict) else {}
+                discount = ""
+                original_price_num = None
+                discount_percentage = 0
+                if lp_price_dict.get("price") is not None:
+                    discount = "Lidl Plus"
+                    price_num = lp_price_dict["price"]
+                    active_price = lp_price_dict
+                    if normal_price is not None and normal_price > price_num:
+                        original_price_num = normal_price
+                    pct_match = re.search(r'(\d+)\s*%', lp.get("highlightText") or "")
+                    if pct_match:
+                        discount_percentage = int(pct_match.group(1))
+                else:
+                    price_num = normal_price
+                    active_price = price_dict
+                    # Vanligt erbjudande med överstruket pris
+                    price_discount = price_dict.get("discount") or {}
+                    old_price = price_discount.get("deletedPrice") or price_dict.get("oldPrice")
+                    if old_price and price_num is not None and old_price > price_num:
+                        original_price_num = old_price
+                        discount_percentage = int(price_discount.get("percentageDiscount") or 0)
+
+                if not discount_percentage and original_price_num and price_num:
+                    discount_percentage = round((1 - price_num / original_price_num) * 100)
+
+                pkg_info = active_price.get("packaging") or {}
                 pkg_text = pkg_info.get("text", "") if isinstance(pkg_info, dict) else ""
-                
-                base_price_info = price_dict.get("basePrice", {}) if isinstance(price_dict, dict) else {}
+
+                base_price_info = active_price.get("basePrice") or {}
                 base_price_text = base_price_info.get("text", "") if isinstance(base_price_info, dict) else ""
-                
+
                 pkg_clean = pkg_text.strip().lower()
                 base_clean = base_price_text.strip().lower()
 
@@ -157,17 +159,15 @@ def get_offers() -> list[dict]:
                     unit_suffix = ""
                     description = pkg_text
 
-                if normal_price_num is not None and discount == "Lidl Plus":
-                    try:
-                        orig_val = float(normal_price_num)
-                        if orig_val.is_integer():
-                            original_price = f"{int(orig_val)}:- kr{unit_suffix}"
-                        else:
-                            original_price = f"{orig_val:.2f} kr{unit_suffix}".replace(".", ",")
-                    except (ValueError, TypeError):
-                        pass
+                original_price = f"{format_kr(original_price_num)} kr{unit_suffix}" if original_price_num else ""
 
-                # Extrahera rabattprocent från ribbons om den inte fanns på Lidl Plus
+                # Jämförpris per kg: kilopriset självt, annars Lidls jämförpris ("329,00 kr/kg")
+                if unit_suffix == "/kg" and price_num:
+                    per_kg = (price_num, price_num)
+                else:
+                    per_kg = parse_price_per_kg(base_price_text)
+
+                # Extrahera rabattprocent från ribbons om den inte fanns ovan
                 if discount_percentage == 0:
                     ribbons = data_dict.get("ribbons") or []
                     for r in ribbons:
@@ -201,7 +201,11 @@ def get_offers() -> list[dict]:
                 image_url = data_dict.get("image", "")
                 category = ""
                 restriction = _extract_restriction(data_dict)
-                
+
+                # Lidl publicerar ingen innehållsförteckning, men produktsidan kan länkas
+                canonical_url = data_dict.get("canonicalUrl") or ""
+                product_url = f"https://www.lidl.se{canonical_url}" if canonical_url.startswith("/") else ""
+
                 parsed_offers.append({
                     "store": store,
                     "product": product,
@@ -214,6 +218,8 @@ def get_offers() -> list[dict]:
                     "restriction": restriction,
                     "original_price": original_price,
                     "discount_percentage": discount_percentage,
+                    "product_url": product_url,
+                    **price_per_kg_fields(per_kg),
                 })
             
             offset += len(items)

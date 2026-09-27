@@ -244,7 +244,7 @@ def get_willys_assortment() -> list[dict]:
             if res.status_code != 200:
                 continue
             data = res.json()
-            for item in data.get("results", []):
+            for item in data.get("results") or []:
                 code = item.get("code")
                 if not code or code in seen_codes:
                     continue
