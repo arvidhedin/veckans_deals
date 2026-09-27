@@ -359,6 +359,7 @@ class ClientGameState {
 
   addPlayer(name, isBot = false, colorIdx = null) {
     if (this.players.length >= this.max_players || this.status !== "LOBBY") return null;
+    name = String(name || '').trim().slice(0, 20) || 'Spelare';
     const pid = this.players.length;
 
     if (colorIdx === null || this.players.some(p => p.color_idx === colorIdx)) {

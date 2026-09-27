@@ -17,8 +17,20 @@ class NetworkPeer {
     this.reconnectAttempts = 0;
     this.maxReconnectAttempts = 10;
     this.reconnectTimer = null;
+    this.turnServers = [];
 
+    this._loadTurnServers();
     this._bindWindowEvents();
+  }
+
+  // TURN servers (Cloudflare, via functions/catan/turn.js) relay the traffic when two phones
+  // can't connect directly, which is common on mobile data. Loaded at startup, before anyone
+  // creates or joins a room. Empty when TURN isn't set up – then only STUN is used.
+  _loadTurnServers() {
+    fetch('/catan/turn', { cache: 'no-store' })
+      .then(res => (res.ok ? res.json() : { iceServers: [] }))
+      .then(data => { this.turnServers = Array.isArray(data.iceServers) ? data.iceServers : []; })
+      .catch(() => {});
   }
 
   _getPeerConfig() {
@@ -28,7 +40,8 @@ class NetworkPeer {
         iceServers: [
           { urls: 'stun:stun.l.google.com:19302' },
           { urls: 'stun:global.stun.twilio.com:3478' },
-          { urls: 'stun:stun.cloudflare.com:3478' }
+          { urls: 'stun:stun.cloudflare.com:3478' },
+          ...this.turnServers
         ]
       }
     };

@@ -305,8 +305,8 @@ class CatanApp {
 
       slot.innerHTML = `
         <div class="slot-left">
-          <div class="color-dot" style="background-color:${p.color}"></div>
-          <span class="slot-name">${p.name}</span>
+          <div class="color-dot" style="background-color:${escapeHtml(p.color)}"></div>
+          <span class="slot-name">${escapeHtml(p.name)}</span>
         </div>
         <div style="display:flex;align-items:center;gap:6px;">
           ${isOffline ? '<span class="slot-badge offline">Frånkopplad</span>' : ''}

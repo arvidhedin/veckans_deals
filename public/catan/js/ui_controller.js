@@ -3,6 +3,13 @@
  * Manages player status bar, resource ribbons, bottom sheets, modals, and user actions.
  */
 
+// Player names come from other players' devices – always escape them before using innerHTML
+function escapeHtml(str) {
+  return String(str ?? '').replace(/[&<>"']/g, ch => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
+  })[ch]);
+}
+
 class UIController {
   constructor(app) {
     this.app = app;
@@ -737,8 +744,8 @@ class UIController {
       row.className = 'steal-player-row';
       row.innerHTML = `
         <div style="display:flex;align-items:center;gap:8px;">
-          <div class="color-dot" style="background:${p.color}"></div>
-          <strong>${p.name}</strong>
+          <div class="color-dot" style="background:${escapeHtml(p.color)}"></div>
+          <strong>${escapeHtml(p.name)}</strong>
         </div>
         <span>${p.resources_count} kort</span>
       `;
@@ -768,7 +775,7 @@ class UIController {
     sorted.forEach((p, idx) => {
       const row = document.createElement('div');
       row.style.cssText = 'display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.1);';
-      row.innerHTML = `<span>#${idx + 1} ${p.name}</span><strong>${p.total_vp} VP</strong>`;
+      row.innerHTML = `<span>#${idx + 1} ${escapeHtml(p.name)}</span><strong>${escapeHtml(p.total_vp)} VP</strong>`;
       scoresList.appendChild(row);
     });
   }
