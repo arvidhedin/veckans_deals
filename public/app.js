@@ -838,14 +838,6 @@ function isCoffee(offer) {
   return COFFEE_RE.test(getOfferText(offer));
 }
 
-// Hard and semi-hard cheese like prästost, herrgård and grevé
-const HARD_CHEESE_RE = /(?:^|[^a-zåäöé])(?:prästost|präst|herrgårdsost|herrgård|grevé|greve|svecia|gouda|cheddar|västerbottensost|västerbotten|hushållsost|lagrad ost|långlagrad|mellanlagrad|port salut|havarti|edamer|emmentaler|gruyère|parmesan|parmigiano|grana padano|pecorino|manchego)(?![a-zåäöé])/i;
-
-function isHardCheese(offer) {
-  const cat = offer.category || categorizeOfferJS(offer);
-  return cat === 'Mejeri & Ägg' && HARD_CHEESE_RE.test(getOfferText(offer));
-}
-
 // --- Helper for Kött & Fågel < 80 kr/kg Filter ---
 function isMeatUnder80PerKg(offer) {
   return isQualifyingMeat(offer) && isPricePerKgUnder(offer, 80);
@@ -856,8 +848,10 @@ function isCoffeeUnder100PerKg(offer) {
   return isCoffee(offer) && isPricePerKgUnder(offer, 100);
 }
 
-// --- Helper for Ost från Arla < 80 kr/kg Filter ---
-function isArlaCheeseUnder80PerKg(offer) {
+// --- Arla cheese ---
+// Recognised by the word "Arla" only: cheese names like Präst, Herrgård and Grevé
+// are also used by other dairies (e.g. "Skånemejerier Grevé")
+function isArlaCheese(offer) {
   const brand = (offer.brand || '').toLowerCase();
   const prod = (offer.product || '').toLowerCase();
   const desc = (offer.description || '').toLowerCase();
@@ -870,10 +864,17 @@ function isArlaCheeseUnder80PerKg(offer) {
   // 2. Must be cheese
   const textWithoutFrukost = fullText.replace(/frukost/g, '');
   const cheesePattern = /\b(?:ost|ostar|ostskivor|skivost|skivad ost|rivost|riven ost|hushållsost|prästost|präst|herrgård|herrgårdsost|grevé|greve|svecia|gräddost|gouda|edamer|port salut|havarti|mozzarella|feta|färskost|brie|camembert|kvibille|ädelost|blåmögelost|vitmögelost|cheddar|västerbottensost|parmesan|parmigiano|halloumi|norrloumi|grillost|smältost|mjukost|flödeost|familjefavoriter|familjefavorit|billinge)\b/i;
-  if (!cheesePattern.test(textWithoutFrukost)) return false;
+  return cheesePattern.test(textWithoutFrukost);
+}
 
-  // 3. Price per kg
-  return isPricePerKgUnder(offer, 80);
+// --- Helper for Ost från Arla < 80 kr/kg Filter ---
+function isArlaCheeseUnder80PerKg(offer) {
+  return isArlaCheese(offer) && isPricePerKgUnder(offer, 80);
+}
+
+// Cheese in "Veckans bästa deal": Arla cheese, but not hushållsost
+function isBestDealCheese(offer) {
+  return isArlaCheese(offer) && !/\bhushålls?(?:ost)?\b/i.test(getOfferText(offer));
 }
 
 // --- Helper for Fun Light Extrapris Filter ---
@@ -922,7 +923,7 @@ function computeCategoryCounts() {
 const BEST_DEAL_GROUPS = [
   { label: 'Kött', maxPerKg: 80, minPerKg: 20, matches: isQualifyingMeat },
   { label: 'Kaffe', maxPerKg: 100, minPerKg: 40, matches: isCoffee },
-  { label: 'Ost', maxPerKg: 80, minPerKg: 30, matches: isHardCheese }
+  { label: 'Arla-ost', maxPerKg: 80, minPerKg: 30, matches: isBestDealCheese }
 ];
 const BEST_DEAL_RUNNER_UPS = 4;
 
@@ -959,13 +960,50 @@ function findBestDeals() {
     const key = `${chain}|${(offer.product || '').toLowerCase()}|${(offer.brand || '').toLowerCase()}|${offer.price}`;
     const existing = deals.get(key);
     if (existing) {
-      existing.stores.push(offer.store);
+      // Lidl sometimes lists the same product twice – count each store once
+      if (!existing.stores.includes(offer.store)) existing.stores.push(offer.store);
       if (score < existing.score) Object.assign(existing, { offer, perKg, score });
       continue;
     }
     deals.set(key, { offer, group, perKg, chain, stores: [offer.store], score });
   }
-  return [...deals.values()].sort((a, b) => b.score - a.score);
+  // Remove duplicates across chains. The list is sorted, so the better deal is kept.
+  const ranked = [...deals.values()].sort((a, b) => b.score - a.score);
+  const unique = [];
+  for (const deal of ranked) {
+    const sameDeal = unique.find(kept => isSameDealElsewhere(kept, deal));
+    if (sameDeal) {
+      sameDeal.stores.push(...deal.stores.filter(store => !sameDeal.stores.includes(store)));
+    } else if (!unique.some(kept => isSameProduct(kept, deal))) {
+      unique.push(deal);
+    }
+  }
+  return unique;
+}
+
+// Lowercase without accents or symbols: "ZOÉGAS®" -> "zoegas"
+function normalizeName(text) {
+  return String(text || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, ' ').trim();
+}
+
+// Product name without a leading brand: "Zoégas Skånerost" -> "skanerost"
+function getCoreProductName(offer) {
+  const brand = normalizeName(offer.brand);
+  const name = normalizeName(offer.product);
+  return brand && name.startsWith(`${brand} `) ? name.slice(brand.length + 1) : name;
+}
+
+// The same brand at the same price per kg in another chain (e.g. Zoégas at Willys and Lidl)
+function isSameDealElsewhere(a, b) {
+  const brand = normalizeName(a.offer.brand);
+  return a.group === b.group && !!brand && brand === normalizeName(b.offer.brand) &&
+    Math.abs(a.perKg.min - b.perKg.min) <= 0.02 * Math.max(a.perKg.min, b.perKg.min);
+}
+
+// The same kind of product (e.g. fläskytterfilé) – only the best price is shown
+function isSameProduct(a, b) {
+  return a.group === b.group && getCoreProductName(a.offer) === getCoreProductName(b.offer);
 }
 
 // Two deals from the same chain and brand (e.g. chicken legs and wings) are too similar to show both
@@ -992,6 +1030,8 @@ function pickBestDeals(ranked) {
 }
 
 function formatDealStores(deal) {
+  const chains = [...new Set(deal.stores.map(getChainName))];
+  if (chains.length > 1) return chains.join(' + ');
   return deal.stores.length > 1 ? `${deal.chain} · ${deal.stores.length} butiker` : getShortStoreName(deal.offer.store);
 }
 
