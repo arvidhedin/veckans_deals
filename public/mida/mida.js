@@ -65,9 +65,9 @@ const state = {
   viewMonth: new Date().getMonth(), // 0 - 11
   viewYear: new Date().getFullYear(),
   activeWeekNumber: getISOWeek(new Date()),
-  activeWeekYear: new Date().getFullYear(),
+  activeWeekYear: getISOWeekYear(new Date()),
   currentRealWeek: getISOWeek(new Date()),
-  currentRealYear: new Date().getFullYear(),
+  currentRealYear: getISOWeekYear(new Date()),
   allWeeksCache: {}, // { "2026-W36": { week_id, host_id, is_paused, proposed_days, host_notes, confirmed_day } }
   allVotesCache: {}, // { "2026-W36": [ { week_id, member_id, day_id, vote } ] }
   swaps: [],
@@ -82,6 +82,27 @@ function getISOWeek(date) {
   d.setUTCDate(d.getUTCDate() + 4 - dayNum);
   const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
   return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+}
+
+// ISO week-year: the year of the week's Thursday (e.g. 1 Jan 2027 belongs to 2026-W53)
+function getISOWeekYear(date) {
+  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
+  return d.getUTCFullYear();
+}
+
+// Number of weeks from one ISO week to another. Counted with dates, since some
+// years (like 2026) have 53 weeks.
+function weeksBetween(fromYear, fromWeek, toYear, toWeek) {
+  const diffMs = getWeekStartDate(toYear, toWeek) - getWeekStartDate(fromYear, fromWeek);
+  return Math.round(diffMs / (7 * 24 * 60 * 60 * 1000));
+}
+
+// The ISO week n weeks after (or before) the given week -> [year, week]
+function addWeeks(year, weekNumber, n) {
+  const d = getWeekStartDate(year, weekNumber);
+  d.setDate(d.getDate() + n * 7);
+  return [getISOWeekYear(d), getISOWeek(d)];
 }
 
 function getWeekStartDate(year, weekNumber) {
@@ -129,7 +150,7 @@ function getCalendarWeeksForMonth(year, monthIndex) {
   let cur = new Date(startCal);
   while (cur <= lastDayOfMonth || cur.getDay() !== 1) {
     const wNum = getISOWeek(cur);
-    const wYear = (monthIndex === 11 && wNum === 1) ? year + 1 : (monthIndex === 0 && wNum > 50) ? year - 1 : year;
+    const wYear = getISOWeekYear(cur);
     const weekId = getWeekId(wYear, wNum);
 
     const daysInWeek = [];
@@ -165,12 +186,12 @@ function isAdmin(user) {
 }
 
 function parseWeekId(weekId) {
-  if (!weekId) return [new Date().getFullYear(), getISOWeek(new Date())];
+  if (!weekId) return [getISOWeekYear(new Date()), getISOWeek(new Date())];
   const parts = weekId.split('-W');
   if (parts.length === 2) {
     return [parseInt(parts[0], 10), parseInt(parts[1], 10)];
   }
-  return [new Date().getFullYear(), getISOWeek(new Date())];
+  return [getISOWeekYear(new Date()), getISOWeek(new Date())];
 }
 
 // ================= ROTATION ENGINE =================
@@ -179,9 +200,7 @@ function getDefaultHostForWeek(year, week) {
   if (!state.members || state.members.length === 0) return null;
   const sorted = [...state.members].sort((a, b) => a.rotation_order - b.rotation_order);
 
-  const targetAbsoluteWeek = (year * 52) + week;
-  const anchorAbsoluteWeek = (ANCHOR_YEAR * 52) + ANCHOR_WEEK;
-  const diffWeeks = targetAbsoluteWeek - anchorAbsoluteWeek;
+  const diffWeeks = weeksBetween(ANCHOR_YEAR, ANCHOR_WEEK, year, week);
 
   let hostIdx = ((ANCHOR_HOST_INDEX + diffWeeks) % sorted.length);
   if (hostIdx < 0) hostIdx += sorted.length;
@@ -283,7 +302,7 @@ async function loadMembers() {
     try {
       const { data, error } = await supabaseClient
         .from('mida_members')
-        .select('*')
+        .select('id,name,rotation_order') // Never download the PIN codes
         .order('rotation_order', { ascending: true });
 
       if (!error && data && data.length > 0) {
@@ -454,13 +473,34 @@ function closeLoginModal() {
   document.getElementById('modal-login')?.classList.add('hidden');
 }
 
-function handleLoginSubmit() {
+// The PIN is checked in the database, so the members' PIN codes never reach the browser.
+// Members who haven't chosen their own PIN have the default 1234.
+async function verifyPin(member, pin) {
+  if (!supabaseClient) {
+    return pin === (member.pin || '1234');
+  }
+  let query = supabaseClient.from('mida_members').select('id').eq('id', member.id);
+  query = pin === '1234' ? query.or('pin.eq.1234,pin.is.null') : query.eq('pin', pin);
+  const { data, error } = await query;
+  if (error) throw error;
+  return Array.isArray(data) && data.length > 0;
+}
+
+async function handleLoginSubmit() {
   const select = document.getElementById('login-select-user');
   const pinInput = document.getElementById('login-input-pin');
   const errorMsg = document.getElementById('login-error-msg');
+  const submitBtn = document.getElementById('btn-login-submit');
 
   const memberId = select.value;
   const pin = pinInput.value.trim();
+
+  const showError = (text) => {
+    if (errorMsg) {
+      errorMsg.textContent = text;
+      errorMsg.classList.remove('hidden');
+    }
+  };
 
   if (!memberId) {
     alert('Välj ditt namn i listan.');
@@ -470,10 +510,23 @@ function handleLoginSubmit() {
   const member = state.members.find(m => m.id === memberId);
   if (!member) return;
 
-  const expectedPin = member.pin || '1234';
-  if (pin && pin !== expectedPin && pin !== '1234') {
-    if (errorMsg) errorMsg.classList.remove('hidden');
+  if (!pin) {
+    showError('Ange din PIN-kod.');
     return;
+  }
+
+  if (submitBtn) submitBtn.disabled = true;
+  try {
+    if (!(await verifyPin(member, pin))) {
+      showError('Felaktig PIN-kod. Försök igen.');
+      return;
+    }
+  } catch (e) {
+    console.warn('PIN check failed', e);
+    showError('Kunde inte kontrollera PIN-koden. Försök igen.');
+    return;
+  } finally {
+    if (submitBtn) submitBtn.disabled = false;
   }
 
   setCurrentUser(member);
@@ -1016,17 +1069,9 @@ function openSwapModal() {
   const targetOptions = [];
   const currentWeekId = getWeekId(state.activeWeekYear, state.activeWeekNumber);
 
-  // Scan range: from currentRealWeek - 1 up to +20 weeks
-  const startW = Math.max(1, state.currentRealWeek - 1);
-  const endW = state.currentRealWeek + 20;
-
-  for (let i = 0; i <= (endW - startW); i++) {
-    let w = startW + i;
-    let y = state.currentRealYear;
-    while (w > 52) {
-      w -= 52;
-      y += 1;
-    }
+  // Scan range: from the week before the current week up to +20 weeks
+  for (let i = -1; i <= 20; i++) {
+    const [y, w] = addWeeks(state.currentRealYear, state.currentRealWeek, i);
 
     const weekId = getWeekId(y, w);
     const host = getHostForWeek(y, w);
@@ -1243,7 +1288,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     state.viewMonth = new Date().getMonth();
     state.viewYear = new Date().getFullYear();
     state.activeWeekNumber = getISOWeek(new Date());
-    state.activeWeekYear = new Date().getFullYear();
+    state.activeWeekYear = getISOWeekYear(new Date());
     renderApp();
   });
 
@@ -1383,12 +1428,20 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
     if (state.currentUser) {
-      state.currentUser.pin = newPin;
-      localStorage.setItem('mida_cached_members', JSON.stringify(state.members));
-      if (supabaseClient) supabaseClient.from('mida_members').update({ pin: newPin }).eq('id', state.currentUser.id).then();
-      alert('Din PIN-kod har uppdaterats!');
-      input.value = '';
-      closeManageModal();
+      if (!supabaseClient) {
+        alert('Ingen databas ansluten – PIN-koden kan inte sparas.');
+        return;
+      }
+      supabaseClient.from('mida_members').update({ pin: newPin }).eq('id', state.currentUser.id).then(({ error }) => {
+        if (error) {
+          console.warn('PIN update failed', error);
+          alert('Kunde inte spara PIN-koden. Försök igen.');
+          return;
+        }
+        alert('Din PIN-kod har uppdaterats!');
+        input.value = '';
+        closeManageModal();
+      });
     } else {
       openLoginModal();
     }
@@ -1402,12 +1455,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     const newMember = {
       id: newId,
       name: name,
-      pin: '1234',
       rotation_order: state.members.length + 1
     };
     state.members.push(newMember);
     localStorage.setItem('mida_cached_members', JSON.stringify(state.members));
-    if (supabaseClient) supabaseClient.from('mida_members').insert([newMember]).then();
+    // New members start with the default PIN 1234
+    if (supabaseClient) supabaseClient.from('mida_members').insert([{ ...newMember, pin: '1234' }]).then();
     input.value = '';
     renderManageMembersList();
     renderApp();

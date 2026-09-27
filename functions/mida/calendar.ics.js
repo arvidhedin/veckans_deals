@@ -8,6 +8,10 @@ const ANCHOR_YEAR = 2026;
 const ANCHOR_WEEK = 35;
 const ANCHOR_HOST_INDEX = 0; // David
 
+// The feed covers a few weeks back and a year ahead, counted from the current week
+const WEEKS_BACK = 4;
+const WEEKS_TO_GENERATE = 56;
+
 const DEFAULT_MEMBERS = [
   { id: 'david', name: 'David', rotation_order: 1 },
   { id: 'sten', name: 'Sten', rotation_order: 2 },
@@ -17,6 +21,41 @@ const DEFAULT_MEMBERS = [
   { id: 'elis', name: 'Elis', rotation_order: 6 },
   { id: 'isak', name: 'Isak', rotation_order: 7 }
 ];
+
+// --- ISO week helpers (same logic as public/mida/mida.js, in UTC) ---
+function getISOWeek(date) {
+  const d = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
+  d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+}
+
+// ISO week-year: the year of the week's Thursday (e.g. 1 Jan 2027 belongs to 2026-W53)
+function getISOWeekYear(date) {
+  const d = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
+  d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
+  return d.getUTCFullYear();
+}
+
+// Monday of an ISO week – week 1 is the week that contains 4 January
+function getWeekStartDate(year, week) {
+  const jan4 = new Date(Date.UTC(year, 0, 4));
+  const monday = new Date(jan4);
+  monday.setUTCDate(jan4.getUTCDate() - ((jan4.getUTCDay() + 6) % 7) + (week - 1) * 7);
+  return monday;
+}
+
+// Number of weeks between two ISO weeks, counted with dates since some years have 53 weeks
+function weeksBetween(fromYear, fromWeek, toYear, toWeek) {
+  return Math.round((getWeekStartDate(toYear, toWeek) - getWeekStartDate(fromYear, fromWeek)) / (7 * 86400000));
+}
+
+// The ISO week n weeks after (or before) the given week -> [year, week]
+function addWeeks(year, week, n) {
+  const d = getWeekStartDate(year, week);
+  d.setUTCDate(d.getUTCDate() + n * 7);
+  return [getISOWeekYear(d), getISOWeek(d)];
+}
 
 function formatDateToICSDate(d) {
   const year = d.getUTCFullYear();
@@ -96,20 +135,17 @@ export async function onRequest(context) {
 
     const sortedMembers = [...members].sort((a, b) => a.rotation_order - b.rotation_order);
 
-    // 2. Generate events from anchor week 35 forward 30 weeks
+    // 2. Generate events from a few weeks back to a year ahead (never before the rotation started)
     const now = new Date();
-    const startWeek = Math.max(1, 35);
-    const totalWeeksToGenerate = 30;
+    let [startYear, startWeek] = addWeeks(getISOWeekYear(now), getISOWeek(now), -WEEKS_BACK);
+    if (weeksBetween(ANCHOR_YEAR, ANCHOR_WEEK, startYear, startWeek) < 0) {
+      [startYear, startWeek] = [ANCHOR_YEAR, ANCHOR_WEEK];
+    }
 
     let eventsICS = [];
 
-    for (let i = 0; i < totalWeeksToGenerate; i++) {
-      let w = startWeek + i;
-      let y = ANCHOR_YEAR;
-      while (w > 52) {
-        w -= 52;
-        y += 1;
-      }
+    for (let i = 0; i < WEEKS_TO_GENERATE; i++) {
+      const [y, w] = addWeeks(startYear, startWeek, i);
 
       const weekId = `${y}-W${String(w).padStart(2, '0')}`;
       const weekData = weeksMap[weekId];
@@ -120,9 +156,7 @@ export async function onRequest(context) {
         host = sortedMembers.find(m => m.id === weekData.host_id) || null;
       }
       if (!host) {
-        const targetAbsoluteWeek = (y * 52) + w;
-        const anchorAbsoluteWeek = (ANCHOR_YEAR * 52) + ANCHOR_WEEK;
-        const diffWeeks = targetAbsoluteWeek - anchorAbsoluteWeek;
+        const diffWeeks = weeksBetween(ANCHOR_YEAR, ANCHOR_WEEK, y, w);
         let hostIdx = ((ANCHOR_HOST_INDEX + diffWeeks) % sortedMembers.length);
         if (hostIdx < 0) hostIdx += sortedMembers.length;
         host = sortedMembers[hostIdx] || sortedMembers[0];
