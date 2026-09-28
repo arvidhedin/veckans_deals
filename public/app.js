@@ -856,9 +856,10 @@ function computeCategoryCounts() {
 // Usually expensive staples at a really good price. A deal must be under its group's
 // price per kg limit. The best one has the biggest discount (compared with the normal
 // price), with a bonus for being far below the limit.
+// normalPerKg: what the group usually costs in any chain (see getBestDealDiscount)
 const BEST_DEAL_GROUPS = [
   { label: 'Kött', maxPerKg: 80, minPerKg: 20, matches: isQualifyingMeat },
-  { label: 'Kaffe', maxPerKg: 100, minPerKg: 40, matches: isCoffee },
+  { label: 'Kaffe', maxPerKg: 100, minPerKg: 40, normalPerKg: 150, matches: isCoffee },
   { label: 'Arla-ost', maxPerKg: 80, minPerKg: 30, matches: isBestDealCheese }
 ];
 const BEST_DEAL_RUNNER_UPS = 4;
@@ -876,6 +877,20 @@ function describePricePerKg(offer) {
   return `${typeof offer.price_per_kg === 'number' ? '' : '≈ '}${formatPricePerKg(perKg)}`;
 }
 
+// The discount compared with the store's own normal price
+function getStoreDiscount(offer) {
+  return parseFloat(offer.discount_percentage) || 0;
+}
+
+// Normal prices differ between the chains (coffee is often 15–25 % more expensive at ICA than
+// at Willys), so in a group where one brand is as good as another, the discount is measured
+// from the group's normal price instead – then the cheapest per kg is always the best deal.
+function getBestDealDiscount(offer, group, perKg) {
+  if (group.normalPerKg) return (1 - perKg.min / group.normalPerKg) * 100;
+  // Discounts above 60 % are capped – they are usually data errors
+  return Math.min(getStoreDiscount(offer), 60);
+}
+
 function findBestDeals() {
   const deals = new Map();
   for (const offer of getStoreFilteredOffers()) {
@@ -885,8 +900,7 @@ function findBestDeals() {
     // minPerKg filters out obviously broken prices
     if (!perKg || perKg.min >= group.maxPerKg || perKg.min < group.minPerKg) continue;
 
-    // Discounts above 60 % are capped – they are usually data errors
-    const discount = Math.min(parseFloat(offer.discount_percentage) || 0, 60);
+    const discount = getBestDealDiscount(offer, group, perKg);
     const belowLimit = 1 - perKg.min / group.maxPerKg;
     const score = discount + belowLimit * 20;
 
@@ -898,7 +912,7 @@ function findBestDeals() {
     if (existing) {
       // Lidl sometimes lists the same product twice – count each store once
       if (!existing.stores.includes(offer.store)) existing.stores.push(offer.store);
-      if (score < existing.score) Object.assign(existing, { offer, perKg, score });
+      if (getStoreDiscount(offer) < getStoreDiscount(existing.offer)) Object.assign(existing, { offer, perKg, score });
       continue;
     }
     deals.set(key, { offer, group, perKg, chain, stores: [offer.store], score });
