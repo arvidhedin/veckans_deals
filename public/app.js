@@ -12,6 +12,7 @@ localStorage.removeItem('theme');
 // Standard Grocery Categories
 const ALL_CATEGORIES = [
   'Kött & Fågel',
+  'Chark & Pålägg',
   'Fisk & Skaldjur',
   'Mejeri & Ägg',
   'Frukt & Grönt',
@@ -99,71 +100,9 @@ const STORE_COLORS = {
 
 const DEFAULT_IMG = "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=300&q=80";
 
-// Categorization helper for frontend
-function categorizeOfferJS(offer) {
-  const text = `${offer.product || ''} ${offer.brand || ''} ${offer.description || ''}`.toLowerCase();
-  const rawCat = (offer.category || '').toLowerCase();
-  
-  // 1. Hushåll & Hygien / Djurmat
-  if (/\b(?:hundmat|kattmat|hund|katt|kattsand|pedigree|whiskas|latz|dentasticks|tvättmedel|tvättkapslar|sköljmedel|rengöring|schampo|shampoo|tvål|handtvål|duschtvål|duschgel|duschcreme|blöjor|blöjpåse|toalettpapper|hushållspapper|tandkräm|diskmedel|fryspåsar|plastpåsar|avfallspåsar|sopsäck|hundbajspåse|deodorant|deo|balsam|lotion|hudkräm|hårfärg|multivitamin|omega 3|vitamin|magnesium|kreatin|creatine|gummies|listerine|munskölj|städservetter|diskborste|disksvamp|diskduk|servetter|hälsa & skönhet|tandborste|tandborsthuvud|värmeljus|rakhyvel|ansiktsmask|bindor|trosskydd|intimtvätt|libresse|batterier|batteri|plastfolie|folie|pappmugg|hink|mopp|tvättlappar|maskindisktabletter)\b/i.test(text)) {
-    return 'Hushåll & Hygien';
-  }
-
-  // 2. Fisk & Skaldjur
-  if (/\b(?:fisk|lax|torsk|räkor|räka|sill|makrill|tonfisk|tuna|tunnfisk|kräftor|kräfta|sej|sejfärs|spätta|musslor|skaldjur|lutfisk|rom|fiskpinnar|fiskkaka|fiskgratäng|surströmming|hummer|krabba|fiskfilé|panerad fisk|bläckfisk|scampi|laxfilé|torskfilé|sejfilé|röding|öring|caviar|kaviar|tångcaviar|surströmmingsfiléer)\b/i.test(text)) {
-    return 'Fisk & Skaldjur';
-  }
-
-  // 3. Kött & Fågel
-  if (/kyckling|fläsk|nötkött|oxfilé|lövbiff|rostbiff|entrecote|entrecôte|ryggbiff|högrev|fransyska|karré|karre|kotlett|kalkon|leverpastej|chark|salami|medwurst|pulled pork|revbensspjäll|lamm|blodpudding|falukorv|grillkorv|wienerkorv|varmkorv|ölkorv|bacon|skinka|kassler|kebab|grytbitar|chorizo|cabanoss|salsiccia|prinskorv|smörgåspålägg|prosciutto|jamon|mortadella|paté|pate|schnitzel|grillkarré|flapsteak|spickekött|fuet|grillskiva|grillskivor|grillkött|guldfågeln|kronfågel|familjefågel|\b(?:kött|färs|blandfärs|nötfärs|fläskfärs|korv|korvar|lever|sylta|späck|ribs|nöt|ox|bog|lägg|bringa)\b/i.test(text)) {
-    return 'Kött & Fågel';
-  }
-
-  // 4. Mejeri & Ägg (fil/filmjölk only as standalone word \bfil\b or filmjölk)
-  if (/\b(?:färskost|mjölk|grädde|smör|ost|ostar|margarin|yoggi|yoghurt|filmjölk|kvarg|ägg|crème fraiche|creme fraiche|fraiche|keso|halloumi|norrloumi|mozzarella|vispgrädde|matlagningsgrädde|bregott|flora|lätta|kesella|gräddfil|ricotta|feta|vitost|brie|camembert|parmesan|parmigiano|gouda|hushållsost|prästost|präst|herrgård|grevé|svecia|västerbottensost|gräddost|havredryck|mandeldryck|sojadryck|oatly|yalla|actimel|danonino|skyr|hamburgerost|smältost|mjukost|skivost|rivost|proteinshake|fil|familjefavoriter|familjefavorit|billinge)\b/i.test(text)) {
-    return 'Mejeri & Ägg';
-  }
-
-  // 5. Frukt & Grönt
-  if (/\b(?:frukt|grönsak|grönsaker|grönt|bär|äpple|äpplen|banan|bananer|potatis|färskpotatis|tomat|tomater|gurka|gurkor|sallad|lök|morot|morötter|majs|majskolv|avokado|melon|citron|citroner|apelsin|apelsiner|druvor|jordgubb|hallon|blåbär|paprika|vitlök|champinjon|svamp|clementin|satsumas|nektarin|persika|plommon|kiwi|kolv|broccoli|blomkål|spenat|rotfrukter|sparris|purjolök|ruccola|basilika|persilja|dill|krasse|selleri|palsternacka|rödbetor|kål|vitkål|rödkål|grönkål|lime|ingefära|chili|mango|ananas|päron|vindruvor|grapefrukt|småbladsmix|kronärtskocka|sharon|kaki|granatäpple|solrosor|blommor|bukett|krysantemum|växt|krukväxt)\b/i.test(text)) {
-    return 'Frukt & Grönt';
-  }
-
-  // 6. Frys & Färdigmat
-  if (/\b(?:thaibox|thaiboxar|enportionsrätter|enportionsrätt|färdigrätt|färdigrätter|matlåda|matlådor|vårrullar|pytt|pizza|pizzor|kebabpizza|pirog|gorbys|billys|dafgård|felix|findus|gooh|nuggets|pommes|glass|gb glace|triumf|paj)\b/i.test(text)) {
-    return 'Frys & Färdigmat';
-  }
-
-  // 7. Bröd & Bageri
-  if (/\b(?:korvbröd|hamburgerbröd|bröd|kaka|kakor|bulle|bullar|tårta|knäcke|knäckebröd|fralla|frallor|pita|pitabröd|tortilla|toast|croissant|limpa|pågen|pågens|fazer|skogaholm|våffla|våfflor|donut|donuts|muffin|muffins|bagel|wienerbröd|kanelbulle|vaniljbulle|semla|kladdkaka|surdeg|rågbröd|lingongrova|hönökaka|vetekaka|tekaka|fullkornsbröd|småbröd|polarbröd|polarkaka|formbröd|formfranska|rostbröd|scones|bageri|pinsa|panini|mellangrova)\b/i.test(text)) {
-    return 'Bröd & Bageri';
-  }
-
-  // 8. Snacks & Godis
-  if (/\b(?:chips|dipp|godis|choklad|popcorn|nötter|nötblandning|nötmix|kex|ostbågar|ostkrokar|lakrits|tuggummi|marabou|estrella|olw|cloetta|haribo|cheez|snacks|wafer|proteinbar|corny|cashew|mandel|pistage|valnöt|jordnötter|solroskärnor|chiafrön|lösgodis|kexchoklad|daim|twix|snickers|mars|bounty|dumle|geisha|alesto|nutella|halva|delicatoboll|läkerol|halstabletter|fisherman|mentos|gott & blandat|gott och blandat|gott&blandat|malaco)\b/i.test(text)) {
-    return 'Snacks & Godis';
-  }
-
-  // 9. Dryck
-  if (/\b(?:läsk|saft|vatten|juice|energidryck|öl|cider|alkoholfri|must|coca-cola|coca cola|cola|pepsi|fanta|sprite|nocco|celsius|red bull|ramlösa|loka|monster|tonic|iskaffe|smoothie|kombucha|dricka|måltidsdryck|lättöl|festis|tropicana|god morgon|brämhults|trocadero|pucko|zingo|7up|powerade|gainomax|proteindryck|fun light|nyponsoppa|fruktdryck|matlagningsvin|peroni|dr pepper|pepper|dryck|nåbe|aloe vera|aloe)\b/i.test(text)) {
-    return 'Dryck';
-  }
-
-  // 10. Skafferi
-  if (/\b(?:jordnötssmör|nötssmör|pasta|ris|basmati|jasminris|risotto|mjöl|socker|olja|vinäger|kaffe|te|sås|ketchup|senap|konserv|linser|bönor|krydda|kryddor|buljong|müsli|musli|granola|cheerios|frosties|cornflakes|havreringar|cereal|flingor|havregryn|pesto|taco|tacos|spaghetti|macaroni|makaroner|matolja|rapsolja|olivolja|majonnäs|mayo|sylt|marmelad|honung|gevalia|zoegas|arvid nordquist|löfbergs|nescafé|nesquik|nudlar|couscous|bulgur|dressing|marinad|salsa|tomatkross|passerade tomater|kokosmjölk|cornichons|oliver|kapris|barnmat|välling|gröt|sirap|ströbröd|tofu|hummus|fond|soja|lasagne|grytbas)\b/i.test(text)) {
-    return 'Skafferi';
-  }
-
-  if (rawCat.includes('frukt') || rawCat.includes('grönt')) return 'Frukt & Grönt';
-  if (rawCat.includes('kött') || rawCat.includes('chark') || rawCat.includes('fågel')) return 'Kött & Fågel';
-  if (rawCat.includes('fisk') || rawCat.includes('skaldjur')) return 'Fisk & Skaldjur';
-  if (rawCat.includes('mejeri') || rawCat.includes('ost')) return 'Mejeri & Ägg';
-  if (rawCat.includes('bröd') || rawCat.includes('bageri')) return 'Bröd & Bageri';
-  if (rawCat.includes('dryck')) return 'Dryck';
-  if (rawCat.includes('snacks') || rawCat.includes('godis')) return 'Snacks & Godis';
-  if (rawCat.includes('djupfryst') || rawCat.includes('fryst')) return 'Frys & Färdigmat';
-
-  return 'Övrigt';
+// The category is set when deals.json is built (scrapers/categorizer.py)
+function getCategory(offer) {
+  return offer.category || 'Övrigt';
 }
 
 // --- Data Fetching ---
@@ -820,15 +759,9 @@ function getOfferText(offer) {
   return `${offer.product || ''} ${offer.brand || ''} ${offer.description || ''}`.toLowerCase();
 }
 
+// Korv, pålägg and ready meals like kebab and köttbullar have their own categories
 function isQualifyingMeat(offer) {
-  const cat = offer.category || categorizeOfferJS(offer);
-  if (cat !== 'Kött & Fågel') return false;
-
-  // Allow minces ("färs") even if they contain salsiccia/chorizo
-  const text = getOfferText(offer);
-  const isFars = text.includes('färs') || text.includes('fars');
-  const excludedKeywords = ['korv', 'blodpudding', 'cabanoss', 'hotdog', 'hot dog', 'salsiccia', 'chorizo'];
-  return isFars || !excludedKeywords.some(kw => text.includes(kw));
+  return getCategory(offer) === 'Kött & Fågel';
 }
 
 // Coffee: the word "kaffe" (not compounds like "kaffekapslar" or "snabbkaffe") or a coffee brand
@@ -907,7 +840,7 @@ function computeCategoryCounts() {
   }
 
   for (const offer of getStoreFilteredOffers()) {
-    const cat = offer.category || categorizeOfferJS(offer);
+    const cat = getCategory(offer);
     state.categoryCounts[cat] = (state.categoryCounts[cat] || 0) + 1;
 
     for (const [label, matches] of Object.entries(SPECIAL_FILTERS)) {
@@ -1408,7 +1341,7 @@ function applyFilters() {
     if (specialFilter) {
       return specialFilter(offer);
     }
-    const cat = offer.category || categorizeOfferJS(offer);
+    const cat = getCategory(offer);
     if (!state.selectedCategories.has(cat)) return false;
     if (state.activeCategoryPill !== 'all' && state.activeCategoryPill !== cat) return false;
     return true;
@@ -1654,7 +1587,7 @@ function createDealCardHtml(offer, index) {
   const shortStore = getShortStoreName(store);
   const storeBadgeColor = STORE_COLORS[store]?.bg || (store.toLowerCase().includes('ica') ? '#E21936' : (store.toLowerCase().includes('hemköp') ? '#D31115' : '#4B5563'));
   
-  const cat = offer.category || categorizeOfferJS(offer);
+  const cat = getCategory(offer);
   const catBadgeHtml = cat 
     ? `<span class="text-[9px] sm:text-[10px] font-semibold text-zinc-500 bg-zinc-100 px-1.5 py-0.5 rounded border border-zinc-200/60 truncate max-w-full block w-fit mt-0.5">${escapeHtml(cat)}</span>`
     : '';
@@ -2130,7 +2063,7 @@ async function renderModalIngredients(offer) {
   select.onchange = null;
 
   const variants = Array.isArray(offer.eans) ? offer.eans.filter(v => v && v.ean) : [];
-  const cat = offer.category || categorizeOfferJS(offer);
+  const cat = getCategory(offer);
 
   // 1. Willys/Hemköp: product_info.json
   if (offer.product_code) {
@@ -2199,7 +2132,7 @@ function openProductModal(offer) {
 
   const store = (offer.store || 'Okänd butik').trim();
   const storeBadgeColor = STORE_COLORS[store]?.bg || (store.toLowerCase().includes('ica') ? '#E21936' : (store.toLowerCase().includes('hemköp') ? '#D31115' : '#4B5563'));
-  const cat = offer.category || categorizeOfferJS(offer);
+  const cat = getCategory(offer);
   const discountPct = parseFloat(offer.discount_percentage) || 0;
   const productName = offer.product || 'Okänd produkt';
   const brandName = offer.brand || '';

@@ -180,6 +180,9 @@ def _parse_offer(item: dict, store_name: str) -> dict:
             name = variant_content.get("onlineProductName") or variant_content.get("title", "")
             variant_eans.append({"ean": ean, "name": name})
 
+    # Coops egen kategori, t.ex. "Färsk/Chark/Deli/Färdigmat" (används av kategoriseraren)
+    category = "/".join(filter(None, [item.get("categoryGroup"), (item.get("categoryTeam") or {}).get("name")]))
+
     return {
         "store": store_name,
         "product": content.get("title", "Okänd produkt"),
@@ -188,7 +191,7 @@ def _parse_offer(item: dict, store_name: str) -> dict:
         "discount": us.get("tag", ""),
         "description": description,
         "image_url": image_url,
-        "category": "",
+        "category": category,
         "restriction": "",
         "original_price": original_price,
         "discount_percentage": discount_percentage,

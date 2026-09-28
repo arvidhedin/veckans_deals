@@ -199,7 +199,11 @@ def get_offers() -> list[dict]:
                     price_str = "Se pris i butik"
                     
                 image_url = data_dict.get("image", "")
-                category = ""
+                # Lidls egen kategori, t.ex. "Food/Mat och nära mat/Kött & fågel/Korv & charkuterier"
+                # eller "NonFood/Mode & accessoarer/Herrkläder" (används av kategoriseraren)
+                keyfacts = data_dict.get("keyfacts") or {}
+                won_category = (keyfacts.get("wonCategoryPrimary") or "").removeprefix("Världar i nöd/")
+                category = "/".join(filter(None, [data_dict.get("category"), won_category]))
                 restriction = _extract_restriction(data_dict)
 
                 # Lidl publicerar ingen innehållsförteckning, men produktsidan kan länkas

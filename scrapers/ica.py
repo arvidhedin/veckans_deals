@@ -26,6 +26,22 @@ HEADERS = {
     "Accept-Language": "sv-SE,sv;q=0.9",
 }
 
+# ICA:s varugrupper är breda ("Färskvaror" rymmer både kött, ost och fisk), så de finare
+# grupperna (expandedArticleGroupId) används när de är kända. Kategoriseraren använder
+# gruppen när varans namn inte räcker.
+ARTICLE_GROUPS = {
+    12: "Kött",
+    13: "Ost",
+    14: "Färdigmat",
+    15: "Fisk",
+    16: "Chark",
+    17: "Blommor",
+    18: "Dryck",
+    19: "Godis & snacks",
+    21: "Hushåll",
+    22: "Djurmat",
+}
+
 
 def _parse_initial_data(html: str) -> dict | None:
     """Extrahera window.__INITIAL_DATA__ från HTML och parsa till dict."""
@@ -110,6 +126,9 @@ def _parse_offer(offer: dict, store_name: str) -> dict:
     # ICA sätter ibland veckonumret först i namnet, t.ex. "V39 Wasa Sandwich"
     product_name = re.sub(r"^V\d{1,2}\s+", "", details.get("name") or "Okänd produkt")
 
+    category = offer.get("category") or {}
+    category_name = ARTICLE_GROUPS.get(category.get("expandedArticleGroupId")) or category.get("articleGroupName") or ""
+
     return {
         "store": store_name,
         "product": product_name,
@@ -118,7 +137,7 @@ def _parse_offer(offer: dict, store_name: str) -> dict:
         "discount": f"Ord.pris {original_price}" if original_price else "",
         "description": details.get("packageInformation", ""),
         "image_url": image_url,
-        "category": offer.get("category", {}).get("articleGroupName", ""),
+        "category": category_name,
         "restriction": offer.get("restriction", ""),
         "original_price": original_price,
         "discount_percentage": discount_percentage,
