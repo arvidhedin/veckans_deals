@@ -1,11 +1,11 @@
 {
-  "updated_at": "2026-09-28T08:44:58.123778+00:00",
-  "updated_at_readable": "2026-09-28 08:44 UTC",
-  "total_offers": 1100,
+  "updated_at": "2026-09-28T08:52:26.758930+00:00",
+  "updated_at_readable": "2026-09-28 08:52 UTC",
+  "total_offers": 1119,
   "store_counts": {
     "ICA Nära Råbyvägen": 37,
     "ICA Supermarket Torgkassen": 53,
-    "ICA Nära Rosendal": 40,
+    "ICA Nära Rosendal": 41,
     "ICA Supermarket Väst": 34,
     "ICA Vretgränd": 38,
     "ICA Supermarket City": 6,
@@ -17,21 +17,22 @@
     "Hemköp (Rosendal)": 69,
     "Coop (Centralhuset)": 5,
     "Coop (Liljegatan)": 18,
+    "Coop (Ekeby)": 18,
     "Lidl": 402
   },
   "category_counts": {
-    "Skafferi": 162,
-    "Övrigt": 151,
-    "Frukt & Grönt": 125,
-    "Mejeri & Ägg": 123,
-    "Frys & Färdigmat": 117,
-    "Hushåll & Hygien": 103,
-    "Kött & Fågel": 76,
-    "Bröd & Bageri": 68,
+    "Frys & Färdigmat": 120,
+    "Hushåll & Hygien": 104,
+    "Fisk & Skaldjur": 16,
+    "Mejeri & Ägg": 124,
+    "Frukt & Grönt": 130,
     "Chark & Pålägg": 63,
-    "Snacks & Godis": 55,
-    "Dryck": 41,
-    "Fisk & Skaldjur": 16
+    "Skafferi": 165,
+    "Bröd & Bageri": 70,
+    "Dryck": 42,
+    "Kött & Fågel": 77,
+    "Snacks & Godis": 57,
+    "Övrigt": 151
   },
   "offers": [
     {
@@ -736,6 +737,27 @@
     },
     {
       "store": "Coop (Liljegatan)",
+      "product": "Vitost",
+      "brand": "Apetina",
+      "price": "2 för 30:-",
+      "discount": "",
+      "description": "200 g.",
+      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1734565523/cloud/418595.png",
+      "category": "Mejeri & Ägg",
+      "restriction": "",
+      "original_price": "26,69 kr",
+      "discount_percentage": 44,
+      "eans": [
+        {
+          "ean": "5760466642019",
+          "name": "Vitost Krämig Hel Original"
+        }
+      ],
+      "price_per_kg": 75.0,
+      "price_per_kg_max": 75.0
+    },
+    {
+      "store": "Coop (Ekeby)",
       "product": "Vitost",
       "brand": "Apetina",
       "price": "2 för 30:-",
@@ -2129,6 +2151,165 @@
       ]
     },
     {
+      "store": "Coop (Ekeby)",
+      "product": "Kryddor i småglas",
+      "brand": "Kockens",
+      "price": "4 för 59:-",
+      "discount": "",
+      "description": "8-53 g. Välj mellan olika sorter. Gäller ej ekologiskt eller vaniljstång.",
+      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1652350707/cloud/252001.png",
+      "category": "Skafferi",
+      "restriction": "",
+      "original_price": "23,95 kr",
+      "discount_percentage": 38,
+      "eans": [
+        {
+          "ean": "7310394002072",
+          "name": "Basilika"
+        },
+        {
+          "ean": "7310394002201",
+          "name": "Dragon"
+        },
+        {
+          "ean": "7310394002690",
+          "name": "Vitlökspulver"
+        },
+        {
+          "ean": "7310394002386",
+          "name": "Lökpulver"
+        },
+        {
+          "ean": "7310394002515",
+          "name": "Rosépeppar"
+        },
+        {
+          "ean": "7310394002263",
+          "name": "Gurkmeja"
+        },
+        {
+          "ean": "7350046460515",
+          "name": "Koriander Malen"
+        },
+        {
+          "ean": "7310394002522",
+          "name": "Rosmarin"
+        },
+        {
+          "ean": "7310394002423",
+          "name": "Muskotnöt Malen"
+        },
+        {
+          "ean": "7310394002485",
+          "name": "Persillade"
+        },
+        {
+          "ean": "7350046465299",
+          "name": "Paprika Rökt"
+        },
+        {
+          "ean": "8722700200185",
+          "name": "Chili Flakes"
+        },
+        {
+          "ean": "7310394002393",
+          "name": "Mejram"
+        },
+        {
+          "ean": "8722700100102",
+          "name": "Persilja"
+        },
+        {
+          "ean": "7310394002225",
+          "name": "Garam Masala"
+        },
+        {
+          "ean": "7310394002720",
+          "name": "Vitpeppar Malen"
+        },
+        {
+          "ean": "7310394002676",
+          "name": "Vitlök Finhackad"
+        },
+        {
+          "ean": "7310394002294",
+          "name": "Kanel Cassia Malen"
+        },
+        {
+          "ean": "7310394002317",
+          "name": "Kardemumma Malen"
+        },
+        {
+          "ean": "7310394002454",
+          "name": "Paprika"
+        },
+        {
+          "ean": "7350046465657",
+          "name": "Vitlök Rostad"
+        },
+        {
+          "ean": "7310394002508",
+          "name": "Pizzakrydda"
+        },
+        {
+          "ean": "7350046465183",
+          "name": "Spiskummin Malen"
+        },
+        {
+          "ean": "7350046465015",
+          "name": "Svartpeppar Grovmalen"
+        },
+        {
+          "ean": "7310394002133",
+          "name": "Curry"
+        },
+        {
+          "ean": "7350046464780",
+          "name": "Oregano"
+        },
+        {
+          "ean": "7350046464599",
+          "name": "Ingefära Malen"
+        },
+        {
+          "ean": "7310394002638",
+          "name": "Timjan"
+        },
+        {
+          "ean": "7310394002348",
+          "name": "Kryddpeppar Malen"
+        },
+        {
+          "ean": "7350046469471",
+          "name": "Citronpeppar"
+        },
+        {
+          "ean": "7310394002270",
+          "name": "Örter Provencal"
+        },
+        {
+          "ean": "7350046464841",
+          "name": "Chilipulver"
+        },
+        {
+          "ean": "7310394002331",
+          "name": "Kryddpeppar Hel"
+        },
+        {
+          "ean": "7350046465152",
+          "name": "Cayennepeppar"
+        },
+        {
+          "ean": "7350046464933",
+          "name": "Sesamfrön"
+        },
+        {
+          "ean": "7350046465602",
+          "name": "Superkryddor Kanel, Kardemumma, Ingefära Klassisk"
+        }
+      ]
+    },
+    {
       "store": "ICA Nära Rosendal",
       "product": "Färsk laxsida ASC",
       "brand": "ICA Gott liv. Ursprung Norge",
@@ -3058,6 +3239,106 @@
       ]
     },
     {
+      "store": "Coop (Ekeby)",
+      "product": "Färsk fläskfilé",
+      "brand": "Danmark/Danish Crown",
+      "price": "79,90/kg",
+      "discount": "Medlemspris",
+      "description": "Ca 590 g. Kyld. I bit.",
+      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1651671893/cloud/251579.png",
+      "category": "Kött & Fågel",
+      "restriction": "",
+      "original_price": "124 kr/kg",
+      "discount_percentage": 36,
+      "eans": [
+        {
+          "ean": "2385912200006",
+          "name": "Fläskfilé"
+        }
+      ],
+      "price_per_kg": 79.9,
+      "price_per_kg_max": 79.9
+    },
+    {
+      "store": "Coop (Ekeby)",
+      "product": "Läsk",
+      "brand": "Coca-Cola/Fanta/Sprite",
+      "price": "5 för 30:-",
+      "discount": "",
+      "description": "33 cl. Välj mellan olika sorter.",
+      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1765209067/cloud/575290.png",
+      "category": "Dryck",
+      "restriction": "",
+      "original_price": "9,42 kr",
+      "discount_percentage": 36,
+      "eans": [
+        {
+          "ean": "5000112512748",
+          "name": "Fanta Zero Exotic"
+        },
+        {
+          "ean": "5000112654240",
+          "name": "Coca-Cola Zero Koffeinfri"
+        },
+        {
+          "ean": "5000112637922",
+          "name": "Coca-Cola"
+        },
+        {
+          "ean": "5000112638035",
+          "name": "Fanta Orange Zero"
+        },
+        {
+          "ean": "5000112637991",
+          "name": "Coca-Cola Cherry"
+        },
+        {
+          "ean": "5000112667646",
+          "name": "Fanta Orange"
+        },
+        {
+          "ean": "5000112637977",
+          "name": "Fanta Exotic"
+        },
+        {
+          "ean": "5000112638868",
+          "name": "Coca-Cola Zero Vanilla"
+        },
+        {
+          "ean": "5000112638028",
+          "name": "Fanta Strawberry & Kiwi"
+        },
+        {
+          "ean": "5000112638875",
+          "name": "Sprite Zero"
+        },
+        {
+          "ean": "5000112637908",
+          "name": "Coca-Cola Vanilla"
+        },
+        {
+          "ean": "5000112637939",
+          "name": "Coca-Cola Zero"
+        },
+        {
+          "ean": "5000112672053",
+          "name": "Coca-Cola Zero Cherry"
+        },
+        {
+          "ean": "5000112637953",
+          "name": "Sprite"
+        },
+        {
+          "ean": "5000112690767",
+          "name": "Coca-Cola Zero Lemon"
+        },
+        {
+          "ean": "5000112650402",
+          "name": "Fanta Zero Lemon"
+        }
+      ]
+    },
+    {
       "store": "Lidl",
       "product": "Gul lök",
       "brand": "Qualité Suisse",
@@ -3212,31 +3493,31 @@
       "eans": [
         {
           "ean": "7622300336738",
-          "name": "Original"
+          "name": "Cookies 154g Oreo"
         },
         {
           "ean": "7622210137258",
-          "name": "Double stuff cookies"
+          "name": "Double stuff cookies 157g Oreo"
         },
         {
           "ean": "5000396020687",
-          "name": "Mini Cookies"
+          "name": "Mini Oreo 115g Oreo"
         },
         {
           "ean": "7622210693303",
-          "name": "Choco Brownie"
+          "name": "Kaka Choco brownie 154g Oreo"
         },
         {
           "ean": "7622210477439",
-          "name": "Golden"
+          "name": "Kakor Golden 154g Oreo"
         },
         {
           "ean": "7622201125660",
-          "name": "Crunchies Dipped"
+          "name": "Crunchies Dipped 110g Oreo"
         },
         {
           "ean": "7622201501143",
-          "name": "Remix Raspberry LTD"
+          "name": "Kakor Remix Raspberry 157g Ore"
         },
         {
           "ean": "7622202827389",
@@ -4415,6 +4696,27 @@
       "price_per_kg_max": 33.13
     },
     {
+      "store": "Coop (Ekeby)",
+      "product": "Toalettpapper 6-pack",
+      "brand": "Serla",
+      "price": "3 för 99:-",
+      "discount": "Medlemspris",
+      "description": "996 g.",
+      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1733394062/cloud/414034.png",
+      "category": "Hushåll & Hygien",
+      "restriction": "",
+      "original_price": "48,95 kr",
+      "discount_percentage": 33,
+      "eans": [
+        {
+          "ean": "6414301028184",
+          "name": "Toalettpapper 6-pack"
+        }
+      ],
+      "price_per_kg": 33.13,
+      "price_per_kg_max": 33.13
+    },
+    {
       "store": "Lidl",
       "product": "KANIA Kanel malen",
       "brand": "KANIA",
@@ -4880,6 +5182,35 @@
     },
     {
       "store": "Coop (Liljegatan)",
+      "product": "Chokladpåsar Chrunchy Treats",
+      "brand": "Anthon Berg",
+      "price": "2 för 49:-",
+      "discount": "Medlemspris",
+      "description": "120 g. Välj mellan olika sorter.",
+      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1781192201/cloud/705493.png",
+      "category": "Snacks & Godis",
+      "restriction": "",
+      "original_price": "35,95 kr",
+      "discount_percentage": 32,
+      "eans": [
+        {
+          "ean": "5774540175003",
+          "name": "Crunchy Treats Sweet & Salty Lakrits"
+        },
+        {
+          "ean": "5774540175102",
+          "name": "Mandel i Mörk Choklad"
+        },
+        {
+          "ean": "5774540175201",
+          "name": "Crunchy Treats Salted Caramel"
+        }
+      ],
+      "price_per_kg": 204.17,
+      "price_per_kg_max": 204.17
+    },
+    {
+      "store": "Coop (Ekeby)",
       "product": "Chokladpåsar Chrunchy Treats",
       "brand": "Anthon Berg",
       "price": "2 för 49:-",
@@ -5829,6 +6160,59 @@
       "price_per_kg_max": 99.0
     },
     {
+      "store": "Coop (Ekeby)",
+      "product": "Bryggkaffe",
+      "brand": "Arvid Nordquist",
+      "price": "2 för 99:-",
+      "discount": "",
+      "description": "500 g. Välj mellan olika sorters brygg-, press- och kokkaffe. Gäller ej Selection-serien.",
+      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1676905217/cloud/274646.png",
+      "category": "Skafferi",
+      "restriction": "",
+      "original_price": "70,95 kr",
+      "discount_percentage": 30,
+      "eans": [
+        {
+          "ean": "7310760012308",
+          "name": "Bryggkaffe Extra Mörkrost Festivita"
+        },
+        {
+          "ean": "7310760012988",
+          "name": "Presskaffe Mörkrost Pressiado"
+        },
+        {
+          "ean": "7310760012391",
+          "name": "Bryggkaffe Mörkrost Wanyama"
+        },
+        {
+          "ean": "7310760012629",
+          "name": "Bryggkaffe Mellanmörk rost Sommar"
+        },
+        {
+          "ean": "7310760012919",
+          "name": "Bryggkaffe Mellanmörk Svea"
+        },
+        {
+          "ean": "7310760012902",
+          "name": "Bryggkaffe Extra Mörk Franskrost"
+        },
+        {
+          "ean": "7310760012315",
+          "name": "Bryggkaffe Mellanmörk Gran Dia"
+        },
+        {
+          "ean": "7310760012896",
+          "name": "Bryggkaffe Mellanrost"
+        },
+        {
+          "ean": "7310760012889",
+          "name": "Kokkaffe Mellanrost"
+        }
+      ],
+      "price_per_kg": 99.0,
+      "price_per_kg_max": 99.0
+    },
+    {
       "store": "Lidl",
       "product": "Avokado i nät",
       "brand": "",
@@ -6422,6 +6806,31 @@
       "price_per_kg_max": 82.29
     },
     {
+      "store": "Coop (Ekeby)",
+      "product": "Fish & Crisp",
+      "brand": "Findus",
+      "price": "2 för 79:-",
+      "discount": "Medlemspris",
+      "description": "480-490 g. Frysta. Välj mellan gourmetfiléer och fish nuggets.",
+      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1760133405/cloud/539344.png",
+      "category": "Frys & Färdigmat",
+      "restriction": "",
+      "original_price": "55,37-59,58 kr",
+      "discount_percentage": 29,
+      "eans": [
+        {
+          "ean": "7035119999269",
+          "name": "Fish & Crisp Gourmetfiléer"
+        },
+        {
+          "ean": "7310500186641",
+          "name": "Fisk Nuggets"
+        }
+      ],
+      "price_per_kg": 80.61,
+      "price_per_kg_max": 82.29
+    },
+    {
       "store": "Lidl",
       "product": "Matriket Vaniljbullar",
       "brand": "Matriket",
@@ -6923,6 +7332,59 @@
     },
     {
       "store": "Coop (Liljegatan)",
+      "product": "Proteinbar",
+      "brand": "Nicks",
+      "price": "3 för 38:-",
+      "discount": "",
+      "description": "50 g. Välj mellan olika sorter.",
+      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1763413171/cloud/555912.png",
+      "category": "Snacks & Godis",
+      "restriction": "",
+      "original_price": "17,51 kr",
+      "discount_percentage": 28,
+      "eans": [
+        {
+          "ean": "7350104403003",
+          "name": "Proteinbar Caramel chocolate"
+        },
+        {
+          "ean": "7350104403041",
+          "name": "Proteinbar Peanut butter"
+        },
+        {
+          "ean": "7350104405182",
+          "name": "Proteinbar Creamy coconut "
+        },
+        {
+          "ean": "7350104403058",
+          "name": "Proteinbar Hazelnut chocolate"
+        },
+        {
+          "ean": "7350104403027",
+          "name": "Proteinbar Almond caramel"
+        },
+        {
+          "ean": "7350104403034",
+          "name": "Proteinbar Triple chocolate"
+        },
+        {
+          "ean": "7350104403010",
+          "name": "Proteinbar Salty peanut"
+        },
+        {
+          "ean": "7350104405045",
+          "name": "Proteinbar Dulce de leche"
+        },
+        {
+          "ean": "7350104404796",
+          "name": "Proteinbar choco crush"
+        }
+      ],
+      "price_per_kg": 253.33,
+      "price_per_kg_max": 253.33
+    },
+    {
+      "store": "Coop (Ekeby)",
       "product": "Proteinbar",
       "brand": "Nicks",
       "price": "3 för 38:-",
@@ -8907,6 +9369,27 @@
       "price_per_kg_max": 232.14
     },
     {
+      "store": "Coop (Ekeby)",
+      "product": "Tacokrydda 3-pack",
+      "brand": "Santa Maria",
+      "price": "2 för 39:-",
+      "discount": "",
+      "description": "84 g.",
+      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1531093135/322462.png",
+      "category": "Skafferi",
+      "restriction": "",
+      "original_price": "25,95 kr",
+      "discount_percentage": 25,
+      "eans": [
+        {
+          "ean": "7311310031039",
+          "name": "Kryddmix Taco Mild 3-pack"
+        }
+      ],
+      "price_per_kg": 232.14,
+      "price_per_kg_max": 232.14
+    },
+    {
       "store": "Lidl",
       "product": "Esmara Väst",
       "brand": "Esmara",
@@ -9270,6 +9753,25 @@
       ],
       "price_per_kg": 104.17,
       "price_per_kg_max": 104.17
+    },
+    {
+      "store": "ICA Nära Rosendal",
+      "product": "Pizza Capricciosa",
+      "brand": "",
+      "price": "85:-/st",
+      "discount": "Ord.pris 112 kr",
+      "description": "",
+      "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/2095887100002.jpg",
+      "category": "Frys & Färdigmat",
+      "restriction": "",
+      "original_price": "112 kr",
+      "discount_percentage": 24,
+      "eans": [
+        {
+          "ean": "2095887100002",
+          "name": "Pizza Capricciosa"
+        }
+      ]
     },
     {
       "store": "ICA Supermarket Väst",
@@ -13821,6 +14323,57 @@
       ]
     },
     {
+      "store": "Coop (Ekeby)",
+      "product": "Pizza",
+      "brand": "Grandiosa",
+      "price": "3 för 99:-",
+      "discount": "Medlemspris",
+      "description": "310-350 g. Fryst. Välj mellan olika sorter.",
+      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1713175962/cloud/344561.png",
+      "category": "Frys & Färdigmat",
+      "restriction": "",
+      "original_price": "40,65 kr",
+      "discount_percentage": 19,
+      "eans": [
+        {
+          "ean": "7310240071658",
+          "name": "Pizza X-Tra Allt Gudfadern"
+        },
+        {
+          "ean": "7316110000766",
+          "name": "Pizza Suveräna Salami"
+        },
+        {
+          "ean": "7310240071665",
+          "name": "Pizza X-Tra Allt Vesuvio"
+        },
+        {
+          "ean": "7310240071849",
+          "name": "Pizza X-tra Allt Kebab"
+        },
+        {
+          "ean": "7310240071672",
+          "name": "Pizza X-Tra Allt Capricciosa"
+        },
+        {
+          "ean": "7310240072167",
+          "name": "Pizza X-tra Allt Pepperoni"
+        },
+        {
+          "ean": "7310240071870",
+          "name": "Pizza X-Tra Allt Mexicana"
+        },
+        {
+          "ean": "7316110000797",
+          "name": "Pizza Magiska Maggan"
+        },
+        {
+          "ean": "7350126086697",
+          "name": "Pizza Queen Kantarell"
+        }
+      ]
+    },
+    {
       "store": "ICA Nära Rosendal",
       "product": "Högrev",
       "brand": "Scan. Ursprung Sverige",
@@ -18171,6 +18724,69 @@
     },
     {
       "store": "Coop (Liljegatan)",
+      "product": "Rosta",
+      "brand": "Pågen",
+      "price": "12,90/st",
+      "discount": "",
+      "description": "450 g.",
+      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1661926215/cloud/258017.png",
+      "category": "Bröd & Bageri",
+      "restriction": "",
+      "original_price": "",
+      "discount_percentage": 0,
+      "eans": [
+        {
+          "ean": "22779",
+          "name": "Rosta"
+        }
+      ],
+      "price_per_kg": 28.67,
+      "price_per_kg_max": 28.67
+    },
+    {
+      "store": "Coop (Liljegatan)",
+      "product": "Paprikamix 3-pack",
+      "brand": "Nederländerna/Coop",
+      "price": "22:-",
+      "discount": "",
+      "description": "400 g. Klass 1. I påse.",
+      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1434985593/38145.png",
+      "category": "Frukt & Grönt",
+      "restriction": "",
+      "original_price": "",
+      "discount_percentage": 0,
+      "eans": [
+        {
+          "ean": "23106",
+          "name": "Paprika Mix"
+        }
+      ],
+      "price_per_kg": 55.0,
+      "price_per_kg_max": 55.0
+    },
+    {
+      "store": "Coop (Liljegatan)",
+      "product": "Plommon i ask",
+      "brand": "Spanien/Italien",
+      "price": "15:-",
+      "discount": "",
+      "description": "500 g. Klass 1.",
+      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1630914147/cloud/203288.png",
+      "category": "Frukt & Grönt",
+      "restriction": "",
+      "original_price": "",
+      "discount_percentage": 0,
+      "eans": [
+        {
+          "ean": "1006106082116",
+          "name": "Plommon Blå/Röda 500Gr"
+        }
+      ],
+      "price_per_kg": 40.0,
+      "price_per_kg_max": 40.0
+    },
+    {
+      "store": "Coop (Liljegatan)",
       "product": "Purjolök",
       "brand": "Sverige",
       "price": "20:-/kg",
@@ -18216,7 +18832,53 @@
       "price_per_kg_max": 40.0
     },
     {
-      "store": "Coop (Liljegatan)",
+      "store": "Coop (Ekeby)",
+      "product": "Potatis i påse",
+      "brand": "Sverige/Coop",
+      "price": "10:-",
+      "discount": "Medlemspris",
+      "description": "900 g. Välj mellan fast och mjölig.",
+      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1738326046/cloud/430359.png",
+      "category": "Frukt & Grönt",
+      "restriction": "",
+      "original_price": "",
+      "discount_percentage": 0,
+      "eans": [
+        {
+          "ean": "6702",
+          "name": "Potatis Mjölig"
+        },
+        {
+          "ean": "6895",
+          "name": "Potatis Fast"
+        }
+      ],
+      "price_per_kg": 11.11,
+      "price_per_kg_max": 11.11
+    },
+    {
+      "store": "Coop (Ekeby)",
+      "product": "Frönuftig",
+      "brand": "Polarbröd",
+      "price": "20:-",
+      "discount": "Medlemspris",
+      "description": "375 g.",
+      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1786697429/cloud/732403.png",
+      "category": "Bröd & Bageri",
+      "restriction": "",
+      "original_price": "",
+      "discount_percentage": 0,
+      "eans": [
+        {
+          "ean": "7311800000149",
+          "name": "Frönuftig"
+        }
+      ],
+      "price_per_kg": 53.33,
+      "price_per_kg_max": 53.33
+    },
+    {
+      "store": "Coop (Ekeby)",
       "product": "Plommon i ask",
       "brand": "Spanien/Italien",
       "price": "15:-",
@@ -18237,7 +18899,28 @@
       "price_per_kg_max": 40.0
     },
     {
-      "store": "Coop (Liljegatan)",
+      "store": "Coop (Ekeby)",
+      "product": "Purjolök",
+      "brand": "Sverige",
+      "price": "20:-/kg",
+      "discount": "",
+      "description": "Klass 1.",
+      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1632412703/cloud/25179.png",
+      "category": "Frukt & Grönt",
+      "restriction": "",
+      "original_price": "",
+      "discount_percentage": 0,
+      "eans": [
+        {
+          "ean": "2317462900006",
+          "name": "Purjolök"
+        }
+      ],
+      "price_per_kg": 20,
+      "price_per_kg_max": 20
+    },
+    {
+      "store": "Coop (Ekeby)",
       "product": "Rosta",
       "brand": "Pågen",
       "price": "12,90/st",
@@ -18258,7 +18941,32 @@
       "price_per_kg_max": 28.67
     },
     {
-      "store": "Coop (Liljegatan)",
+      "store": "Coop (Ekeby)",
+      "product": "Ekologisk palsternacka",
+      "brand": "Sverige/Änglamark",
+      "price": "20:-",
+      "discount": "",
+      "description": "500 g. Klass 1.",
+      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1636362932/cloud/178362.png",
+      "category": "Frukt & Grönt",
+      "restriction": "",
+      "original_price": "",
+      "discount_percentage": 0,
+      "eans": [
+        {
+          "ean": "52620",
+          "name": "Palsternacka 500 Gr"
+        },
+        {
+          "ean": "7300190832607",
+          "name": "Palsternacka Eko"
+        }
+      ],
+      "price_per_kg": 40.0,
+      "price_per_kg_max": 40.0
+    },
+    {
+      "store": "Coop (Ekeby)",
       "product": "Paprikamix 3-pack",
       "brand": "Nederländerna/Coop",
       "price": "22:-",
@@ -46538,21 +47246,21 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Crunchy Pieces Biscoff",
-      "brand": "Marabou",
-      "price": "17,90 kr",
-      "description": "90g | Jmf: 198,89 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07622202814198_C1C1_s01",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Mjölkchoklad Bar",
       "brand": "Marabou",
       "price": "9,90 kr",
       "description": "43g | Jmf: 230,23 kr/kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07622300245146_C1N1_s03",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Crunchy Pieces Biscoff",
+      "brand": "Marabou",
+      "price": "17,90 kr",
+      "description": "90g | Jmf: 198,89 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07622202814198_C1C1_s01",
       "original_price": "",
       "discount_percentage": 0
     },
