@@ -55,6 +55,7 @@ const state = {
     'Coop',
     'Coop (Centralhuset)',
     'Coop (Liljegatan)',
+    'Coop (Ekeby)',
     // Lidl
     'Lidl'
   ]),
@@ -93,6 +94,7 @@ const STORE_COLORS = {
   'Coop': { bg: '#007A33', text: '#FFFFFF' },
   'Coop (Centralhuset)': { bg: '#007A33', text: '#FFFFFF' },
   'Coop (Liljegatan)': { bg: '#007A33', text: '#FFFFFF' },
+  'Coop (Ekeby)': { bg: '#007A33', text: '#FFFFFF' },
 
   // Lidl (#00509E)
   'Lidl': { bg: '#00509E', text: '#FFFFFF' }
@@ -183,6 +185,7 @@ function computeStoreCounts() {
   // Coop
   updateCountElement('count-coop-centralhuset', getCount('Coop (Centralhuset)', ['Coop']));
   updateCountElement('count-coop-liljegatan', getCount('Coop (Liljegatan)'));
+  updateCountElement('count-coop-ekeby', getCount('Coop (Ekeby)'));
 
   // Lidl
   updateCountElement('count-lidl', getCount('Lidl'));
@@ -1567,6 +1570,7 @@ function getShortStoreName(store) {
     'Hemköp (Rosendal)': 'Hemköp Rosendal',
     'Coop (Centralhuset)': 'Coop Centralhuset',
     'Coop (Liljegatan)': 'Coop Liljegatan',
+    'Coop (Ekeby)': 'Coop Ekeby',
     'Willys (Björkgatan)': 'Willys',
   };
 

@@ -8,7 +8,8 @@ from scrapers.pricing import format_kr, parse_price_per_kg, price_per_kg_fields
 # Coop butiker att hämta erbjudanden för
 STORES = {
     "Coop (Centralhuset)": "036910",
-    "Coop (Liljegatan)": "036002"
+    "Coop (Liljegatan)": "036002",
+    "Coop (Ekeby)": "036906"
 }
 
 # Coops webbutik – erbjudande-API:et saknar ordinarie pris, så det hämtas härifrån
