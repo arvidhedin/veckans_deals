@@ -1,0 +1,52 @@
+name: Fetch Facebook Posts
+
+# ICA Nära Råbyvägen posts deals ("Prisfest, bara idag!") on Facebook at different times
+# of the day. The site shows the photos as they are (public/facebook.json). The file only
+# changes when there is a new post or image links need renewing, so most runs commit nothing.
+on:
+  schedule:
+    # Every other hour 06:41–22:41 summer time / 05:41–21:41 winter time.
+    # Off the hour, since GitHub often starts scheduled runs on the hour late.
+    - cron: '41 4-20/2 * * *'
+  workflow_dispatch: # Allows manual trigger from GitHub Actions tab
+
+permissions:
+  contents: write
+
+concurrency:
+  group: facebook-posts
+  cancel-in-progress: false
+
+jobs:
+  fetch-facebook-posts:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Fetch the latest post
+        run: python build_facebook.py
+
+      - name: Commit and push public/facebook.json if it changed
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add public/facebook.json
+
+          if git diff --staged --quiet; then
+            echo "No changes in facebook.json to commit."
+          else
+            git commit -m "Update Facebook posts"
+            # The deals scrape may have pushed while this was running
+            git pull --rebase
+            git push
+          fi

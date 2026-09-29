@@ -2353,6 +2353,165 @@ function closeProductModal() {
   }, 300);
 }
 
+// --- ICA Nära Råbyvägen on Facebook ---
+// The store posts photos of its price signs ("Prisfest, bara idag!"), usually without text.
+// build_facebook.py saves the latest posts in facebook.json and the photos are shown as they are.
+const FACEBOOK_URL = 'facebook.json';
+const FACEBOOK_MAX_AGE_DAYS = 7; // hide the section when the newest post is older
+
+const facebook = {
+  posts: [],
+  activePost: 0,
+  viewerIndex: 0
+};
+
+async function fetchFacebookPosts() {
+  try {
+    const response = await fetch(`${FACEBOOK_URL}?v=${Date.now()}`);
+    if (!response.ok) return;
+    const data = await response.json();
+    const posts = (data.posts || []).filter(post => (post.images || []).length > 0 || post.text);
+    const newest = posts[0];
+    if (!newest || Date.now() - new Date(newest.created_at) > FACEBOOK_MAX_AGE_DAYS * 24 * 3600 * 1000) return;
+
+    facebook.posts = posts;
+    facebook.activePost = 0;
+    renderFacebookSection();
+  } catch (error) {
+    console.error('Fel vid hämtning av Facebook-inlägg:', error);
+  }
+}
+
+// "Idag 09:17", "Igår 13:32" or "fre 26 sep. 13:32", in Swedish time
+function formatPostTime(isoDate) {
+  const date = new Date(isoDate);
+  const zone = { timeZone: 'Europe/Stockholm' };
+  const time = date.toLocaleTimeString('sv-SE', { ...zone, hour: '2-digit', minute: '2-digit' });
+  const dayOf = d => d.toLocaleDateString('sv-SE', zone);
+  const now = new Date();
+  if (dayOf(date) === dayOf(now)) return `Idag ${time}`;
+  if (dayOf(date) === dayOf(new Date(now.getTime() - 24 * 3600 * 1000))) return `Igår ${time}`;
+  return `${date.toLocaleDateString('sv-SE', { ...zone, weekday: 'short', day: 'numeric', month: 'short' })} ${time}`;
+}
+
+function renderFacebookSection() {
+  const section = document.getElementById('facebook-section');
+  const tabsEl = document.getElementById('facebook-tabs');
+  const linkEl = document.getElementById('facebook-post-link');
+  const textEl = document.getElementById('facebook-text');
+  const imagesEl = document.getElementById('facebook-images');
+  if (!section || !tabsEl || !linkEl || !textEl || !imagesEl) return;
+
+  const post = facebook.posts[facebook.activePost];
+  section.classList.toggle('hidden', !post);
+  if (!post) return;
+
+  tabsEl.innerHTML = facebook.posts.map((p, i) => {
+    const active = i === facebook.activePost;
+    const colors = active
+      ? 'bg-zinc-900 text-white border-zinc-900'
+      : 'bg-white text-zinc-700 border-zinc-200 hover:bg-zinc-50 hover:border-zinc-300';
+    return `<button type="button" role="tab" aria-selected="${active}" data-facebook-post="${i}" class="px-3 py-1.5 rounded-full text-xs font-bold border transition cursor-pointer whitespace-nowrap ${colors}">${escapeHtml(formatPostTime(p.created_at))}</button>`;
+  }).join('');
+
+  linkEl.href = post.url;
+  textEl.firstElementChild.textContent = post.text || '';
+  textEl.classList.toggle('hidden', !post.text);
+
+  const images = post.images || [];
+  imagesEl.innerHTML = images.map((image, i) => `
+    <button type="button" data-facebook-image="${i}" class="shrink-0 h-48 sm:h-64 rounded-xl overflow-hidden bg-zinc-100 border border-zinc-200/80 hover:opacity-90 transition cursor-zoom-in" style="aspect-ratio: ${Number(image.width) || 3} / ${Number(image.height) || 4};" aria-label="Visa bild ${i + 1} av ${images.length}">
+      <img src="${escapeHtml(image.url)}" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer" class="w-full h-full object-cover">
+    </button>`).join('');
+  imagesEl.scrollLeft = 0;
+}
+
+function openFacebookViewer(index) {
+  const viewer = document.getElementById('facebook-viewer');
+  if (!viewer) return;
+  facebook.viewerIndex = index;
+  showFacebookViewerImage();
+  viewer.classList.remove('hidden');
+  document.body.classList.add('overflow-hidden');
+  document.getElementById('facebook-viewer-close')?.focus();
+}
+
+function closeFacebookViewer() {
+  const viewer = document.getElementById('facebook-viewer');
+  if (!viewer || viewer.classList.contains('hidden')) return;
+  viewer.classList.add('hidden');
+  document.body.classList.remove('overflow-hidden');
+}
+
+// Shows the photo `step` places from the current one, wrapping around
+function showFacebookViewerImage(step = 0) {
+  const images = facebook.posts[facebook.activePost]?.images || [];
+  if (images.length === 0) return;
+  facebook.viewerIndex = (facebook.viewerIndex + step + images.length) % images.length;
+
+  const imageEl = document.getElementById('facebook-viewer-image');
+  imageEl.src = images[facebook.viewerIndex].url;
+  imageEl.alt = `Bild ${facebook.viewerIndex + 1} av ${images.length} från Facebook`;
+  document.getElementById('facebook-viewer-counter').textContent = `${facebook.viewerIndex + 1} / ${images.length}`;
+  document.getElementById('facebook-viewer-prev').classList.toggle('hidden', images.length < 2);
+  document.getElementById('facebook-viewer-next').classList.toggle('hidden', images.length < 2);
+}
+
+function setupFacebookSection() {
+  document.getElementById('facebook-tabs')?.addEventListener('click', (e) => {
+    const tab = e.target.closest('[data-facebook-post]');
+    if (!tab) return;
+    facebook.activePost = parseInt(tab.dataset.facebookPost, 10);
+    renderFacebookSection();
+  });
+
+  const imagesEl = document.getElementById('facebook-images');
+  if (imagesEl) {
+    imagesEl.addEventListener('click', (e) => {
+      const button = e.target.closest('[data-facebook-image]');
+      if (button) openFacebookViewer(parseInt(button.dataset.facebookImage, 10));
+    });
+
+    // Facebook's image links expire after a few days (build_facebook.py renews them in time)
+    imagesEl.addEventListener('error', (e) => {
+      if (e.target.tagName !== 'IMG') return;
+      const message = document.createElement('span');
+      message.className = 'flex items-center justify-center h-full p-3 text-center text-[11px] font-semibold text-zinc-500';
+      message.textContent = 'Bilden gick inte att visa. Öppna inlägget på Facebook.';
+      e.target.replaceWith(message);
+    }, true);
+  }
+
+  const viewer = document.getElementById('facebook-viewer');
+  if (!viewer) return;
+  document.getElementById('facebook-viewer-close').addEventListener('click', closeFacebookViewer);
+  document.getElementById('facebook-viewer-prev').addEventListener('click', () => showFacebookViewerImage(-1));
+  document.getElementById('facebook-viewer-next').addEventListener('click', () => showFacebookViewerImage(1));
+  // A click next to the photo closes the viewer
+  viewer.addEventListener('click', (e) => {
+    if (e.target === viewer) closeFacebookViewer();
+  });
+
+  window.addEventListener('keydown', (e) => {
+    if (viewer.classList.contains('hidden')) return;
+    if (e.key === 'Escape') closeFacebookViewer();
+    else if (e.key === 'ArrowLeft') showFacebookViewerImage(-1);
+    else if (e.key === 'ArrowRight') showFacebookViewerImage(1);
+  });
+
+  // Swipe between the photos on phones
+  let touchStartX = null;
+  viewer.addEventListener('touchstart', (e) => {
+    touchStartX = e.touches[0].clientX;
+  }, { passive: true });
+  viewer.addEventListener('touchend', (e) => {
+    if (touchStartX === null) return;
+    const distance = e.changedTouches[0].clientX - touchStartX;
+    touchStartX = null;
+    if (Math.abs(distance) > 40) showFacebookViewerImage(distance < 0 ? 1 : -1);
+  });
+}
+
 // --- Helper Functions ---
 function escapeHtml(str) {
   if (!str) return '';
@@ -2684,6 +2843,8 @@ function setupEventListeners() {
 document.addEventListener('DOMContentLoaded', () => {
   state.cart = loadCartFromStorage();
   setupEventListeners();
+  setupFacebookSection();
   fetchDealsData();
+  fetchFacebookPosts();
   updateCartUI();
 });
