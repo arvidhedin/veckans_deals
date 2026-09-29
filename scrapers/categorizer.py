@@ -23,6 +23,7 @@ CATEGORIES = [
     "Skafferi",
     "Snacks & Godis",
     "Dryck",
+    "Energidryck",
     "Frys & Färdigmat",
     "Hushåll & Hygien",
     "Övrigt",
@@ -152,12 +153,15 @@ KEYWORDS = {
     "Dryck": """
         läsk saft juice must nektar dryck drycker vatten cola pepsi fanta sprite 7up
         zingo trocadero pommac loka ramlösa bonaqua vichy tonic ginger_ale ginger_beer
-        iste ice_tea iskaffe energidryck nocco celsius red_bull =monster powerking
-        powerade gatorade festis smoothie smoothies shot kombucha cider =öl lättöl
-        folköl mojito lemonad limonad lemonade sodavatten glögg nyponsoppa blåbärssoppa
-        fun_light god_morgon tropicana brämhults gainomax fruit_crush ramune radler
-        peroni dr_pepper pucko cocio vitamin_well ice_coffee iced_coffee ice_coffe
-        frappe =dricka nåbe aloe_vera
+        iste ice_tea iskaffe powerade gatorade festis smoothie smoothies shot kombucha
+        cider =öl lättöl folköl mojito lemonad limonad lemonade sodavatten glögg
+        nyponsoppa blåbärssoppa fun_light god_morgon tropicana brämhults gainomax
+        fruit_crush ramune radler peroni dr_pepper pucko cocio vitamin_well ice_coffee
+        iced_coffee ice_coffe frappe =dricka nåbe aloe_vera
+    """,
+    "Energidryck": """
+        energidryck energidrycker nocco celsius red_bull redbull =monster powerking
+        kong_strong rockstar =burn clean_drink
     """,
     "Frys & Färdigmat": """
         pizza pizzor ristorante grandiosa billys gorbys paj pajer pirog piroger

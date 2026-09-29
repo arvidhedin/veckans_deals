@@ -20,6 +20,7 @@ const ALL_CATEGORIES = [
   'Skafferi',
   'Snacks & Godis',
   'Dryck',
+  'Energidryck',
   'Frys & Färdigmat',
   'Hushåll & Hygien',
   'Övrigt'
