@@ -6335,6 +6335,26 @@
       "source": "Willys",
       "fetched": "2026-09-29"
     },
+    "101892699_ST": {
+      "name": "Frönuftig",
+      "details": "POLARBRÖD, 375g",
+      "ingredients": "VETEmjöl¹, vatten, surdeg (RÅG)¹ (7%), fullkornsRÅGmjöl¹, hampafrö (1,9%), VETEGLUTEN, rapsolja¹, salt, fermenterat VETEmjöl, jäst¹, chiafrö (0,5%), maltmjöl (KORN). ¹Ursprungsland: Sverige. Innehåller naturligt förekommande sockerarter.",
+      "nutrition_basis": "per 100 g",
+      "nutrition": {
+        "Energi": "1100 kJ / 260 kcal",
+        "Fett": "3,7 g",
+        "Varav mättat fett": "0,4 g",
+        "Kolhydrat": "45 g",
+        "Varav sockerarter": "2,9 g",
+        "Fiber": "3,4 g",
+        "Protein": "8,7 g",
+        "Salt": "1,2 g"
+      },
+      "origin": "",
+      "country": "Sverige",
+      "source": "Willys",
+      "fetched": "2026-09-29"
+    },
     "100494387_ST": {
       "name": "Roast'n Toast",
       "details": "PÅGEN, 800g",
@@ -7868,26 +7888,6 @@
       "source": "Willys",
       "fetched": "2026-09-29"
     },
-    "101892699_ST": {
-      "name": "Frönuftig",
-      "details": "POLARBRÖD, 375g",
-      "ingredients": "VETEmjöl¹, vatten, surdeg (RÅG)¹ (7%), fullkornsRÅGmjöl¹, hampafrö (1,9%), VETEGLUTEN, rapsolja¹, salt, fermenterat VETEmjöl, jäst¹, chiafrö (0,5%), maltmjöl (KORN). ¹Ursprungsland: Sverige. Innehåller naturligt förekommande sockerarter.",
-      "nutrition_basis": "per 100 g",
-      "nutrition": {
-        "Energi": "1100 kJ / 260 kcal",
-        "Fett": "3,7 g",
-        "Varav mättat fett": "0,4 g",
-        "Kolhydrat": "45 g",
-        "Varav sockerarter": "2,9 g",
-        "Fiber": "3,4 g",
-        "Protein": "8,7 g",
-        "Salt": "1,2 g"
-      },
-      "origin": "",
-      "country": "Sverige",
-      "source": "Willys",
-      "fetched": "2026-09-29"
-    },
     "coop:5760466642019": {
       "name": "Vitost Krämig Hel Original",
       "details": "Apetina®",
@@ -7918,10 +7918,10 @@
       "source": "Coop",
       "fetched": "2026-09-29"
     },
-    "coop:5774540175102": {
-      "name": "Mandel i Mörk Choklad",
+    "coop:5774540175201": {
+      "name": "Crunchy Treats Salted Caramel",
       "details": "Anthon Berg",
-      "ingredients": "Rostade MANDLAR, socker, kakaomassa*, kakaosmör*, HELMJÖLKSPULVER, glykossirap, modifierad stärkelse (potatis), havssalt, emulgeringsmedel (lecitin), ytbehandlingsmedel (shellack), färgämne (järnoxider och -hydroxider). Kan innehålla spår av hasselnötter.\nMinst 50% kakaotorrsubstans i den mörka chokladen.\n*Rainforest Alliance Certified. www.ra.org",
+      "ingredients": "Socker, HELMJÖLKSPULVER, kakaosmör*, kakaomassa*, invertsockersirap, MJÖLKFETT, glukossirap, stärkelse (ris), havssalt, förtjockningsmedel (gummi arabicum), emulgeringsmedel (lecitin), SKUMMJÖLKSPULVER, surhetsreglerande medel (natriumkarbonater), ytbehandlingsmedel (shellack), modifierad stärkelse (potatis), färgämne (järnoxider och -hydroxider), vaniljextrakt. Kan innehålla spår av mandlar och hasselnötter. \nMinst 33% kakaotorrsubstans i mjölkchokladen.\n*Rainforest Alliance Certified. www.ra.org",
       "nutrition_basis": "",
       "nutrition": {},
       "origin": "Ursprungsland: Polen",
@@ -7975,6 +7975,16 @@
       "nutrition_basis": "",
       "nutrition": {},
       "origin": "Ursprungsland: Tyskland",
+      "source": "Coop",
+      "fetched": "2026-09-29"
+    },
+    "coop:7311800000149": {
+      "name": "Frönuftig",
+      "details": "Polarbröd",
+      "ingredients": "VETEmjöl¹, vatten, surdeg (RÅG)¹ (7%), fullkornsRÅGmjöl¹, hampafrö (1,9%), VETEGLUTEN, rapsolja¹, salt, fermenterat VETEmjöl, jäst¹, chiafrö (0,5%), maltmjöl (KORN). ¹Ursprungsland: Sverige. Innehåller naturligt förekommande sockerarter.",
+      "nutrition_basis": "",
+      "nutrition": {},
+      "origin": "Ursprungsland: Sverige",
       "source": "Coop",
       "fetched": "2026-09-29"
     },
@@ -8223,6 +8233,7 @@
     "7310865866448": "101288827_ST",
     "7310865866486": "101288878_ST",
     "7310865866356": "101288854_ST",
+    "7311800000149": "coop:7311800000149",
     "7311070336160": "100494387_ST",
     "7316641415008": "101361773_ST",
     "7316641415022": "101361774_ST",
@@ -8303,11 +8314,10 @@
     "5024278003063": "101422787_ST",
     "5024278003049": "101422954_ST",
     "5024278003087": "101543706_ST",
-    "7311800000149": "101892699_ST",
     "5760466642019": "coop:5760466642019",
     "7310394002072": "coop:7310394002072",
     "5000112512748": "coop:5000112512748",
-    "5774540175102": "coop:5774540175102",
+    "5774540175201": "coop:5774540175201",
     "7310760012988": "coop:7310760012988",
     "7350104404796": "coop:7350104404796",
     "7350104403058": "coop:7350104403058",

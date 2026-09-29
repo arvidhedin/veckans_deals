@@ -1,12 +1,12 @@
 {
-  "updated_at": "2026-09-29T06:20:57.437479+00:00",
-  "updated_at_readable": "2026-09-29 06:20 UTC",
-  "total_offers": 1073,
+  "updated_at": "2026-09-29T07:33:10.769772+00:00",
+  "updated_at_readable": "2026-09-29 07:33 UTC",
+  "total_offers": 1074,
   "store_counts": {
     "ICA Nära Råbyvägen": 37,
     "ICA Supermarket Torgkassen": 53,
     "ICA Nära Rosendal": 41,
-    "ICA Supermarket Väst": 34,
+    "ICA Supermarket Väst": 35,
     "ICA Vretgränd": 39,
     "ICA Supermarket City": 6,
     "ICA Supermarket Luthagens Livs": 53,
@@ -25,7 +25,7 @@
     "Hushåll & Hygien": 103,
     "Fisk & Skaldjur": 16,
     "Mejeri & Ägg": 121,
-    "Frukt & Grönt": 129,
+    "Frukt & Grönt": 130,
     "Chark & Pålägg": 58,
     "Skafferi": 161,
     "Bröd & Bageri": 64,
@@ -1280,6 +1280,28 @@
       "origin": "",
       "price_per_kg": 71.07,
       "price_per_kg_max": 71.07
+    },
+    {
+      "store": "ICA Supermarket Väst",
+      "product": "Sötpotatis",
+      "brand": ",",
+      "price": "15:-/kg",
+      "discount": "Ord.pris 24,98 kr/kg",
+      "description": "kg",
+      "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/2092409100007.jpg",
+      "category": "Frukt & Grönt",
+      "restriction": "",
+      "original_price": "24,98 kr/kg",
+      "discount_percentage": 40,
+      "eans": [
+        {
+          "ean": "2092409100007",
+          "name": "Sötpotatis"
+        }
+      ],
+      "origin": "",
+      "price_per_kg": 15.0,
+      "price_per_kg_max": 15.0
     },
     {
       "store": "ICA Supermarket City",
@@ -7718,6 +7740,28 @@
     },
     {
       "store": "Coop (Liljegatan)",
+      "product": "Frönuftig",
+      "brand": "Polarbröd",
+      "price": "20:-",
+      "discount": "Medlemspris",
+      "description": "375 g.",
+      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1786697429/cloud/732403.png",
+      "category": "Bröd & Bageri",
+      "restriction": "",
+      "original_price": "27,95 kr",
+      "discount_percentage": 28,
+      "eans": [
+        {
+          "ean": "7311800000149",
+          "name": "Frönuftig"
+        }
+      ],
+      "origin": "",
+      "price_per_kg": 53.33,
+      "price_per_kg_max": 53.33
+    },
+    {
+      "store": "Coop (Liljegatan)",
       "product": "Proteinbar",
       "brand": "Nicks",
       "price": "3 för 38:-",
@@ -7769,6 +7813,28 @@
       "origin": "",
       "price_per_kg": 253.33,
       "price_per_kg_max": 253.33
+    },
+    {
+      "store": "Coop (Ekeby)",
+      "product": "Frönuftig",
+      "brand": "Polarbröd",
+      "price": "20:-",
+      "discount": "Medlemspris",
+      "description": "375 g.",
+      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1786697429/cloud/732403.png",
+      "category": "Bröd & Bageri",
+      "restriction": "",
+      "original_price": "27,95 kr",
+      "discount_percentage": 28,
+      "eans": [
+        {
+          "ean": "7311800000149",
+          "name": "Frönuftig"
+        }
+      ],
+      "origin": "",
+      "price_per_kg": 53.33,
+      "price_per_kg_max": 53.33
     },
     {
       "store": "Coop (Ekeby)",
@@ -19291,25 +19357,69 @@
     },
     {
       "store": "Coop (Liljegatan)",
-      "product": "Frönuftig",
-      "brand": "Polarbröd",
-      "price": "20:-",
-      "discount": "Medlemspris",
-      "description": "375 g.",
-      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1786697429/cloud/732403.png",
-      "category": "Bröd & Bageri",
+      "product": "Paprikamix 3-pack",
+      "brand": "Nederländerna/Coop",
+      "price": "22:-",
+      "discount": "",
+      "description": "400 g. Klass 1. I påse.",
+      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1434985593/38145.png",
+      "category": "Frukt & Grönt",
       "restriction": "",
       "original_price": "",
       "discount_percentage": 0,
       "eans": [
         {
-          "ean": "7311800000149",
-          "name": "Frönuftig"
+          "ean": "23106",
+          "name": "Paprika Mix"
         }
       ],
-      "origin": "",
-      "price_per_kg": 53.33,
-      "price_per_kg_max": 53.33
+      "origin": "Nederländerna",
+      "price_per_kg": 55.0,
+      "price_per_kg_max": 55.0
+    },
+    {
+      "store": "Coop (Liljegatan)",
+      "product": "Purjolök",
+      "brand": "Sverige",
+      "price": "20:-/kg",
+      "discount": "",
+      "description": "Klass 1.",
+      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1632412703/cloud/25179.png",
+      "category": "Frukt & Grönt",
+      "restriction": "",
+      "original_price": "",
+      "discount_percentage": 0,
+      "eans": [
+        {
+          "ean": "2317462900006",
+          "name": "Purjolök"
+        }
+      ],
+      "origin": "Sverige",
+      "price_per_kg": 20,
+      "price_per_kg_max": 20
+    },
+    {
+      "store": "Coop (Liljegatan)",
+      "product": "Plommon i ask",
+      "brand": "Spanien/Italien",
+      "price": "15:-",
+      "discount": "",
+      "description": "500 g. Klass 1.",
+      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1630914147/cloud/203288.png",
+      "category": "Frukt & Grönt",
+      "restriction": "",
+      "original_price": "",
+      "discount_percentage": 0,
+      "eans": [
+        {
+          "ean": "1006106082116",
+          "name": "Plommon Blå/Röda 500Gr"
+        }
+      ],
+      "origin": "Spanien, Italien",
+      "price_per_kg": 40.0,
+      "price_per_kg_max": 40.0
     },
     {
       "store": "Coop (Liljegatan)",
@@ -19339,28 +19449,6 @@
     },
     {
       "store": "Coop (Liljegatan)",
-      "product": "Purjolök",
-      "brand": "Sverige",
-      "price": "20:-/kg",
-      "discount": "",
-      "description": "Klass 1.",
-      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1632412703/cloud/25179.png",
-      "category": "Frukt & Grönt",
-      "restriction": "",
-      "original_price": "",
-      "discount_percentage": 0,
-      "eans": [
-        {
-          "ean": "2317462900006",
-          "name": "Purjolök"
-        }
-      ],
-      "origin": "Sverige",
-      "price_per_kg": 20,
-      "price_per_kg_max": 20
-    },
-    {
-      "store": "Coop (Liljegatan)",
       "product": "Rosta",
       "brand": "Pågen",
       "price": "12,90/st",
@@ -19380,50 +19468,6 @@
       "origin": "",
       "price_per_kg": 28.67,
       "price_per_kg_max": 28.67
-    },
-    {
-      "store": "Coop (Liljegatan)",
-      "product": "Paprikamix 3-pack",
-      "brand": "Nederländerna/Coop",
-      "price": "22:-",
-      "discount": "",
-      "description": "400 g. Klass 1. I påse.",
-      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1434985593/38145.png",
-      "category": "Frukt & Grönt",
-      "restriction": "",
-      "original_price": "",
-      "discount_percentage": 0,
-      "eans": [
-        {
-          "ean": "23106",
-          "name": "Paprika Mix"
-        }
-      ],
-      "origin": "Nederländerna",
-      "price_per_kg": 55.0,
-      "price_per_kg_max": 55.0
-    },
-    {
-      "store": "Coop (Liljegatan)",
-      "product": "Plommon i ask",
-      "brand": "Spanien/Italien",
-      "price": "15:-",
-      "discount": "",
-      "description": "500 g. Klass 1.",
-      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1630914147/cloud/203288.png",
-      "category": "Frukt & Grönt",
-      "restriction": "",
-      "original_price": "",
-      "discount_percentage": 0,
-      "eans": [
-        {
-          "ean": "1006106082116",
-          "name": "Plommon Blå/Röda 500Gr"
-        }
-      ],
-      "origin": "Spanien, Italien",
-      "price_per_kg": 40.0,
-      "price_per_kg_max": 40.0
     },
     {
       "store": "Coop (Ekeby)",
@@ -19453,71 +19497,23 @@
     },
     {
       "store": "Coop (Ekeby)",
-      "product": "Frönuftig",
-      "brand": "Polarbröd",
-      "price": "20:-",
-      "discount": "Medlemspris",
-      "description": "375 g.",
-      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1786697429/cloud/732403.png",
-      "category": "Bröd & Bageri",
-      "restriction": "",
-      "original_price": "",
-      "discount_percentage": 0,
-      "eans": [
-        {
-          "ean": "7311800000149",
-          "name": "Frönuftig"
-        }
-      ],
-      "origin": "",
-      "price_per_kg": 53.33,
-      "price_per_kg_max": 53.33
-    },
-    {
-      "store": "Coop (Ekeby)",
-      "product": "Paprikamix 3-pack",
-      "brand": "Nederländerna/Coop",
-      "price": "22:-",
-      "discount": "",
-      "description": "400 g. Klass 1. I påse.",
-      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1434985593/38145.png",
-      "category": "Frukt & Grönt",
-      "restriction": "",
-      "original_price": "",
-      "discount_percentage": 0,
-      "eans": [
-        {
-          "ean": "23106",
-          "name": "Paprika Mix"
-        }
-      ],
-      "origin": "Nederländerna",
-      "price_per_kg": 55.0,
-      "price_per_kg_max": 55.0
-    },
-    {
-      "store": "Coop (Ekeby)",
-      "product": "Ekologisk palsternacka",
-      "brand": "Sverige/Änglamark",
-      "price": "20:-",
+      "product": "Plommon i ask",
+      "brand": "Spanien/Italien",
+      "price": "15:-",
       "discount": "",
       "description": "500 g. Klass 1.",
-      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1636362932/cloud/178362.png",
+      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1630914147/cloud/203288.png",
       "category": "Frukt & Grönt",
       "restriction": "",
       "original_price": "",
       "discount_percentage": 0,
       "eans": [
         {
-          "ean": "52620",
-          "name": "Palsternacka 500 Gr"
-        },
-        {
-          "ean": "7300190832607",
-          "name": "Palsternacka Eko"
+          "ean": "1006106082116",
+          "name": "Plommon Blå/Röda 500Gr"
         }
       ],
-      "origin": "Sverige",
+      "origin": "Spanien, Italien",
       "price_per_kg": 40.0,
       "price_per_kg_max": 40.0
     },
@@ -19567,25 +19563,51 @@
     },
     {
       "store": "Coop (Ekeby)",
-      "product": "Plommon i ask",
-      "brand": "Spanien/Italien",
-      "price": "15:-",
+      "product": "Ekologisk palsternacka",
+      "brand": "Sverige/Änglamark",
+      "price": "20:-",
       "discount": "",
       "description": "500 g. Klass 1.",
-      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1630914147/cloud/203288.png",
+      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1636362932/cloud/178362.png",
       "category": "Frukt & Grönt",
       "restriction": "",
       "original_price": "",
       "discount_percentage": 0,
       "eans": [
         {
-          "ean": "1006106082116",
-          "name": "Plommon Blå/Röda 500Gr"
+          "ean": "52620",
+          "name": "Palsternacka 500 Gr"
+        },
+        {
+          "ean": "7300190832607",
+          "name": "Palsternacka Eko"
         }
       ],
-      "origin": "Spanien, Italien",
+      "origin": "Sverige",
       "price_per_kg": 40.0,
       "price_per_kg_max": 40.0
+    },
+    {
+      "store": "Coop (Ekeby)",
+      "product": "Paprikamix 3-pack",
+      "brand": "Nederländerna/Coop",
+      "price": "22:-",
+      "discount": "",
+      "description": "400 g. Klass 1. I påse.",
+      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1434985593/38145.png",
+      "category": "Frukt & Grönt",
+      "restriction": "",
+      "original_price": "",
+      "discount_percentage": 0,
+      "eans": [
+        {
+          "ean": "23106",
+          "name": "Paprika Mix"
+        }
+      ],
+      "origin": "Nederländerna",
+      "price_per_kg": 55.0,
+      "price_per_kg_max": 55.0
     },
     {
       "store": "Lidl",
@@ -24068,21 +24090,21 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Kycklingfilé Bröstfilé Sverige",
-      "brand": "Garant",
-      "price": "125,00 kr",
-      "description": "ca: 850g | Jmf: 125,00 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/02359634700007_C1L1_s04",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Kycklingspett Teriyaki",
       "brand": "Spicefield",
       "price": "87,92 kr",
       "description": "450g | Jmf: 195,38 kr/kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07611612121552_C1N1_s01",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Kycklingfilé Bröstfilé Sverige",
+      "brand": "Garant",
+      "price": "125,00 kr",
+      "description": "ca: 850g | Jmf: 125,00 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/02359634700007_C1L1_s04",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -28878,21 +28900,21 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Barista Havredryck",
-      "brand": "Oddlygood",
-      "price": "16,90 kr",
-      "description": "1l | Jmf: 16,90 kr/l",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/06408430102068_C1R1_s02",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Ikaffe Barista Edition Havredryck",
       "brand": "Oatly",
       "price": "24,51 kr",
       "description": "1,5l | Jmf: 16,34 kr/l",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07394376621697_C1R1_s01",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Barista Havredryck",
+      "brand": "Oddlygood",
+      "price": "16,90 kr",
+      "description": "1l | Jmf: 16,90 kr/l",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/06408430102068_C1R1_s02",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -38038,11 +38060,11 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Kycklingpastej Pilka Classic",
-      "brand": "Ovako",
-      "price": "11,26 kr",
-      "description": "95g | Jmf: 118,53 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/03870114001258_C1C1_s01",
+      "product": "Kycklingpastej Classic",
+      "brand": "Podravka",
+      "price": "13,90 kr",
+      "description": "95g | Jmf: 146,32 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/03856020244576_C1C1_s03",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -40108,21 +40130,21 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Müslibröd",
-      "brand": "Pågen",
-      "price": "33,90 kr",
-      "description": "650g | Jmf: 52,16 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311070004144_C1L1_s01",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Skördefest",
       "brand": "Pågen",
       "price": "32,50 kr",
       "description": "650g | Jmf: 50,00 kr/kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311070004168_C1L1_s02",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Müslibröd",
+      "brand": "Pågen",
+      "price": "33,90 kr",
+      "description": "650g | Jmf: 52,16 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311070004144_C1L1_s01",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -40378,21 +40400,21 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Golden Oreo Cookies Kakor",
-      "brand": "Oreo",
-      "price": "18,83 kr",
-      "description": "154g | Jmf: 122,27 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07622210477439_C1N1_s02",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Chokoflarn",
       "brand": "Eldorado",
       "price": "29,90 kr",
       "description": "600g | Jmf: 49,83 kr/kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043015078_C1L1_s01",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Golden Oreo Cookies Kakor",
+      "brand": "Oreo",
+      "price": "18,83 kr",
+      "description": "154g | Jmf: 122,27 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07622210477439_C1N1_s02",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -41548,21 +41570,21 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Lök Schalotten Klass 1",
-      "brand": null,
-      "price": "39,90 kr",
-      "description": "ca: 30g | Jmf: 39,90 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042006244_C1C0_s01",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Morot Klass 1",
       "brand": null,
       "price": "15,90 kr",
       "description": "ca: 100g | Jmf: 15,90 kr/kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042001560_C1N0_s01",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Lök Schalotten Klass 1",
+      "brand": null,
+      "price": "39,90 kr",
+      "description": "ca: 30g | Jmf: 39,90 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042006244_C1C0_s01",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -46288,21 +46310,21 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Passion/rhubar Sockerfri Blanddryck Pet",
-      "brand": "Fun Light",
-      "price": "24,90 kr",
-      "description": "1l/10l | Jmf: 2,49 kr/l",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07316110002616_C1N1_s01",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Apelsin Saft Pet",
       "brand": "Bob",
       "price": "31,13 kr",
       "description": "95cl/7,6 | Jmf: 4,10 kr/l",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310090344131_C1N1_s01",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Passion/rhubar Sockerfri Blanddryck Pet",
+      "brand": "Fun Light",
+      "price": "24,90 kr",
+      "description": "1l/10l | Jmf: 2,49 kr/l",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07316110002616_C1N1_s01",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -46858,6 +46880,16 @@
     },
     {
       "store": "Willys Ord.pris",
+      "product": "Grillchips",
+      "brand": "Estrella",
+      "price": "19,90 kr",
+      "description": "160g | Jmf: 124,38 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310532305959_C1N1_s01",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
       "product": "Smör &havssalt Västkustchips",
       "brand": "Estrella",
       "price": "24,90 kr",
@@ -46868,11 +46900,11 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Grillchips",
+      "product": "Sourcream & Onion Chips",
       "brand": "Estrella",
       "price": "19,90 kr",
       "description": "160g | Jmf: 124,38 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310532305959_C1N1_s01",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310532305942_C1N1_s01",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -46893,16 +46925,6 @@
       "price": "9,50 kr",
       "description": "40g | Jmf: 237,50 kr/kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310531022901_C1N1_s03",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
-      "product": "Sourcream & Onion Chips",
-      "brand": "Estrella",
-      "price": "19,90 kr",
-      "description": "160g | Jmf: 124,38 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07310532305942_C1N1_s01",
       "original_price": "",
       "discount_percentage": 0
     },
@@ -47238,21 +47260,21 @@
     },
     {
       "store": "Willys Ord.pris",
-      "product": "Nötmix Klassisk",
-      "brand": "Olw",
-      "price": "29,90 kr",
-      "description": "200g | Jmf: 149,50 kr/kg",
-      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07340005403462_C1N1_s02",
-      "original_price": "",
-      "discount_percentage": 0
-    },
-    {
-      "store": "Willys Ord.pris",
       "product": "Chili Nötter",
       "brand": "Olw",
       "price": "24,90 kr",
       "description": "150g | Jmf: 166,00 kr/kg",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07340005405343_C1N1_s02",
+      "original_price": "",
+      "discount_percentage": 0
+    },
+    {
+      "store": "Willys Ord.pris",
+      "product": "Nötmix Klassisk",
+      "brand": "Olw",
+      "price": "29,90 kr",
+      "description": "200g | Jmf: 149,50 kr/kg",
+      "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/07340005403462_C1N1_s02",
       "original_price": "",
       "discount_percentage": 0
     },
