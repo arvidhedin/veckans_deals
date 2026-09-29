@@ -1,6 +1,6 @@
 {
-  "updated_at": "2026-09-29T06:12:54.181581+00:00",
-  "updated_at_readable": "2026-09-29 06:12 UTC",
+  "updated_at": "2026-09-29T06:20:57.437479+00:00",
+  "updated_at_readable": "2026-09-29 06:20 UTC",
   "total_offers": 1073,
   "store_counts": {
     "ICA Nära Råbyvägen": 37,
@@ -29,10 +29,11 @@
     "Chark & Pålägg": 58,
     "Skafferi": 161,
     "Bröd & Bageri": 64,
-    "Dryck": 40,
+    "Dryck": 36,
     "Kött & Fågel": 77,
     "Snacks & Godis": 52,
-    "Övrigt": 139
+    "Övrigt": 139,
+    "Energidryck": 4
   },
   "offers": [
     {
@@ -960,7 +961,7 @@
       "discount": "",
       "description": "35,5-50cl",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/05060335635716_C1N1_s02",
-      "category": "Dryck",
+      "category": "Energidryck",
       "restriction": "",
       "original_price": "20,95 kr",
       "discount_percentage": 43,
@@ -3277,127 +3278,105 @@
     },
     {
       "store": "Coop (Liljegatan)",
-      "product": "Läsk",
-      "brand": "Coca-Cola/Fanta/Sprite",
-      "price": "5 för 30:-",
-      "discount": "",
-      "description": "33 cl. Välj mellan olika sorter.",
-      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1765209067/cloud/575290.png",
-      "category": "Dryck",
+      "product": "Färsk fläskfilé",
+      "brand": "Danmark/Danish Crown",
+      "price": "79,90/kg",
+      "discount": "Medlemspris",
+      "description": "Ca 590 g. Kyld. I bit.",
+      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1651671893/cloud/251579.png",
+      "category": "Kött & Fågel",
       "restriction": "",
-      "original_price": "9,42 kr",
+      "original_price": "124 kr/kg",
       "discount_percentage": 36,
       "eans": [
         {
-          "ean": "5000112512748",
-          "name": "Fanta Zero Exotic"
-        },
-        {
-          "ean": "5000112654240",
-          "name": "Coca-Cola Zero Koffeinfri"
-        },
-        {
-          "ean": "5000112637922",
-          "name": "Coca-Cola"
-        },
-        {
-          "ean": "5000112638035",
-          "name": "Fanta Orange Zero"
-        },
-        {
-          "ean": "5000112637991",
-          "name": "Coca-Cola Cherry"
-        },
-        {
-          "ean": "5000112667646",
-          "name": "Fanta Orange"
-        },
-        {
-          "ean": "5000112637977",
-          "name": "Fanta Exotic"
-        },
-        {
-          "ean": "5000112638868",
-          "name": "Coca-Cola Zero Vanilla"
-        },
-        {
-          "ean": "5000112638028",
-          "name": "Fanta Strawberry & Kiwi"
-        },
-        {
-          "ean": "5000112638875",
-          "name": "Sprite Zero"
-        },
-        {
-          "ean": "5000112637908",
-          "name": "Coca-Cola Vanilla"
-        },
-        {
-          "ean": "5000112637939",
-          "name": "Coca-Cola Zero"
-        },
-        {
-          "ean": "5000112672053",
-          "name": "Coca-Cola Zero Cherry"
-        },
-        {
-          "ean": "5000112637953",
-          "name": "Sprite"
-        },
-        {
-          "ean": "5000112690767",
-          "name": "Coca-Cola Zero Lemon"
-        },
-        {
-          "ean": "5000112650402",
-          "name": "Fanta Zero Lemon"
+          "ean": "2385912200006",
+          "name": "Fläskfilé"
         }
       ],
-      "origin": ""
+      "origin": "Danmark",
+      "price_per_kg": 79.9,
+      "price_per_kg_max": 79.9
     },
     {
       "store": "Coop (Liljegatan)",
-      "product": "Färsk fläskfilé",
-      "brand": "Danmark/Danish Crown",
-      "price": "79,90/kg",
-      "discount": "Medlemspris",
-      "description": "Ca 590 g. Kyld. I bit.",
-      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1651671893/cloud/251579.png",
-      "category": "Kött & Fågel",
+      "product": "Läsk",
+      "brand": "Coca-Cola/Fanta/Sprite",
+      "price": "5 för 30:-",
+      "discount": "",
+      "description": "33 cl. Välj mellan olika sorter.",
+      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1765209067/cloud/575290.png",
+      "category": "Dryck",
       "restriction": "",
-      "original_price": "124 kr/kg",
+      "original_price": "9,42 kr",
       "discount_percentage": 36,
       "eans": [
         {
-          "ean": "2385912200006",
-          "name": "Fläskfilé"
-        }
-      ],
-      "origin": "Danmark",
-      "price_per_kg": 79.9,
-      "price_per_kg_max": 79.9
-    },
-    {
-      "store": "Coop (Ekeby)",
-      "product": "Färsk fläskfilé",
-      "brand": "Danmark/Danish Crown",
-      "price": "79,90/kg",
-      "discount": "Medlemspris",
-      "description": "Ca 590 g. Kyld. I bit.",
-      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1651671893/cloud/251579.png",
-      "category": "Kött & Fågel",
-      "restriction": "",
-      "original_price": "124 kr/kg",
-      "discount_percentage": 36,
-      "eans": [
+          "ean": "5000112512748",
+          "name": "Fanta Zero Exotic"
+        },
         {
-          "ean": "2385912200006",
-          "name": "Fläskfilé"
+          "ean": "5000112654240",
+          "name": "Coca-Cola Zero Koffeinfri"
+        },
+        {
+          "ean": "5000112637922",
+          "name": "Coca-Cola"
+        },
+        {
+          "ean": "5000112638035",
+          "name": "Fanta Orange Zero"
+        },
+        {
+          "ean": "5000112637991",
+          "name": "Coca-Cola Cherry"
+        },
+        {
+          "ean": "5000112667646",
+          "name": "Fanta Orange"
+        },
+        {
+          "ean": "5000112637977",
+          "name": "Fanta Exotic"
+        },
+        {
+          "ean": "5000112638868",
+          "name": "Coca-Cola Zero Vanilla"
+        },
+        {
+          "ean": "5000112638028",
+          "name": "Fanta Strawberry & Kiwi"
+        },
+        {
+          "ean": "5000112638875",
+          "name": "Sprite Zero"
+        },
+        {
+          "ean": "5000112637908",
+          "name": "Coca-Cola Vanilla"
+        },
+        {
+          "ean": "5000112637939",
+          "name": "Coca-Cola Zero"
+        },
+        {
+          "ean": "5000112672053",
+          "name": "Coca-Cola Zero Cherry"
+        },
+        {
+          "ean": "5000112637953",
+          "name": "Sprite"
+        },
+        {
+          "ean": "5000112690767",
+          "name": "Coca-Cola Zero Lemon"
+        },
+        {
+          "ean": "5000112650402",
+          "name": "Fanta Zero Lemon"
         }
       ],
-      "origin": "Danmark",
-      "price_per_kg": 79.9,
-      "price_per_kg_max": 79.9
+      "origin": ""
     },
     {
       "store": "Coop (Ekeby)",
@@ -3478,6 +3457,28 @@
         }
       ],
       "origin": ""
+    },
+    {
+      "store": "Coop (Ekeby)",
+      "product": "Färsk fläskfilé",
+      "brand": "Danmark/Danish Crown",
+      "price": "79,90/kg",
+      "discount": "Medlemspris",
+      "description": "Ca 590 g. Kyld. I bit.",
+      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1651671893/cloud/251579.png",
+      "category": "Kött & Fågel",
+      "restriction": "",
+      "original_price": "124 kr/kg",
+      "discount_percentage": 36,
+      "eans": [
+        {
+          "ean": "2385912200006",
+          "name": "Fläskfilé"
+        }
+      ],
+      "origin": "Danmark",
+      "price_per_kg": 79.9,
+      "price_per_kg_max": 79.9
     },
     {
       "store": "Lidl",
@@ -5575,7 +5576,7 @@
       "discount": "Ord.pris 19,40-19,77 kr",
       "description": "355 ml",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7350058336365.jpg",
-      "category": "Dryck",
+      "category": "Energidryck",
       "restriction": "",
       "original_price": "19,40-19,77 kr",
       "discount_percentage": 31,
@@ -6762,7 +6763,7 @@
       "discount": "Ord.pris 18,83-18,88 kr",
       "description": "355 ml",
       "image_url": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7350058336365.jpg",
-      "category": "Dryck",
+      "category": "Energidryck",
       "restriction": "",
       "original_price": "18,83-18,88 kr",
       "discount_percentage": 29,
@@ -16518,7 +16519,7 @@
       "discount": "",
       "description": "25cl",
       "image_url": "https://assets.axfood.se/image/upload/f_auto,t_200/09002490291228_C1N1_s01",
-      "category": "Dryck",
+      "category": "Energidryck",
       "restriction": "",
       "original_price": "12,90 kr",
       "discount_percentage": 15,
@@ -19312,6 +19313,32 @@
     },
     {
       "store": "Coop (Liljegatan)",
+      "product": "Ekologisk palsternacka",
+      "brand": "Sverige/Änglamark",
+      "price": "20:-",
+      "discount": "",
+      "description": "500 g. Klass 1.",
+      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1636362932/cloud/178362.png",
+      "category": "Frukt & Grönt",
+      "restriction": "",
+      "original_price": "",
+      "discount_percentage": 0,
+      "eans": [
+        {
+          "ean": "52620",
+          "name": "Palsternacka 500 Gr"
+        },
+        {
+          "ean": "7300190832607",
+          "name": "Palsternacka Eko"
+        }
+      ],
+      "origin": "Sverige",
+      "price_per_kg": 40.0,
+      "price_per_kg_max": 40.0
+    },
+    {
+      "store": "Coop (Liljegatan)",
       "product": "Purjolök",
       "brand": "Sverige",
       "price": "20:-/kg",
@@ -19353,32 +19380,6 @@
       "origin": "",
       "price_per_kg": 28.67,
       "price_per_kg_max": 28.67
-    },
-    {
-      "store": "Coop (Liljegatan)",
-      "product": "Ekologisk palsternacka",
-      "brand": "Sverige/Änglamark",
-      "price": "20:-",
-      "discount": "",
-      "description": "500 g. Klass 1.",
-      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1636362932/cloud/178362.png",
-      "category": "Frukt & Grönt",
-      "restriction": "",
-      "original_price": "",
-      "discount_percentage": 0,
-      "eans": [
-        {
-          "ean": "52620",
-          "name": "Palsternacka 500 Gr"
-        },
-        {
-          "ean": "7300190832607",
-          "name": "Palsternacka Eko"
-        }
-      ],
-      "origin": "Sverige",
-      "price_per_kg": 40.0,
-      "price_per_kg_max": 40.0
     },
     {
       "store": "Coop (Liljegatan)",
@@ -19474,69 +19475,25 @@
     },
     {
       "store": "Coop (Ekeby)",
-      "product": "Plommon i ask",
-      "brand": "Spanien/Italien",
-      "price": "15:-",
+      "product": "Paprikamix 3-pack",
+      "brand": "Nederländerna/Coop",
+      "price": "22:-",
       "discount": "",
-      "description": "500 g. Klass 1.",
-      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1630914147/cloud/203288.png",
+      "description": "400 g. Klass 1. I påse.",
+      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1434985593/38145.png",
       "category": "Frukt & Grönt",
       "restriction": "",
       "original_price": "",
       "discount_percentage": 0,
       "eans": [
         {
-          "ean": "1006106082116",
-          "name": "Plommon Blå/Röda 500Gr"
+          "ean": "23106",
+          "name": "Paprika Mix"
         }
       ],
-      "origin": "Spanien, Italien",
-      "price_per_kg": 40.0,
-      "price_per_kg_max": 40.0
-    },
-    {
-      "store": "Coop (Ekeby)",
-      "product": "Rosta",
-      "brand": "Pågen",
-      "price": "12,90/st",
-      "discount": "",
-      "description": "450 g.",
-      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1661926215/cloud/258017.png",
-      "category": "Bröd & Bageri",
-      "restriction": "",
-      "original_price": "",
-      "discount_percentage": 0,
-      "eans": [
-        {
-          "ean": "22779",
-          "name": "Rosta"
-        }
-      ],
-      "origin": "",
-      "price_per_kg": 28.67,
-      "price_per_kg_max": 28.67
-    },
-    {
-      "store": "Coop (Ekeby)",
-      "product": "Purjolök",
-      "brand": "Sverige",
-      "price": "20:-/kg",
-      "discount": "",
-      "description": "Klass 1.",
-      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1632412703/cloud/25179.png",
-      "category": "Frukt & Grönt",
-      "restriction": "",
-      "original_price": "",
-      "discount_percentage": 0,
-      "eans": [
-        {
-          "ean": "2317462900006",
-          "name": "Purjolök"
-        }
-      ],
-      "origin": "Sverige",
-      "price_per_kg": 20,
-      "price_per_kg_max": 20
+      "origin": "Nederländerna",
+      "price_per_kg": 55.0,
+      "price_per_kg_max": 55.0
     },
     {
       "store": "Coop (Ekeby)",
@@ -19566,25 +19523,69 @@
     },
     {
       "store": "Coop (Ekeby)",
-      "product": "Paprikamix 3-pack",
-      "brand": "Nederländerna/Coop",
-      "price": "22:-",
+      "product": "Purjolök",
+      "brand": "Sverige",
+      "price": "20:-/kg",
       "discount": "",
-      "description": "400 g. Klass 1. I påse.",
-      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1434985593/38145.png",
+      "description": "Klass 1.",
+      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1632412703/cloud/25179.png",
       "category": "Frukt & Grönt",
       "restriction": "",
       "original_price": "",
       "discount_percentage": 0,
       "eans": [
         {
-          "ean": "23106",
-          "name": "Paprika Mix"
+          "ean": "2317462900006",
+          "name": "Purjolök"
         }
       ],
-      "origin": "Nederländerna",
-      "price_per_kg": 55.0,
-      "price_per_kg_max": 55.0
+      "origin": "Sverige",
+      "price_per_kg": 20,
+      "price_per_kg_max": 20
+    },
+    {
+      "store": "Coop (Ekeby)",
+      "product": "Rosta",
+      "brand": "Pågen",
+      "price": "12,90/st",
+      "discount": "",
+      "description": "450 g.",
+      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1661926215/cloud/258017.png",
+      "category": "Bröd & Bageri",
+      "restriction": "",
+      "original_price": "",
+      "discount_percentage": 0,
+      "eans": [
+        {
+          "ean": "22779",
+          "name": "Rosta"
+        }
+      ],
+      "origin": "",
+      "price_per_kg": 28.67,
+      "price_per_kg_max": 28.67
+    },
+    {
+      "store": "Coop (Ekeby)",
+      "product": "Plommon i ask",
+      "brand": "Spanien/Italien",
+      "price": "15:-",
+      "discount": "",
+      "description": "500 g. Klass 1.",
+      "image_url": "https://res.cloudinary.com/coopsverige/image/upload/v1630914147/cloud/203288.png",
+      "category": "Frukt & Grönt",
+      "restriction": "",
+      "original_price": "",
+      "discount_percentage": 0,
+      "eans": [
+        {
+          "ean": "1006106082116",
+          "name": "Plommon Blå/Röda 500Gr"
+        }
+      ],
+      "origin": "Spanien, Italien",
+      "price_per_kg": 40.0,
+      "price_per_kg_max": 40.0
     },
     {
       "store": "Lidl",
