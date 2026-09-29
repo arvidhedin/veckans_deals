@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 import re
 import json
+import time
 
 from scrapers.origin import country
 from scrapers.pricing import parse_number, parse_price_per_kg, price_per_kg_fields
@@ -26,6 +27,13 @@ HEADERS = {
                   "Chrome/120.0.0.0 Safari/537.36",
     "Accept-Language": "sv-SE,sv;q=0.9",
 }
+
+# ICA:s sida svarar ibland utan erbjudanden eller inte alls, så varje butik får flera försök
+ATTEMPTS = 3
+RETRY_DELAY = 5  # sekunder
+
+# Sidans status för veckans erbjudanden: 0 = NotLoaded, 1 = Loading, 2 = Loaded, 3 = Error
+WEEKLY_OFFERS_LOADED = 2
 
 # ICA:s varugrupper är breda ("Färskvaror" rymmer både kött, ost och fisk), så de finare
 # grupperna (expandedArticleGroupId) används när de är kända. Kategoriseraren använder
@@ -64,6 +72,41 @@ def _parse_initial_data(html: str) -> dict | None:
     json_str = re.sub(r"new\s+Map\(\[.*?\]\)", "{}", json_str)
 
     return json.loads(json_str)
+
+
+def _weekly_offers(html: str) -> list[dict]:
+    """Veckans erbjudanden ur butikssidan. Sidan renderas hos ICA och svarar 200 även när
+    ICA:s server inte fick fram erbjudandena – då är weeklyOffersStatus 3 (Error) och
+    listan tom. Det ger ett fel, så att butiken hämtas igen i stället för att tyst försvinna."""
+    data = _parse_initial_data(html)
+    if not data:
+        raise ValueError("sidan saknar window.__INITIAL_DATA__")
+
+    offers = data.get("offers") or {}
+    weekly_offers = offers.get("weeklyOffers") or []
+    status = offers.get("weeklyOffersStatus")
+    # Tom lista med status Loaded betyder att butiken inte har några erbjudanden
+    if not weekly_offers and status != WEEKLY_OFFERS_LOADED:
+        raise ValueError(f"sidan saknar erbjudanden (weeklyOffersStatus {status})")
+    return weekly_offers
+
+
+def _fetch_weekly_offers(store_name: str, url: str) -> list[dict]:
+    """Hämtar butikens veckoerbjudanden. Försöker igen efter en kort paus om sidan inte
+    svarar eller saknar erbjudanden, och skriver ut ett fel om alla försök misslyckas."""
+    for attempt in range(1, ATTEMPTS + 1):
+        try:
+            response = requests.get(url, headers=HEADERS, timeout=10)
+            response.raise_for_status()
+            return _weekly_offers(response.text)
+        except Exception as e:
+            error = e
+            if attempt < ATTEMPTS:
+                print(f"ICA-erbjudanden ({store_name}): {e} – försöker igen om {RETRY_DELAY} s")
+                time.sleep(RETRY_DELAY)
+
+    print(f"Fel vid hämtning av ICA-erbjudanden ({store_name}), gav upp efter {ATTEMPTS} försök: {error}")
+    return []
 
 
 def _parse_offer(offer: dict, store_name: str) -> dict:
@@ -158,16 +201,8 @@ def get_offers() -> list[dict]:
     all_offers = []
 
     for store_name, url in STORES.items():
+        weekly_offers = _fetch_weekly_offers(store_name, url)
         try:
-            response = requests.get(url, headers=HEADERS, timeout=10)
-            response.raise_for_status()
-
-            data = _parse_initial_data(response.text)
-            if not data:
-                continue
-
-            weekly_offers = data.get("offers", {}).get("weeklyOffers", [])
-
             for offer in weekly_offers:
                 parsed = _parse_offer(offer, store_name)
                 all_offers.append(parsed)
