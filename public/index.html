@@ -104,25 +104,6 @@
       </button>
     </header>
 
-    <!-- ICA Nära Råbyvägen's latest Facebook posts, shown as the photos they are
-         (facebook.json from build_facebook.py; rendered by app.js, hidden without a recent post) -->
-    <section id="facebook-section" class="hidden mb-6 sm:mb-8" aria-labelledby="facebook-title">
-      <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 mb-3 sm:mb-4">
-        <div class="flex items-center gap-2 min-w-0">
-          <h2 id="facebook-title" class="text-lg sm:text-xl font-extrabold tracking-tight text-zinc-900">På Facebook</h2>
-          <span class="px-2 py-0.5 rounded text-[10px] sm:text-[11px] font-bold uppercase tracking-wide text-white bg-store-ica">ICA Nära Råbyvägen</span>
-        </div>
-        <div class="flex items-center gap-2">
-          <div id="facebook-tabs" class="flex gap-1.5" role="tablist" aria-label="Inlägg"></div>
-          <a id="facebook-post-link" href="#" target="_blank" rel="noopener" class="text-xs font-semibold text-zinc-500 hover:text-zinc-900 hover:underline whitespace-nowrap">Öppna på Facebook</a>
-        </div>
-      </div>
-      <div id="facebook-text" class="hidden mb-3">
-        <p class="max-w-3xl text-xs sm:text-sm text-zinc-600 whitespace-pre-line line-clamp-2"></p>
-      </div>
-      <div id="facebook-images" class="flex gap-2 sm:gap-3 overflow-x-auto custom-scrollbar pb-2"></div>
-    </section>
-
     <!-- Veckans bästa deal (rendered by app.js, hidden when nothing qualifies) -->
     <section id="best-deal-section" class="hidden mb-6 sm:mb-8" aria-labelledby="best-deal-title">
       <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2 sm:gap-4 mb-3 sm:mb-4">
@@ -486,6 +467,19 @@
             <!-- Populated via JS -->
           </div>
         </div>
+
+        <!-- ICA Nära Råbyvägen's latest Facebook posts, shown as the photos they are, in place of
+             the offers when their category pill is chosen (facebook.json from build_facebook.py) -->
+        <section id="facebook-section" class="hidden" aria-label="ICA Nära Råbyvägen på Facebook">
+          <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 mb-3">
+            <div id="facebook-tabs" class="flex flex-wrap gap-1.5" role="tablist" aria-label="Inlägg"></div>
+            <a id="facebook-post-link" href="#" target="_blank" rel="noopener" class="text-xs font-semibold text-zinc-500 hover:text-zinc-900 hover:underline whitespace-nowrap">Öppna inlägget på Facebook</a>
+          </div>
+          <div id="facebook-text" class="hidden mb-3">
+            <p class="max-w-3xl text-xs sm:text-sm text-zinc-600 whitespace-pre-line line-clamp-2"></p>
+          </div>
+          <div id="facebook-images" class="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-4 md:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6"></div>
+        </section>
 
         <!-- Deals Grid Container (3 cols on mobile, 4-7 cols on desktop) -->
         <div id="deals-grid" class="grid grid-cols-3 gap-2 sm:gap-4 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 min-[1800px]:grid-cols-7 lg:gap-5">

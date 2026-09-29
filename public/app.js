@@ -1122,6 +1122,27 @@ function renderCategoryPills() {
     </button>
   `;
 
+  // ICA Nära Råbyvägen's Facebook photos, labelled with the day of the newest post
+  if (facebook.posts.length > 0) {
+    const isFacebookActive = state.activeCategoryPill === FACEBOOK_PILL;
+    html += `
+      <button
+        type="button"
+        data-cat="${escapeHtml(FACEBOOK_PILL)}"
+        class="cat-pill cursor-pointer select-none px-3 py-1.5 rounded-full text-xs font-bold border transition-all duration-150 flex items-center gap-1.5 ${
+          isFacebookActive
+            ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
+            : 'bg-blue-50 text-blue-950 border-blue-200/90 hover:bg-blue-100 hover:border-blue-300'
+        }"
+      >
+        <span>${escapeHtml(FACEBOOK_PILL)}</span>
+        <span class="px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
+          isFacebookActive ? 'bg-blue-800 text-blue-100' : 'bg-blue-200/80 text-blue-900'
+        }">${escapeHtml(formatPostDay(facebook.posts[0].created_at))}</span>
+      </button>
+    `;
+  }
+
   for (const cat of ALL_CATEGORIES) {
     const count = state.categoryCounts[cat] || 0;
     if (count === 0 && state.activeCategoryPill !== cat) continue;
@@ -1388,6 +1409,11 @@ function getStoreFilteredOffers() {
 }
 
 function applyFilters() {
+  // Searching finds offers, not Facebook photos
+  if (state.activeCategoryPill === FACEBOOK_PILL && state.searchQuery.trim()) {
+    state.activeCategoryPill = 'all';
+  }
+
   // 1-2. Filter by selected store and Lidl period
   let result = getStoreFilteredOffers();
 
@@ -1749,6 +1775,15 @@ function renderDeals() {
   const emptyState = document.getElementById('empty-state');
   if (!grid || !emptyState) return;
 
+  // The Facebook pill shows the store's photos instead of offers
+  const showFacebook = state.activeCategoryPill === FACEBOOK_PILL;
+  document.getElementById('facebook-section')?.classList.toggle('hidden', !showFacebook);
+  grid.classList.toggle('hidden', showFacebook);
+  if (showFacebook) {
+    emptyState.classList.add('hidden');
+    return;
+  }
+
   if (state.filteredOffers.length === 0) {
     grid.innerHTML = '';
     const descEl = emptyState.querySelector('p');
@@ -1769,9 +1804,13 @@ function renderDeals() {
 
 function renderResultsCount() {
   const countEl = document.getElementById('results-count');
-  if (countEl) {
-    countEl.innerHTML = `Visar <strong class="text-zinc-900 font-bold">${state.filteredOffers.length}</strong> aktuella erbjudanden`;
+  if (!countEl) return;
+  if (state.activeCategoryPill === FACEBOOK_PILL) {
+    const images = facebook.posts[facebook.activePost]?.images || [];
+    countEl.innerHTML = `Visar <strong class="text-zinc-900 font-bold">${images.length}</strong> bilder från ICA Nära Råbyvägens inlägg`;
+    return;
   }
+  countEl.innerHTML = `Visar <strong class="text-zinc-900 font-bold">${state.filteredOffers.length}</strong> aktuella erbjudanden`;
 }
 
 function renderErrorState(message) {
@@ -2355,9 +2394,11 @@ function closeProductModal() {
 
 // --- ICA Nära Råbyvägen on Facebook ---
 // The store posts photos of its price signs ("Prisfest, bara idag!"), usually without text.
-// build_facebook.py saves the latest posts in facebook.json and the photos are shown as they are.
+// build_facebook.py saves the latest posts in facebook.json and the photos are shown as they are,
+// in place of the offers when their category pill is chosen.
 const FACEBOOK_URL = 'facebook.json';
-const FACEBOOK_MAX_AGE_DAYS = 7; // hide the section when the newest post is older
+const FACEBOOK_PILL = 'Råbyvägen på Facebook'; // state.activeCategoryPill while the photos are shown
+const FACEBOOK_MAX_AGE_DAYS = 7; // no pill when the newest post is older
 
 const facebook = {
   posts: [],
@@ -2377,33 +2418,38 @@ async function fetchFacebookPosts() {
     facebook.posts = posts;
     facebook.activePost = 0;
     renderFacebookSection();
+    // Adds the pill (applyFilters renders the pills if the offers aren't loaded yet)
+    if (state.allOffers.length > 0) renderCategoryPills();
   } catch (error) {
     console.error('Fel vid hämtning av Facebook-inlägg:', error);
   }
 }
 
-// "Idag 09:17", "Igår 13:32" or "fre 26 sep. 13:32", in Swedish time
-function formatPostTime(isoDate) {
-  const date = new Date(isoDate);
+// "Idag", "Igår" or "fre 26 sep.", in Swedish time
+function formatPostDay(isoDate) {
   const zone = { timeZone: 'Europe/Stockholm' };
-  const time = date.toLocaleTimeString('sv-SE', { ...zone, hour: '2-digit', minute: '2-digit' });
+  const date = new Date(isoDate);
   const dayOf = d => d.toLocaleDateString('sv-SE', zone);
   const now = new Date();
-  if (dayOf(date) === dayOf(now)) return `Idag ${time}`;
-  if (dayOf(date) === dayOf(new Date(now.getTime() - 24 * 3600 * 1000))) return `Igår ${time}`;
-  return `${date.toLocaleDateString('sv-SE', { ...zone, weekday: 'short', day: 'numeric', month: 'short' })} ${time}`;
+  if (dayOf(date) === dayOf(now)) return 'Idag';
+  if (dayOf(date) === dayOf(new Date(now.getTime() - 24 * 3600 * 1000))) return 'Igår';
+  return date.toLocaleDateString('sv-SE', { ...zone, weekday: 'short', day: 'numeric', month: 'short' });
+}
+
+// "Idag 09:17", "Igår 13:32" or "fre 26 sep. 13:32"
+function formatPostTime(isoDate) {
+  const time = new Date(isoDate).toLocaleTimeString('sv-SE', { timeZone: 'Europe/Stockholm', hour: '2-digit', minute: '2-digit' });
+  return `${formatPostDay(isoDate)} ${time}`;
 }
 
 function renderFacebookSection() {
-  const section = document.getElementById('facebook-section');
   const tabsEl = document.getElementById('facebook-tabs');
   const linkEl = document.getElementById('facebook-post-link');
   const textEl = document.getElementById('facebook-text');
   const imagesEl = document.getElementById('facebook-images');
-  if (!section || !tabsEl || !linkEl || !textEl || !imagesEl) return;
+  if (!tabsEl || !linkEl || !textEl || !imagesEl) return;
 
   const post = facebook.posts[facebook.activePost];
-  section.classList.toggle('hidden', !post);
   if (!post) return;
 
   tabsEl.innerHTML = facebook.posts.map((p, i) => {
@@ -2420,10 +2466,11 @@ function renderFacebookSection() {
 
   const images = post.images || [];
   imagesEl.innerHTML = images.map((image, i) => `
-    <button type="button" data-facebook-image="${i}" class="shrink-0 h-48 sm:h-64 rounded-xl overflow-hidden bg-zinc-100 border border-zinc-200/80 hover:opacity-90 transition cursor-zoom-in" style="aspect-ratio: ${Number(image.width) || 3} / ${Number(image.height) || 4};" aria-label="Visa bild ${i + 1} av ${images.length}">
+    <button type="button" data-facebook-image="${i}" class="w-full rounded-xl sm:rounded-2xl overflow-hidden bg-zinc-100 border border-zinc-200/80 hover:opacity-90 transition cursor-zoom-in" style="aspect-ratio: ${Number(image.width) || 3} / ${Number(image.height) || 4};" aria-label="Visa bild ${i + 1} av ${images.length}">
       <img src="${escapeHtml(image.url)}" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer" class="w-full h-full object-cover">
     </button>`).join('');
-  imagesEl.scrollLeft = 0;
+  // The number of photos is shown instead of the number of offers
+  if (state.activeCategoryPill === FACEBOOK_PILL) renderResultsCount();
 }
 
 function openFacebookViewer(index) {
