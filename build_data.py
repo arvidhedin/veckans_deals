@@ -8,7 +8,7 @@ import os
 import json
 import datetime
 import traceback
-from scrapers import ica, coop, willys, lidl, hemkop, willys_search, product_info
+from scrapers import ica, coop, willys, lidl, hemkop, willys_search, product_info, origin
 from scrapers.categorizer import categorize_offer
 
 
@@ -21,6 +21,14 @@ def get_discount_pct(offer: dict) -> float:
         return float(pct)
     except (ValueError, TypeError):
         return 0.0
+
+
+def add_origins(offers: list[dict], products: dict) -> None:
+    """Sets the country of origin (e.g. "Sverige") on the offers whose scraper couldn't find it:
+    Willys and Hemköp only have it in the product info, and names like "Svensk nötfärs" say it."""
+    for o in offers:
+        product = products.get(o.get("product_code") or "") or {}
+        o["origin"] = o.get("origin") or product.get("country") or origin.from_name(o.get("product"))
 
 
 def main():
@@ -85,23 +93,9 @@ def main():
     os.makedirs("public", exist_ok=True)
     output_path = os.path.join("public", "deals.json")
 
-    now = datetime.datetime.now(datetime.timezone.utc)
-    payload = {
-        "updated_at": now.isoformat(),
-        "updated_at_readable": now.strftime("%Y-%m-%d %H:%M UTC"),
-        "total_offers": len(all_offers),
-        "store_counts": store_stats,
-        "category_counts": cat_counts,
-        "offers": all_offers,
-        "willys_assortment": willys_assortment,
-    }
-
-    # Write formatted JSON to public/deals.json
-    with open(output_path, "w", encoding="utf-8") as f:
-        json.dump(payload, f, ensure_ascii=False, indent=2)
-
-    # Ingredients & nutrition from Willys/Hemköp -> public/product_info.json
-    # (Axfood's API blocks direct browser requests, so it is fetched here instead)
+    # Ingredients, nutrition & origin from Willys/Hemköp -> public/product_info.json
+    # (Axfood's API blocks direct browser requests, so it is fetched here instead).
+    # Fetched before deals.json is written, since Willys/Hemköp's origin is only found there.
     print("Fetching product info (ingredients)...")
     info_path = os.path.join("public", "product_info.json")
     previous_info = {}
@@ -117,6 +111,23 @@ def main():
     except Exception as e:
         print(f"   [FAIL] Product info: Failed with error: {e}")
         traceback.print_exc()
+
+    add_origins(all_offers, info["products"])
+
+    now = datetime.datetime.now(datetime.timezone.utc)
+    payload = {
+        "updated_at": now.isoformat(),
+        "updated_at_readable": now.strftime("%Y-%m-%d %H:%M UTC"),
+        "total_offers": len(all_offers),
+        "store_counts": store_stats,
+        "category_counts": cat_counts,
+        "offers": all_offers,
+        "willys_assortment": willys_assortment,
+    }
+
+    # Write formatted JSON to public/deals.json
+    with open(output_path, "w", encoding="utf-8") as f:
+        json.dump(payload, f, ensure_ascii=False, indent=2)
 
     # Always write the file so the workflow's `git add` finds it
     with open(info_path, "w", encoding="utf-8") as f:

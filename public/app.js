@@ -924,11 +924,29 @@ function findBestDeals() {
     const sameDeal = unique.find(kept => isSameDealElsewhere(kept, deal));
     if (sameDeal) {
       sameDeal.stores.push(...deal.stores.filter(store => !sameDeal.stores.includes(store)));
-    } else if (!unique.some(kept => isSameProduct(kept, deal))) {
+      continue;
+    }
+    const index = unique.findIndex(kept => isSameProduct(kept, deal));
+    if (index === -1) {
       unique.push(deal);
+    } else if (isSwedishForSamePrice(deal, unique[index])) {
+      // The Swedish product takes the other one's place in the list
+      unique[index] = { ...deal, score: unique[index].score };
     }
   }
   return unique;
+}
+
+// The store says the product comes from Sweden (origin is set when deals.json is built)
+function isSwedish(offer) {
+  return offer.origin === 'Sverige';
+}
+
+// Swedish is always chosen over the same kind of product from elsewhere (or of unknown origin)
+// when it costs the same or less per kg
+function isSwedishForSamePrice(deal, kept) {
+  return isSwedish(deal.offer) && !isSwedish(kept.offer) &&
+    (deal.perKg.min <= kept.perKg.min || isSamePricePerKg(deal, kept));
 }
 
 // Lowercase without accents or symbols: "ZOÉGAS®" -> "zoegas"
@@ -944,16 +962,29 @@ function getCoreProductName(offer) {
   return brand && name.startsWith(`${brand} `) ? name.slice(brand.length + 1) : name;
 }
 
+// The kind of product: "färsk" and "svensk" don't change it, and ytterfilé, innerfilé and
+// bröstfilé count as filé ("Färsk fläskfilé" and "Svensk fläskytterfilé" are both "flaskfile")
+function getProductKind(offer) {
+  return getCoreProductName(offer)
+    .replace(/\b(?:farsk|svensk)[at]?\b/g, ' ')
+    .replace(/(?:ytter|inner|brost)?file(?:er)?\b/g, 'file')
+    .replace(/\s+/g, ' ').trim();
+}
+
+// Up to 2 % apart counts as the same price per kg
+function isSamePricePerKg(a, b) {
+  return Math.abs(a.perKg.min - b.perKg.min) <= 0.02 * Math.max(a.perKg.min, b.perKg.min);
+}
+
 // The same brand at the same price per kg in another chain (e.g. Zoégas at Willys and Lidl)
 function isSameDealElsewhere(a, b) {
   const brand = normalizeName(a.offer.brand);
-  return a.group === b.group && !!brand && brand === normalizeName(b.offer.brand) &&
-    Math.abs(a.perKg.min - b.perKg.min) <= 0.02 * Math.max(a.perKg.min, b.perKg.min);
+  return a.group === b.group && !!brand && brand === normalizeName(b.offer.brand) && isSamePricePerKg(a, b);
 }
 
-// The same kind of product (e.g. fläskytterfilé) – only the best price is shown
+// The same kind of product (e.g. fläskfilé) – only the best price is shown
 function isSameProduct(a, b) {
-  return a.group === b.group && getCoreProductName(a.offer) === getCoreProductName(b.offer);
+  return a.group === b.group && getProductKind(a.offer) === getProductKind(b.offer);
 }
 
 // Two deals from the same chain and brand (e.g. chicken legs and wings) are too similar to show both
@@ -985,10 +1016,17 @@ function formatDealStores(deal) {
   return deal.stores.length > 1 ? `${deal.chain} · ${deal.stores.length} butiker` : getShortStoreName(deal.offer.store);
 }
 
+// "Ursprung Sverige", unless the brand already says it ("ICA. Ursprung Sverige", "Danmark/Danish Crown")
+function getOriginText(offer) {
+  const countries = (offer.origin || '').split(', ').filter(Boolean);
+  if (countries.length === 0 || countries.every(country => (offer.brand || '').includes(country))) return '';
+  return `Ursprung ${offer.origin}`;
+}
+
 function createBestDealHeroHtml(deal) {
   const { offer, group } = deal;
   const discountPct = Math.round(parseFloat(offer.discount_percentage) || 0);
-  const details = [offer.brand, offer.description].filter(Boolean).join(' · ');
+  const details = [offer.brand, getOriginText(offer), offer.description].filter(Boolean).join(' · ');
 
   return `
     <article data-best-deal="0" role="button" tabindex="0" class="cursor-pointer group h-full flex flex-col sm:flex-row overflow-hidden rounded-2xl sm:rounded-3xl bg-zinc-900 text-white shadow-lg hover:shadow-xl transition focus:outline-none focus:ring-2 focus:ring-rose-500">

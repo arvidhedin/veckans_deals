@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 import re
 import json
 
+from scrapers.origin import country
 from scrapers.pricing import parse_number, parse_price_per_kg, price_per_kg_fields
 
 
@@ -129,10 +130,15 @@ def _parse_offer(offer: dict, store_name: str) -> dict:
     category = offer.get("category") or {}
     category_name = ARTICLE_GROUPS.get(category.get("expandedArticleGroupId")) or category.get("articleGroupName") or ""
 
+    # Ursprunget står i märket, t.ex. "Kronfågel. Ursprung Sverige"
+    brand = details.get("brand") or ""
+    origin_match = re.search(r"\bUrsprung:?\s+(.+)$", brand)
+    origin = country(origin_match.group(1)) if origin_match else ""
+
     return {
         "store": store_name,
         "product": product_name,
-        "brand": details.get("brand", ""),
+        "brand": brand,
         "price": price_str or "Se butik",
         "discount": f"Ord.pris {original_price}" if original_price else "",
         "description": details.get("packageInformation", ""),
@@ -142,6 +148,7 @@ def _parse_offer(offer: dict, store_name: str) -> dict:
         "original_price": original_price,
         "discount_percentage": discount_percentage,
         "eans": variant_eans,
+        "origin": origin,
         **price_per_kg_fields(per_kg),
     }
 

@@ -18,7 +18,7 @@ import time
 
 import requests
 
-from scrapers import coop
+from scrapers import coop, origin
 
 HOSTS = {
     "Willys": "https://www.willys.se",
@@ -57,6 +57,9 @@ IMAGE_GTIN = re.compile(r"/(\d{14})_")
 
 # ICA:s och Coops egna märken säljs inte på Willys
 OWN_BRANDS = re.compile(r"^(?:ica|coop)\b", re.IGNORECASE)
+
+# Axfoods märkning av svenska varor, om landet saknas i produktdatan
+SWEDISH_LABELS = {"from_sweden", "meat_from_sweden", "milk_from_sweden", "swedish_bird"}
 
 
 def _format_amount(quantity, unit_code) -> str:
@@ -101,6 +104,15 @@ def _parse_nutrition(product: dict) -> tuple[str, dict]:
     return basis, nutrition
 
 
+def _parse_country(product: dict) -> str:
+    """Ursprungsland, t.ex. 'Sverige' eller 'Polen, Tyskland' (Axfood skriver ibland 'Sweden')."""
+    countries = [product.get("tradeItemCountryOfOrigin")] + (product.get("otherCountries") or [])
+    names = list(dict.fromkeys(filter(None, map(origin.country, countries))))
+    if not names and SWEDISH_LABELS & set(product.get("labels") or []):
+        return "Sverige"
+    return ", ".join(names)
+
+
 def _parse_product(product: dict, source: str) -> dict:
     """Plocka ut det sajten visar från Axfoods produktdata."""
     ingredients = INGREDIENTS_PREFIX.sub("", product.get("ingredients") or "").strip()
@@ -113,6 +125,8 @@ def _parse_product(product: dict, source: str) -> dict:
         "nutrition_basis": basis,
         "nutrition": nutrition,
         "origin": (product.get("countryOfOriginStatement") or "").strip(),
+        # Ursprungslandet sätts på Willys-/Hemköp-erbjudandena i deals.json
+        "country": _parse_country(product),
         "source": source,
         "fetched": datetime.date.today().isoformat(),
     }
@@ -131,6 +145,9 @@ def _fetch_product(code: str, chain: str) -> dict | None:
 
 
 def _is_fresh(cached: dict, today: datetime.date) -> bool:
+    # Hämtad innan ursprungslandet sparades
+    if "country" not in cached:
+        return False
     try:
         fetched = datetime.date.fromisoformat(cached.get("fetched", ""))
     except ValueError:

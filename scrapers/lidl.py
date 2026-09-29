@@ -1,6 +1,8 @@
+import html
 import requests
 import re
 
+from scrapers.origin import country
 from scrapers.pricing import format_kr, parse_price_per_kg, price_per_kg_fields
 
 API_URL = "https://www.lidl.se/q/api/search"
@@ -41,6 +43,19 @@ def _extract_restriction(data_dict: dict) -> str:
                 return text
         elif isinstance(stickers[0], str):
             return stickers[0]
+    return ""
+
+def _extract_origin(data_dict: dict) -> str:
+    """Ursprungsland ur punktlistan ("Ursprung: Sverige") eller sigillen ("KÖTT FRÅN SVERIGE")."""
+    keyfacts = html.unescape((data_dict.get("keyfacts") or {}).get("description") or "")
+    match = re.search(r"ursprung:\s*([^<]+)", keyfacts, re.IGNORECASE)
+    # "Ursprung: se förp." ger inget land
+    found = country(match.group(1)) if match else ""
+    if found:
+        return found
+    for seal in data_dict.get("seals") or []:
+        if isinstance(seal, dict) and re.search(r"FRÅN SVERIGE|SVENSK FÅGEL", seal.get("altText") or ""):
+            return "Sverige"
     return ""
 
 def get_offers() -> list[dict]:
@@ -223,6 +238,7 @@ def get_offers() -> list[dict]:
                     "original_price": original_price,
                     "discount_percentage": discount_percentage,
                     "product_url": product_url,
+                    "origin": _extract_origin(data_dict),
                     **price_per_kg_fields(per_kg),
                 })
             

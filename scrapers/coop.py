@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 import json
 import re
 
+from scrapers.origin import known_country
 from scrapers.pricing import format_kr, parse_price_per_kg, price_per_kg_fields
 
 # Coop butiker att hämta erbjudanden för
@@ -184,10 +185,15 @@ def _parse_offer(item: dict, store_name: str) -> dict:
     # Coops egen kategori, t.ex. "Färsk/Chark/Deli/Färdigmat" (används av kategoriseraren)
     category = "/".join(filter(None, [item.get("categoryGroup"), (item.get("categoryTeam") or {}).get("name")]))
 
+    # Ursprunget står i märket, t.ex. "Danmark/Danish Crown", "Spanien/Italien" eller "Sverige"
+    # (men märket kan också vara "Coca-Cola/Fanta")
+    brand = content.get("brand") or ""
+    origin = ", ".join(filter(None, map(known_country, brand.split("/"))))
+
     return {
         "store": store_name,
         "product": content.get("title", "Okänd produkt"),
-        "brand": content.get("brand", ""),
+        "brand": brand,
         "price": price_str.strip(),
         "discount": us.get("tag", ""),
         "description": description,
@@ -197,6 +203,7 @@ def _parse_offer(item: dict, store_name: str) -> dict:
         "original_price": original_price,
         "discount_percentage": discount_percentage,
         "eans": variant_eans,
+        "origin": origin,
         **price_per_kg_fields(per_kg),
     }
 
