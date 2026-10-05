@@ -5,6 +5,11 @@ A recipe is chosen when its protein (chicken, minced meat, salmon, ...) is on of
 store. Every ingredient is matched against all food offers, so the site can rank the recipes
 with the most ingredients on offer first (for the stores the visitor has chosen).
 
+An offer counts only when it is that very product (_Offer.is_): the same word or a more
+specific kind ending with it ("Svensk nötfärs" is nötfärs, "Delikatesspotatis" potatis), not
+another product starting with it ("Högrevsburgare" is no högrev), from another animal
+("Lammkotlett") or processed ("Varmrökt lax", "Marinerad kycklingfilé").
+
 The recipe pages don't change, so their ingredients are reused from the previous build and
 only new recipes are fetched.
 """
@@ -12,6 +17,7 @@ only new recipes are fetched.
 import json
 import re
 import time
+from functools import lru_cache
 
 import requests
 
@@ -31,10 +37,11 @@ HEADERS = {
 RECIPES_PER_PAGE = 24
 REQUEST_DELAY = 0.3  # seconds between recipe pages
 
-# (protein, ICA list pages, offer, recipe ingredient). The offer pattern is matched against
-# the product name of meat and fish offers, the ingredient pattern against the ingredient
-# names of the recipes ("kycklingfilé eller kycklinginnerfilé"). Order matters for the
-# ingredient: the first protein that matches it is the recipe's protein.
+# (protein, ICA list pages, offer, recipe ingredient). The offer pattern decides which list
+# pages are fetched: those of the proteins with a meat or fish offer this week. The
+# ingredient pattern finds the recipe's protein ("kycklingfilé eller kycklinginnerfilé") and
+# names it (the first that matches). The protein is on offer when an offer is that very
+# product (_Offer.is_), so "Högrevsburgare" on offer is no högrev recipe.
 PROTEINS = [
     ("Kycklinglår", ["kyckling/lar/middag"],
      r"kyckling\w*lår|kycklinglår", r"kyckling\w*lår|lårfilé"),
@@ -42,7 +49,7 @@ PROTEINS = [
      r"kyckling(?:ben|klubb|vingar)", r"kyckling(?:ben|klubb|vingar)|kycklingdelar"),
     ("Kycklingfilé", ["kyckling/file/middag"],
      r"kyckling(?!\w*lår)\w*(?:filé|bröst|strimlor)|strimlad kyckling|marinerad kyckling",
-     r"kyckling\w*(?:filé|bröst|strimlor)|strimlad kyckling"),
+     r"kyckling(?!\w*lår)\w*(?:filé|bröst|strimlor)|strimlad kyckling"),
     ("Hel kyckling", ["kyckling/hel"],
      r"\bhel\b.*kyckling|majskyckling|kryddad kyckling", r"^(?:hel |färsk |)(?:maj)?kyckling\b"),
     ("Kycklingfärs", ["kyckling/fars"], r"kycklingfärs", r"kycklingfärs"),
@@ -50,9 +57,10 @@ PROTEINS = [
      r"(?<!kyckling)(?<!fisk)(?<!kalkon)(?<!taco)färs\b", r"(?:nöt|bland|kött|fläsk|lamm|älg|vilt|hjort)färs|^färs\b"),
     ("Fläskfilé", ["flask/file/middag"], r"fläsk\w*filé", r"fläsk\w*filé"),
     ("Kotlett & karré", ["kotlett", "karre"], r"kotlett|karré", r"kotlett|karré"),
-    ("Högrev", ["hogrev/middag"], r"högrev", r"högrev"),
+    ("Högrev", ["hogrev/middag"], r"högrev", r"högrev(?!s?(?:burgare|färs))"),
     ("Grytbitar", ["grytbitar/middag"], r"grytbitar", r"grytbit"),
     ("Rostbiff & fransyska", ["rostbiff", "fransyska"], r"fransyska|nötstek|rostbiff", r"fransyska|nötstek|(?<!lamm)rostbiff"),
+    ("Lövbiff & ryggbiff", [], r"lövbiff|ryggbiff|entrecôte", r"lövbiff|ryggbiff|entrecôte"),
     ("Oxfilé", ["oxfile"], r"(?<!fläsk)(?:oxfilé|nötytterfilé|ytterfilé av nöt)", r"oxfilé|(?<!fläsk)(?<!lamm)ytterfilé|nötfilé"),
     ("Revbensspjäll", ["revbensspjall"], r"revben|\bribs\b", r"revben"),
     ("Kassler", ["kassler/middag"], r"kassler", r"kassler"),
@@ -74,11 +82,8 @@ PROTEINS = [
 # Ingredients that are not the protein itself ("kalvfond", "lammkorv")
 NOT_PROTEIN = re.compile(r"fond|buljong|korv|lever|vego|sås\b|kryddmix|marinad")
 
-# Proteins whose cuts differ a lot: the recipe's cut must be on offer (lammgrytbitar on offer
-# is no lammracks recipe)
-SAME_CUT_PROTEINS = {"Lamm", "Kalv", "Älg & vilt"}
-
 PROTEIN_CATEGORIES = {"Kött & Fågel", "Fisk & Skaldjur"}
+
 FOOD_CATEGORIES = {
     "Kött & Fågel", "Chark & Pålägg", "Fisk & Skaldjur", "Mejeri & Ägg", "Frukt & Grönt",
     "Bröd & Bageri", "Skafferi", "Frys & Färdigmat",
@@ -86,23 +91,42 @@ FOOD_CATEGORIES = {
 # Frozen vegetables are in Frys & Färdigmat, fresh ones in Frukt & Grönt
 SAME_CATEGORY = {"Frys & Färdigmat": "Frukt & Grönt"}
 
-# Ingredients everyone has at home are never matched
-STAPLES = re.compile(
-    r"^(?:salt|flingsalt|havssalt|svartpeppar|peppar|vitpeppar|vatten|isbitar|olja|olivolja|"
-    r"rapsolja|neutral olja|matolja|socker|strösocker)$"
-)
+# Ingredients everyone has at home are never matched (stems: "grovt salt", "neutral olja")
+STAPLES = {"salt", "flingsalt", "havssalt", "peppar", "svartpeppar", "vitpeppar", "vatt", "isbit",
+           "olj", "olivolj", "rapsolj", "matolj", "sock", "strösock"}
 
-# Words that say how an ingredient is prepared, not what it is ("finhackad persilja")
+# Words that say how an ingredient is prepared or packed, not what it is ("finhackad persilja",
+# "benfria kotletter", "portionsbitar laxfilé")
 PREPARATION_WORDS = re.compile(
-    r"^(?:färsk|färska|färskt|fryst|frysta|hackad|hackade|finhackad|finhackade|grovhackad|"
-    r"riven|rivet|rivna|strimlad|strimlade|skivad|skivade|tärnad|tärnade|kokt|kokta|"
-    r"stor|stora|liten|små|mogen|mogna|torkad|torkade|mald|malen|malda|pressad|"
-    r"kall|kallt|kalla|varm|varmt|rumsvarmt|rumsvarm|smält|smälta|mjukt|mjuk|fast|fasta|"
-    r"ca|förp|port|portioner|st|krm|tsk|msk|dl|cl|ml|l|g|kg|klyfta|klyftor|kvist|kvistar|"
-    r"knippe|burk|burkar|paket|påse|bit|bitar|skiva|skivor|nypa|näve|blad|till|att|"
-    r"servera|garnering|steka|stekning|valfri|valfritt|valfria|gärna|el|eller|och|med|"
-    r"av|à|a|på|i|ev|evt|extra|ekologisk|ekologiska)$"
+    r"^(?:färsk|färska|färskt|fryst|frysta|tinad|tinade|hackad|hackade|finhackad|finhackade|"
+    r"grovhackad|riven|rivet|rivna|strimlad|strimlade|skivad|skivade|skivat|tunnskivad|tunnskivade|"
+    r"tärnad|tärnade|kokt|kokta|stor|stora|liten|lilla|små|mogen|mogna|torkad|torkade|mald|malen|"
+    r"malda|finmalen|grovmald|pressad|kall|kallt|kalla|varm|varmt|rumsvarmt|rumsvarm|smält|smälta|"
+    r"mjukt|mjuk|fast|fasta|benfri|benfria|benfritt|tunn|tunna|tunt|tjock|tjocka|tjockt|odlad|"
+    r"odlade|putsad|putsade|hel|hela|helt|svensk|svenska|färdig|färdiga|mittbit|mittbitar|"
+    r"urbenad|urbenade|djupfryst|djupfrysta|avrunnen|avrunna|rå|råa|tinat|"
+    r"portionsbit|portionsbitar|ca|förp|port|portioner|st|krm|tsk|msk|dl|cl|ml|l|g|kg|klyfta|"
+    r"klyftor|kvist|kvistar|knippe|burk|burkar|paket|påse|ask|bit|bitar|skiva|skivor|sats|nypa|"
+    r"näve|blad|till|att|servera|garnering|steka|stekning|valfri|valfritt|valfria|gärna|el|eller|"
+    r"och|med|av|à|a|på|i|ev|evt|extra|ekologisk|ekologiska)$"
 )
+# "hel" is a preparation word except in "hel kyckling"
+WHOLE_BIRD = re.compile(r"\bhel(?:a)?\s+(?:maj)?kyckling")
+
+# The rest of the name says how the ingredient is cut or served: "lax i bit", "kycklinglår
+# med skinn". Examples and wishes end the whole name: "nötkött t ex bog eller högrev" is
+# nötkött, "nötfärs gärna ICAs nötfärs 12%" nötfärs.
+NAME_END = re.compile(r"\s+(?:i|med|utan|till|för|på|som)\b.*$")
+EXAMPLES = re.compile(r"\s+(?:t\s*\.?\s*ex\b|gärna|helst|typ)\b.*$")
+
+# Things a recipe and an offer can disagree on although the product is the same:
+# (in one, in the other)
+CONFLICTS = [
+    (re.compile(r"\bmed ben\b"), re.compile(r"\bbenfri|\butan ben\b|\burbenad")),
+    (re.compile(r"\bmed skal\b|\boskalade?\b"), re.compile(r"\b(?:hand)?skalade?\b")),
+]
+# Sliced rostbiff in a recipe is pålägg, not the raw roast
+SLICED = re.compile(r"\bskivad|\bskivor\b|\bi skivor\b")
 
 # Irregular plurals and words for part of an ingredient
 ALIASES = {
@@ -119,14 +143,80 @@ ALIASES = {
     "limefrukt": "lime",
     "limefrukter": "lime",
     "potatisar": "potatis",
+    "revben": "revbensspjäll",
+    "gris": "fläsk",
+    "griskött": "fläsk",
 }
+
+# Names for the same product, on both the ingredients and the offers (without accents)
+SYNONYMS = [
+    (re.compile(r"^(kyckling|kalkon)bröst(?:file\w*)?$"), r"\1file"),  # kycklingbröstfilé is kycklingfilé
+    (re.compile(r"^(?:fläsk|gris)(kotlett\w*|karre\w*)$"), r"\1"),     # an unqualified kotlett is fläsk
+    (re.compile(r"(?:hamburgare|hamburger|burgers?)$"), "burgare"),
+    (re.compile(r"^(älg|hjort|vilt|ren|vildsvin|lamm|kalv)köttfärs$"), r"\1färs"),
+    (re.compile(r"^(\w+?)(nöt|lamm|kalv|vilt|älg|hjort)kött$"), r"\1\2"),
+    (re.compile(r"filee(?:r|rna)$"), "file"),                         # filéer
+]
+
+# An unqualified ingredient means any of these: "köttfärs" is nötfärs or blandfärs
+HEAD_ALTERNATIVES = {
+    "köttfärs": ["köttfärs", "nötfärs", "blandfärs"],
+    "viltfärs": ["viltfärs", "älgfärs", "hjortfärs", "vildsvinsfärs"],
+}
+
+# Words too general to stand for a more specific product: "bröd" is not korvbröd
+GENERIC_HEADS = {"sås", "bröd", "kött", "fisk", "grönsak", "frukt", "krydd", "kryddmix", "mix", "biff"}
+
+# "Nötstek av fransyska" is fransyska, but "Lövbiff av innanlår" is lövbiff
+GENERIC_FORMS = {"stek", "nötstek", "kött", "nötkött"}
+# In a recipe, "lövbiff av fransyska" and "mittbit av oxfilé" are fransyska and oxfilé, but
+# "pizzadeg av surdeg" is pizzadeg
+CUT_FORMS = {"stek", "nötstek", "kött", "nötkött", "lövbiff", "pepparbiff", "biff", "mittbit", "skiv", "bit"}
+
+# Animals. An unqualified cut ("kotlett", "rostbiff", "grytbitar") is nöt or fläsk, so an
+# offer from another animal is another product ("Lammkotlett", "Rostbiff av hjort",
+# "Kycklingburgare").
+ANIMALS = ("nöt", "fläsk", "lamm", "kalv", "älg", "hjort", "vilt", "ren", "rådjur", "vildsvin",
+           "kyckling", "kalkon", "anka", "lax", "torsk", "sej", "beef")
+DEFAULT_ANIMALS = {"nöt", "fläsk"}
+# "viltfärs" is älgfärs, hjortfärs, ...
+GAME = {"älg", "hjort", "rådjur", "vildsvin", "ren"}
+ANIMAL_WORD = re.compile(rf"^(?:{'|'.join(ANIMALS)}|gris)(?:kött)?$")
+
+# Processed products are another product than the raw ingredient: "varmrökt lax" is not lax,
+# "marinerad kycklingfilé" is not kycklingfilé. An offer must not be processed in any way the
+# ingredient isn't, and an ingredient that is bought processed ("kallrökt lax", "inlagd gurka",
+# "torkad timjan") must be processed in the same way. "kokt potatis" is cooked at home.
+PROCESSED = re.compile(
+    r"(varmrökt|kallrökt|(?<!lätt)rökt|gravad|inlagd|syrad|picklad|torkad|lufttorkad|panerad|"
+    r"sprödbakad|griljerad|kryddad|marinerad|marinad|grillad|stekt|rostad|friterad|smaksatt|kokt|"
+    r"provencal)"
+)
+COOKED_AT_HOME = {"kryddad", "marinerad", "marinad", "grillad", "stekt", "rostad", "friterad", "smaksatt",
+                  "kokt", "provencal"}
+# A list item that is only an adjective takes the product of the next item ("Gravad, kallrökt lax")
+ADJECTIVE = re.compile(r"(?:ade|ad|at|ada|kta|isk|iska|ig|iga|kt)$")
+
+# Words that make an offer a flavoured or sweet product ("Dessert yoghurt", "Filmjölk lemonad")
+FLAVOURED = re.compile(r"^(?:vanilj|dessert|frukt|choklad|kola|lemonad|smak|kaffe|espresso|mellanrost|mörkrost|snacks|chips|shot)")
+
+# Fish is sold as fillets, sides or pieces: "lax" is laxfilé or laxsida
+FISH_CUTS = ("ryggfil", "rygg", "fil", "sid", "bit")
 
 # Compounds that are another food than their last word ("sötpotatis" is not potatis)
 DIFFERENT_FOODS = re.compile(
     r"(?:sötpotatis|vitlök|purjolök|salladslök|gräslök|grillost|stekost|kokosmjölk|"
     r"jordnötssmör|kryddsmör|vitlökssmör|kycklingbuljong|grönsaksbuljong|köttbuljong|fiskbuljong|"
     r"tomatpuré|ketchup|äppelmos|vaniljsås|chokladsås|kolasås|kapris|currypasta|tomatpasta|"
-    r"färskost|vitost|mjukost|smältost|drickyoghurt|mjölkchoklad)\w*$"
+    r"färskost|vitost|mjukost|smältost|drickyoghurt|mjölkchoklad|filmjölk|kärnmjölk|havremjölk|"
+    r"sojamjölk|mandelmjölk|chokladmjölk|kattmjölk|fruktyoghurt|dessertyoghurt|granatäpple|"
+    r"havreris|kaffebönor|chiliolja|schalottenlök|underlägg)\w*$|^(?:vego|veggie|vegan|quorn|ärt)"
+)
+
+# Ends of compounds, to complete "nöt- eller blandfärs" and "kycklingfilé eller -lårfilé"
+COMPOUND_TAILS = (
+    "lårfilé", "innerfilé", "ytterfilé", "filé", "färs", "kotlett", "kotletter", "karré", "stek",
+    "grytbitar", "korv", "buljong", "fond", "skav", "burgare",
 )
 
 _ACCENTS = str.maketrans("éèêëáàâãíìîóòôõúùûüñç", "eeeeaaaaiiioooouuuunc")
@@ -135,77 +225,248 @@ _ENDINGS = ("orna", "arna", "erna", "or", "ar", "er", "na", "en", "et", "a", "e"
 
 def _words(text: str) -> list[str]:
     text = re.sub(r"\(.*?\)", " ", str(text or "").lower()).translate(_ACCENTS)
-    return re.findall(r"[a-zåäö]+", text)
+    words = []
+    for word in re.findall(r"[a-zåäö]+", text):
+        word = ALIASES.get(word, word)
+        for pattern, replacement in SYNONYMS:
+            word = pattern.sub(replacement, word)
+        words.append(word)
+    return words
 
 
 def _stem(word: str) -> str:
-    word = ALIASES.get(word, word)
     for ending in _ENDINGS:
         if word.endswith(ending) and len(word) - len(ending) >= 3:
             return word[: -len(ending)]
     return word
 
 
-def _same_word(ingredient: str, offer: str, offer_word: str) -> bool:
-    """Whether an offer word is the ingredient: the same word, or a compound ending with it
-    ("jasminris" is ris, but "gris" is not). Not the other way around: "vitlök" is not lök."""
-    if ingredient == offer:
-        return True
-    return (
-        len(ingredient) >= 3
-        and offer.endswith(ingredient)
-        and len(offer) - len(ingredient) >= 3
-        and not DIFFERENT_FOODS.search(offer_word)
-    )
+def _fish_base(stem: str) -> str:
+    for cut in FISH_CUTS:
+        if stem.endswith(cut) and len(stem) - len(cut) >= 3:
+            return stem[: -len(cut)]
+    return stem
+
+
+def _processing(words: list[str]) -> set[str]:
+    return {m.group(1) for w in words for m in [PROCESSED.search(w)] if m}
+
+
+def _animal(word: str) -> str | None:
+    """The animal a word is from: "nötkött" nöt, "griskött" and "skinkgrytbitar" fläsk"""
+    word = re.sub(r"^(?:gris|skink)", "fläsk", word)
+    return next((a for a in ANIMALS if word.startswith(a)), None)
 
 
 def _alternatives(name: str) -> list[str]:
-    """ "kycklingfilé eller kycklinginnerfilé" -> both, without "(...)". Half words are left
-    out: "kalv- eller nötfärs" is nötfärs, not kalv."""
-    name = re.sub(r"\(.*?\)", " ", name.lower())
-    parts = re.split(r"\s+eller\s+|\s*/\s*|,", name)
-    return [p.strip() for p in parts if p.strip() and not p.strip().endswith("-")]
+    """ "kycklingfilé eller kycklinginnerfilé" -> both, without "(...)" except "(av nöt)".
+    Half words are completed: "nöt- eller blandfärs" is nötfärs or blandfärs, and in
+    "grytbitar av lamm eller nöt" the second alternative is grytbitar av nöt."""
+    name = re.sub(r"\(\s*((?:av|från)\s[^)]*)\)", r" \1 ", name.lower())
+    name = EXAMPLES.sub("", re.sub(r"\(.*?\)", " ", name))
+    # "skinn- och benfri laxfilé": the half word is a list of adjectives
+    name = re.sub(r"\b[a-zåäöé]+-\s*(?:och|&)\s+", " ", name)
+    parts = [p.strip() for p in re.split(r"\s+(?:eller|alt|alternativt)\s+|\s*/\s*|,", name)]
+    parts = [p for p in parts if p]
+
+    result = []
+    for i, part in enumerate(parts):
+        if part.endswith("-") and i + 1 < len(parts):
+            # "kalv-, lamm- eller nötfärs": the first whole word after the half words
+            word = next((p for p in parts[i + 1:] if not p.endswith("-")), "-").split()[-1]
+            tail = next((t for t in COMPOUND_TAILS if word.endswith(t)), None)
+            part = part[:-1] + tail if tail else ""
+        elif part.startswith("-") and result:
+            word = result[-1].split()[-1]
+            tail = next((t for t in COMPOUND_TAILS if word.endswith(t)), None)
+            part = word[: -len(tail)] + part[1:] if tail else ""
+        elif result and all(ANIMAL_WORD.match(w) for w in _words(part)) and " av " in result[0]:
+            part = result[0].split(" av ")[0] + " av " + part
+        if part and not part.endswith("-"):
+            result.append(part)
+    return result
+
+
+class _Ingredient:
+    """What an ingredient alternative is: the product word (head), the words that qualify it
+    (modifiers, e.g. "soltorkade"), the animal ("grytbitar av nöt") and its category"""
+
+    def __init__(self, alternative: str):
+        self.text = alternative
+        self.text_words = _words(alternative)
+        self.processing = _processing(self.text_words)
+        self.animals = {a for a in map(_animal, self.text_words) if a}
+        if "vilt" in self.animals:
+            self.animals |= GAME
+        name = NAME_END.sub("", alternative)
+        part, qualifier = (re.split(r"\s+(?:av|från)\s+", name, maxsplit=1) + [""])[:2]
+        self.animal = None
+        qualifier_words = [w for w in _words(qualifier) if not PREPARATION_WORDS.match(w)]
+        part_words = [w for w in _words(part) if not PREPARATION_WORDS.match(w)]
+        extra = []
+        if qualifier_words and all(ANIMAL_WORD.match(w) for w in qualifier_words):
+            self.animal = _animal(qualifier_words[0])
+        elif qualifier_words and (not part_words or _stem(part_words[-1]) in CUT_FORMS):
+            # "nötstek av fransyska", "mittbit av oxfilé": the product is the second part
+            part = qualifier
+        else:
+            # "pizzadeg av surdeg"
+            extra = qualifier_words
+        words = [w for w in _words(part) if not PREPARATION_WORDS.match(w)]
+        self.ok = bool(words)
+        if not self.ok:
+            return
+        stems = [_stem(w) for w in words]
+        self.heads = HEAD_ALTERNATIVES.get(stems[-1], [stems[-1]])
+        self.modifiers = stems[:-1] + [_stem(w) for w in extra] + (["hel"] if WHOLE_BIRD.search(name) else [])
+        self.category = categorize_offer({"product": " ".join(words + qualifier_words)})
+        if stems[-1] == "rostbiff" and SLICED.search(alternative):
+            self.category = "Chark & Pålägg"
+        # "burkar hela tomater" and "burk majs" are tinned, not fresh
+        if self.category == "Frukt & Grönt" and re.search(r"\bburk", alternative):
+            self.category = "Skafferi"
+        self.is_fish = self.category == "Fisk & Skaldjur"
+
+
+@lru_cache(maxsize=None)
+def _word_category(word: str) -> str:
+    return categorize_offer({"product": word})
+
+
+class _OfferPart:
+    """One product in an offer's name ("Bacon, stekfläsk" is two)"""
+
+    def __init__(self, text: str, words: list[str], qualifier_words: list[str]):
+        self.text = text
+        # Also what the name says after "i" and "med": "Vannameiräkor i marinad"
+        self.processing = _processing(_words(text))
+        self.flavoured = {w for w in words if FLAVOURED.match(w)}
+        self.animals = {a for a in map(_animal, (w for w in words if ANIMAL_WORD.match(w))) if a}
+        if qualifier_words and all(ANIMAL_WORD.match(w) for w in qualifier_words):
+            # "Grytbitar av lax" is grytbitar, "Rostbiff av hjort" rostbiff
+            self.animals.update(a for a in map(_animal, qualifier_words) if a)
+        elif words and words[-1] in GENERIC_FORMS:
+            # "Nötstek av fransyska" is fransyska
+            words = words + qualifier_words
+        self.candidates = [(w, _stem(w)) for w in words]
+        self.stems = [_stem(w) for w in words + qualifier_words]
+
+
+class _Offer:
+    """What an offer is: its products, the animals they are from and how they are processed"""
+
+    def __init__(self, index: int, offer: dict):
+        self.index = index
+        self.frozen = offer.get("category") in SAME_CATEGORY
+        self.category = SAME_CATEGORY.get(offer.get("category"), offer.get("category"))
+        self.text = (offer.get("product") or "").lower()
+        # "Torsk- & laxtärningar"
+        name = re.sub(r"\b[a-zåäöé]+-\s*(?:och|&|,)\s*", " ", self.text)
+        self.parts = []
+        texts = [t for t in re.split(r"\s*[,/]\s*", name) if t.strip()]
+        for i, text in enumerate(texts):
+            # "Kotlett med ben", "Delikatesspotatis i påse", "Surimi formade som räkor"
+            product = re.split(r"\s+(?:med|i|som)\s+", text)[0]
+            part, qualifier = (re.split(r"\s+(?:av|från)\s+", product, maxsplit=1) + [""])[:2]
+            words = _words(part)
+            # "Gravad, kallrökt lax" is gravad lax and kallrökt lax
+            if i + 1 < len(texts) and words and (
+                    _word_category(" ".join(words)) == "Övrigt" or (len(words) == 1 and ADJECTIVE.search(words[0]))):
+                words += _words(re.split(r"\s+(?:med|i|som)\s+", texts[i + 1])[0])[-1:]
+            self.parts.append(_OfferPart(text, words, _words(qualifier)))
+
+    def is_(self, ingredient: _Ingredient) -> bool:
+        """Whether this offer is the ingredient"""
+        if self.category != ingredient.category:
+            return False
+        for part in self.parts:
+            for head in ingredient.heads:
+                for position, (word, stem) in enumerate(part.candidates):
+                    prefix = self._prefix(head, word, stem, ingredient.is_fish)
+                    if prefix is None:
+                        continue
+                    # Frozen: only the vegetable itself ("Fryst mango"), not "Halloweenpotatis"
+                    if self.frozen and (prefix or position != len(part.candidates) - 1):
+                        continue
+                    if self._same_kind(part, word, ingredient, prefix):
+                        return True
+        return False
+
+    def _same_kind(self, part: _OfferPart, word: str, ingredient: _Ingredient, prefix: str) -> bool:
+        animals = part.animals | ({_animal(word), _animal(prefix)} - {None})
+        # "Lammkotlett" is not kotlett (fläsk), "Kycklingburgare" not hamburgare
+        if any(a not in DEFAULT_ANIMALS and a not in ingredient.animals for a in animals):
+            return False
+        # "grytbitar av nöt" is not "Grytbitar av gris", and "fransyska av viltkött" not Fransyska
+        if ingredient.animal:
+            wanted = {ingredient.animal} | (GAME if ingredient.animal == "vilt" else set())
+            if (animals and not animals & wanted) or (not animals and ingredient.animal not in DEFAULT_ANIMALS):
+                return False
+        # "soltorkade tomater" is not any tomato
+        if not all(any(s.startswith(m[:5]) for s in part.stems) for m in ingredient.modifiers):
+            return False
+        # "Varmrökt lax" is not lax, and "kallrökt lax" is not Lax
+        if part.processing - ingredient.processing:
+            return False
+        if (ingredient.processing - COOKED_AT_HOME) - part.processing:
+            return False
+        # "Grekisk yoghurt citron", "Grillkorv ost & bacon", "Dessert yoghurt": another product
+        # or a flavour
+        if part.flavoured - set(ingredient.text_words):
+            return False
+        others = {w for w, _ in part.candidates if w != word and w not in ingredient.text_words}
+        if any(_word_category(w) not in ("Övrigt", ingredient.category, self.category)
+               and SAME_CATEGORY.get(_word_category(w)) != ingredient.category for w in others):
+            return False
+        for one, other in CONFLICTS:
+            if (one.search(ingredient.text) and other.search(self.text)) or (
+                    other.search(ingredient.text) and one.search(self.text)):
+                return False
+        return True
+
+    @staticmethod
+    def _prefix(head: str, word: str, stem: str, is_fish: bool) -> str | None:
+        """What the offer word has before the ingredient ("jasmin" in "jasminris"): "" for the
+        same word, None when the offer word is not the ingredient ("gris" is not ris, and
+        "vitlök" is not lök)"""
+        if stem == head:
+            return ""
+        if is_fish and head not in GENERIC_HEADS:
+            base, offer_base = _fish_base(head), _fish_base(stem)
+            if offer_base == base:
+                return ""
+            if offer_base.endswith(base) and len(offer_base) - len(base) >= 3:
+                return offer_base[: -len(base)]
+        if (
+            len(head) >= 3
+            and head not in GENERIC_HEADS
+            and stem.endswith(head)
+            and len(stem) - len(head) >= 3
+            and not DIFFERENT_FOODS.search(word)
+        ):
+            return stem[: -len(head)]
+        return None
 
 
 class _OfferIndex:
-    """The food offers, with the stems of their product names"""
+    """The food offers"""
 
     def __init__(self, offers: list[dict]):
-        self.offers = []
-        for i, offer in enumerate(offers):
-            category = SAME_CATEGORY.get(offer.get("category"), offer.get("category"))
-            if offer.get("category") not in FOOD_CATEGORIES:
-                continue
-            # "Vitkål med morot" is vitkål
-            name = re.split(r"\s+(?:med|&)\s+", offer.get("product") or "")[0]
-            stems = [(w, _stem(w)) for w in _words(name)]
-            self.offers.append((i, offer, category, stems))
+        self.offers = [_Offer(i, offer) for i, offer in enumerate(offers)
+                       if offer.get("category") in FOOD_CATEGORIES]
 
     def matching(self, name: str) -> list[int]:
-        """Indexes of the offers that are this ingredient"""
-        found = set()
-        for alternative in _alternatives(name):
-            if STAPLES.match(alternative):
-                continue
-            words = [w for w in _words(alternative) if not PREPARATION_WORDS.match(w) and not w.isdigit()]
-            if not words:
-                continue
-            words = [ALIASES.get(w, w) for w in words]
-            head, modifiers = _stem(words[-1]), [_stem(w) for w in words[:-1]]
-            # Unknown ingredients ("Övrigt") are not matched
-            category = categorize_offer({"product": " ".join(words)})
-            if category not in FOOD_CATEGORIES:
-                continue
-            category = SAME_CATEGORY.get(category, category)
-            for i, offer, offer_category, stems in self.offers:
-                if offer_category != category:
-                    continue
-                if not any(_same_word(head, stem, word) for word, stem in stems):
-                    continue
-                # "soltorkade tomater" is not any tomato
-                if all(any(stem.startswith(m[:5]) for _, stem in stems) for m in modifiers):
-                    found.add(i)
-        return sorted(found)
+        """Indexes of the offers that are this ingredient (any of its alternatives)"""
+        return sorted({i for alternative in _alternatives(name) for i in self.matching_alternative(alternative)})
+
+    @lru_cache(maxsize=None)
+    def matching_alternative(self, alternative: str) -> tuple[int, ...]:
+        ingredient = _Ingredient(alternative)
+        # Unknown ingredients ("Övrigt") are not matched
+        if not ingredient.ok or ingredient.category not in FOOD_CATEGORIES or ingredient.heads[0] in STAPLES:
+            return ()
+        ingredient.category = SAME_CATEGORY.get(ingredient.category, ingredient.category)
+        return tuple(offer.index for offer in self.offers if offer.is_(ingredient))
 
 
 def _get(session: requests.Session, url: str) -> str | None:
@@ -257,27 +518,26 @@ def get_ingredients(session: requests.Session, url: str) -> tuple[int | None, li
     return groups[0].get("portions"), ingredients
 
 
-def _protein_of(ingredients: list[dict], offer_index: dict[str, list[int]],
-                index: "_OfferIndex") -> tuple[str, dict, list[int]] | None:
-    """The recipe's protein that is on offer, the ingredient it is and its offers"""
-    for protein, _, _, ingredient_pattern in PROTEINS:
-        if protein not in offer_index:
+def _protein_of(ingredients: list[dict], index: _OfferIndex) -> tuple[str, dict, list[int]] | None:
+    """The recipe's protein: the first meat or fish ingredient that is on offer, its name and
+    its offers"""
+    for ingredient in ingredients:
+        alternatives = [alt for alt in _alternatives(ingredient["name"]) if not NOT_PROTEIN.search(alt)]
+        proteins = [next((p for p, _, _, pattern in PROTEINS if re.search(pattern, alt)), None) for alt in alternatives]
+        if not any(proteins):
             continue
-        for ingredient in ingredients:
-            if any(re.search(ingredient_pattern, alt) and not NOT_PROTEIN.search(alt)
-                   for alt in _alternatives(ingredient["name"])):
-                offers = offer_index[protein]
-                if protein in SAME_CUT_PROTEINS:
-                    offers = sorted(set(offers) & set(index.matching(ingredient["name"])))
-                    if not offers:
-                        continue
-                return protein, ingredient, offers
+        offers = index.matching(ingredient["name"])
+        if offers:
+            # Named after the alternative that is on offer: "högrev i bit eller fransyska" with
+            # Fransyska on offer is a fransyska recipe
+            on_offer = [p for p, alt in zip(proteins, alternatives) if p and index.matching_alternative(alt)]
+            return (on_offer or [p for p in proteins if p])[0], ingredient, offers
     return None
 
 
 def build_recipes(offers: list[dict], previous: list[dict] | None = None) -> list[dict]:
     """Recipes whose protein is on offer, with the offers (indexes in `offers`) per ingredient"""
-    # Proteins on offer -> indexes of those offers
+    # The proteins with a meat or fish offer this week, whose list pages are fetched
     protein_offers: dict[str, list[int]] = {}
     for i, offer in enumerate(offers):
         if offer.get("category") not in PROTEIN_CATEGORIES:
@@ -314,7 +574,7 @@ def build_recipes(offers: list[dict], previous: list[dict] | None = None) -> lis
                         continue
                     portions, ingredients = result
 
-                found = _protein_of(ingredients, protein_offers, index)
+                found = _protein_of(ingredients, index)
                 if not found:
                     continue
                 recipe_protein, protein_ingredient, offers_for_protein = found

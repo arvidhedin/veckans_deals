@@ -2648,14 +2648,20 @@ function getRankedRecipes() {
   const available = new Set(getStoreFilteredOffers());
   const ranked = [];
   for (const recipe of recipes.all) {
-    const ingredients = recipe.ingredients.map(ingredient => ({
-      ...ingredient,
-      available: getIngredientOffers(ingredient, available)
-    }));
+    // The same product on two lines ("4 msk smör" and "25 g smör") counts once
+    const seen = new Set();
+    const ingredients = recipe.ingredients.map(ingredient => {
+      const offers = getIngredientOffers(ingredient, available);
+      const key = (ingredient.offers || []).join(',');
+      const duplicate = offers.length > 0 && seen.has(key);
+      if (offers.length > 0) seen.add(key);
+      return { ...ingredient, available: offers, duplicate };
+    });
     const protein = ingredients.find(ingredient => ingredient.protein);
     if (!protein || protein.available.length === 0) continue;
-    const onOffer = ingredients.filter(ingredient => ingredient.available.length > 0).length;
-    ranked.push({ recipe, ingredients, onOffer, ratingScore: getRecipeRatingScore(recipe) });
+    const onOffer = ingredients.filter(ingredient => ingredient.available.length > 0 && !ingredient.duplicate).length;
+    const total = ingredients.filter(ingredient => !ingredient.duplicate).length;
+    ranked.push({ recipe, ingredients, onOffer, total, ratingScore: getRecipeRatingScore(recipe) });
   }
   return ranked.sort((a, b) => b.onOffer - a.onOffer || b.ratingScore - a.ratingScore);
 }
@@ -2679,10 +2685,10 @@ function createRecipeOfferHtml(ingredient, recipeIndex, ingredientIndex) {
 }
 
 function createRecipeCardHtml(entry, recipeIndex) {
-  const { recipe, ingredients, onOffer } = entry;
+  const { recipe, ingredients, onOffer, total } = entry;
   const offered = ingredients
     .map((ingredient, i) => ({ ingredient, i }))
-    .filter(({ ingredient }) => ingredient.available.length > 0)
+    .filter(({ ingredient }) => ingredient.available.length > 0 && !ingredient.duplicate)
     // The protein first
     .sort((a, b) => b.ingredient.protein - a.ingredient.protein);
   const others = ingredients.filter(ingredient => ingredient.available.length === 0);
@@ -2700,7 +2706,7 @@ function createRecipeCardHtml(entry, recipeIndex) {
     <article class="bg-white rounded-2xl border border-zinc-200/80 shadow-sm overflow-hidden flex flex-col">
       <a href="${escapeHtml(recipe.url)}" target="_blank" rel="noopener" class="block relative aspect-[4/3] bg-zinc-100 overflow-hidden group">
         ${recipe.image_url ? `<img src="${escapeHtml(recipe.image_url)}" alt="" loading="lazy" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105">` : ''}
-        <span class="absolute top-2.5 left-2.5 px-2 py-1 rounded-lg bg-rose-600 text-white text-[11px] font-extrabold shadow-sm">${onOffer} av ${ingredients.length} på extrapris</span>
+        <span class="absolute top-2.5 left-2.5 px-2 py-1 rounded-lg bg-rose-600 text-white text-[11px] font-extrabold shadow-sm">${onOffer} av ${total} på extrapris</span>
       </a>
       <div class="p-3.5 sm:p-4 flex flex-col gap-3 flex-grow">
         <div>
