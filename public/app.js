@@ -124,6 +124,7 @@ async function fetchDealsData() {
     } else {
       state.allOffers = data.offers || [];
       state.willysAssortment = data.willys_assortment || [];
+      state.updatedAt = data.updated_at || null;
       if (data.updated_at_readable && statusEl) {
         statusEl.textContent = `Uppdaterad: ${data.updated_at_readable}`;
       } else if (statusEl) {
@@ -1464,6 +1465,9 @@ function applyFilters() {
 
   // 7. Willys Reference Prices
   updateWillysReferenceBox(q);
+
+  // 8. The recipes count the offers in the chosen stores
+  renderRecipes();
 }
 
 function parsePriceNumeric(priceStr) {
@@ -2559,6 +2563,263 @@ function setupFacebookSection() {
   });
 }
 
+// --- Recept ---
+// Dinner recipes from ica.se whose protein is on offer (deals.json "recipes", built by
+// scrapers/recipes.py). Each ingredient lists the offers (indexes in deals.json "offers") that
+// are that ingredient. Only offers in the chosen stores count, and the recipes with the most
+// ingredients on offer come first.
+const RECIPES_PAGE_SIZE = 24;
+
+const RECIPES_URL = 'recipes.json';
+
+const recipes = {
+  all: [],
+  status: 'idle', // 'idle' | 'loading' | 'loaded' | 'error'
+  offersUpdatedAt: null,
+  shown: RECIPES_PAGE_SIZE,
+  activeProtein: 'all'
+};
+
+// Loaded the first time the recipes tab is opened
+async function fetchRecipes() {
+  if (recipes.status !== 'idle') return;
+  recipes.status = 'loading';
+  try {
+    const response = await fetch(`${RECIPES_URL}?v=${Date.now()}`);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const data = await response.json();
+    recipes.all = data.recipes || [];
+    recipes.offersUpdatedAt = data.offers_updated_at || null;
+    recipes.status = 'loaded';
+  } catch (error) {
+    console.error('Fel vid hämtning av recept:', error);
+    recipes.status = 'error';
+  }
+  renderRecipes();
+}
+
+function isRecipesView() {
+  return location.hash === '#recept';
+}
+
+// Shows the offers or the recipes, from the address (#recept)
+function renderView() {
+  const showRecipes = isRecipesView();
+  document.getElementById('recipes-view')?.classList.toggle('hidden', !showRecipes);
+  document.getElementById('offers-view')?.classList.toggle('hidden', showRecipes);
+  document.getElementById('best-deal-wrapper')?.classList.toggle('hidden', showRecipes);
+  document.querySelectorAll('[data-view-tab]').forEach(tab => {
+    const active = (tab.dataset.viewTab === 'recipes') === showRecipes;
+    tab.classList.toggle('bg-white', active);
+    tab.classList.toggle('text-zinc-900', active);
+    tab.classList.toggle('shadow-sm', active);
+    tab.classList.toggle('text-zinc-500', !active);
+    tab.classList.toggle('hover:text-zinc-800', !active);
+    if (active) tab.setAttribute('aria-current', 'page');
+    else tab.removeAttribute('aria-current');
+  });
+  if (showRecipes) {
+    fetchRecipes();
+    renderRecipes();
+  }
+}
+
+// The offers of a recipe's ingredient in the chosen stores
+function getIngredientOffers(ingredient, available) {
+  return (ingredient.offers || []).map(i => state.allOffers[i]).filter(offer => offer && available.has(offer));
+}
+
+// The best offer for an ingredient: the lowest price per kg, otherwise the biggest discount
+function pickIngredientOffer(offers) {
+  const perKg = offer => getPricePerKg(offer)?.min ?? Infinity;
+  return [...offers].sort((a, b) =>
+    perKg(a) - perKg(b) || (parseFloat(b.discount_percentage) || 0) - (parseFloat(a.discount_percentage) || 0)
+  )[0];
+}
+
+// A rating with few votes counts less (3.5 stars from 20 votes are added)
+function getRecipeRatingScore(recipe) {
+  const votes = recipe.votes || 0;
+  return ((recipe.rating || 0) * votes + 3.5 * 20) / (votes + 20);
+}
+
+// The recipes whose protein is on offer in the chosen stores, best first
+function getRankedRecipes() {
+  const available = new Set(getStoreFilteredOffers());
+  const ranked = [];
+  for (const recipe of recipes.all) {
+    const ingredients = recipe.ingredients.map(ingredient => ({
+      ...ingredient,
+      available: getIngredientOffers(ingredient, available)
+    }));
+    const protein = ingredients.find(ingredient => ingredient.protein);
+    if (!protein || protein.available.length === 0) continue;
+    const onOffer = ingredients.filter(ingredient => ingredient.available.length > 0).length;
+    ranked.push({ recipe, ingredients, onOffer, ratingScore: getRecipeRatingScore(recipe) });
+  }
+  return ranked.sort((a, b) => b.onOffer - a.onOffer || b.ratingScore - a.ratingScore);
+}
+
+function createRecipeOfferHtml(ingredient, recipeIndex, ingredientIndex) {
+  const offer = pickIngredientOffer(ingredient.available);
+  const perKg = getPricePerKg(offer);
+  const priceText = perKg && /kg/i.test(offer.price || '') ? formatPricePerKg(perKg) : (offer.price || '');
+  const more = ingredient.available.length > 1 ? ` <span class="text-zinc-400 font-medium">+${ingredient.available.length - 1}</span>` : '';
+  return `
+    <li>
+      <button type="button" data-recipe-offer="${recipeIndex}:${ingredientIndex}" class="w-full flex items-center gap-2.5 p-1.5 -mx-1.5 rounded-lg hover:bg-rose-50/70 transition text-left cursor-pointer">
+        <img src="${escapeHtml(offer.image_url || DEFAULT_IMG)}" alt="" loading="lazy" onerror="this.onerror=null; this.src='${DEFAULT_IMG}';" class="w-9 h-9 object-contain rounded-md bg-zinc-50 border border-zinc-100 shrink-0">
+        <span class="min-w-0 flex-1">
+          <span class="block text-xs font-semibold text-zinc-900 truncate">${escapeHtml(ingredient.text)}</span>
+          <span class="block text-[11px] text-zinc-500 truncate">${escapeHtml(offer.product || '')} · ${escapeHtml(getShortStoreName(offer.store))}${more}</span>
+        </span>
+        <span class="text-xs font-extrabold text-rose-600 whitespace-nowrap">${escapeHtml(priceText)}</span>
+      </button>
+    </li>`;
+}
+
+function createRecipeCardHtml(entry, recipeIndex) {
+  const { recipe, ingredients, onOffer } = entry;
+  const offered = ingredients
+    .map((ingredient, i) => ({ ingredient, i }))
+    .filter(({ ingredient }) => ingredient.available.length > 0)
+    // The protein first
+    .sort((a, b) => b.ingredient.protein - a.ingredient.protein);
+  const others = ingredients.filter(ingredient => ingredient.available.length === 0);
+
+  const meta = [
+    recipe.cooking_time,
+    recipe.difficulty,
+    recipe.portions ? `${recipe.portions} port` : ''
+  ].filter(Boolean).map(escapeHtml).join(' · ');
+  const ratingHtml = recipe.rating
+    ? `<span class="flex items-center gap-1"><svg class="w-3.5 h-3.5 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>${String(recipe.rating).replace('.', ',')}<span class="text-zinc-400">(${recipe.votes || 0})</span></span>`
+    : '';
+
+  return `
+    <article class="bg-white rounded-2xl border border-zinc-200/80 shadow-sm overflow-hidden flex flex-col">
+      <a href="${escapeHtml(recipe.url)}" target="_blank" rel="noopener" class="block relative aspect-[4/3] bg-zinc-100 overflow-hidden group">
+        ${recipe.image_url ? `<img src="${escapeHtml(recipe.image_url)}" alt="" loading="lazy" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105">` : ''}
+        <span class="absolute top-2.5 left-2.5 px-2 py-1 rounded-lg bg-rose-600 text-white text-[11px] font-extrabold shadow-sm">${onOffer} av ${ingredients.length} på extrapris</span>
+      </a>
+      <div class="p-3.5 sm:p-4 flex flex-col gap-3 flex-grow">
+        <div>
+          <a href="${escapeHtml(recipe.url)}" target="_blank" rel="noopener" class="text-sm sm:text-base font-bold text-zinc-900 leading-snug hover:underline">${escapeHtml(recipe.title)}</a>
+          <div class="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-1 text-[11px] sm:text-xs text-zinc-500 font-medium">
+            ${ratingHtml}
+            ${meta ? `<span>${meta}</span>` : ''}
+          </div>
+        </div>
+        <ul class="space-y-0.5">
+          ${offered.map(({ ingredient, i }) => createRecipeOfferHtml(ingredient, recipeIndex, i)).join('')}
+        </ul>
+        ${others.length > 0 ? `
+          <details class="text-xs text-zinc-600 group/details">
+            <summary class="cursor-pointer select-none font-semibold text-zinc-500 hover:text-zinc-800">Övriga ingredienser (${others.length})</summary>
+            <ul class="mt-1.5 space-y-0.5 pl-1">
+              ${others.map(ingredient => `<li>${escapeHtml(ingredient.text)}</li>`).join('')}
+            </ul>
+          </details>` : ''}
+        <a href="${escapeHtml(recipe.url)}" target="_blank" rel="noopener" class="mt-auto inline-flex items-center gap-1 text-xs font-semibold text-rose-600 hover:underline">
+          Visa receptet på ica.se
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+        </a>
+      </div>
+    </article>`;
+}
+
+function renderRecipeProteinPills(ranked) {
+  const container = document.getElementById('recipe-protein-pills');
+  if (!container) return;
+  const counts = new Map();
+  for (const { recipe } of ranked) counts.set(recipe.protein, (counts.get(recipe.protein) || 0) + 1);
+
+  const pill = (value, label, count) => {
+    const active = recipes.activeProtein === value;
+    return `
+      <button type="button" data-recipe-protein="${escapeHtml(value)}" class="cursor-pointer select-none px-3 py-1.5 rounded-full text-xs font-semibold border transition-all duration-150 flex items-center gap-1.5 ${
+        active ? 'bg-zinc-900 text-white border-zinc-900 shadow-sm' : 'bg-white text-zinc-700 border-zinc-200 hover:bg-zinc-100 hover:border-zinc-300'
+      }">
+        <span>${escapeHtml(label)}</span>
+        <span class="px-1.5 py-0.2 rounded-full text-[10px] font-bold ${active ? 'bg-zinc-700 text-zinc-100' : 'bg-zinc-100 text-zinc-600'}">${count}</span>
+      </button>`;
+  };
+  container.innerHTML = pill('all', 'Alla', ranked.length) +
+    [...counts.entries()].sort((a, b) => b[1] - a[1]).map(([protein, count]) => pill(protein, protein, count)).join('');
+}
+
+let renderedRecipes = [];
+
+function renderRecipes() {
+  const grid = document.getElementById('recipes-grid');
+  const countEl = document.getElementById('recipes-count');
+  const moreBtn = document.getElementById('btn-recipes-more');
+  if (!grid || !countEl || !moreBtn || !isRecipesView()) return;
+  if (recipes.status === 'error') {
+    countEl.textContent = 'Kunde inte hämta recepten.';
+    return;
+  }
+  if (recipes.status !== 'loaded' || state.allOffers.length === 0) return;
+  // The ingredients point at the offers by index, so both files must be from the same build
+  if (recipes.offersUpdatedAt && state.updatedAt && recipes.offersUpdatedAt !== state.updatedAt) {
+    countEl.textContent = 'Recepten uppdateras. Ladda om sidan om en stund.';
+    grid.innerHTML = '';
+    moreBtn.classList.add('hidden');
+    return;
+  }
+
+  const ranked = getRankedRecipes();
+  if (recipes.activeProtein !== 'all' && !ranked.some(({ recipe }) => recipe.protein === recipes.activeProtein)) {
+    recipes.activeProtein = 'all';
+  }
+  renderRecipeProteinPills(ranked);
+
+  const filtered = recipes.activeProtein === 'all' ? ranked : ranked.filter(({ recipe }) => recipe.protein === recipes.activeProtein);
+  renderedRecipes = filtered.slice(0, recipes.shown);
+
+  if (filtered.length === 0) {
+    countEl.textContent = recipes.all.length === 0
+      ? 'Inga recept den här veckan.'
+      : 'Inget protein i recepten är på extrapris i de valda butikerna.';
+  } else {
+    countEl.innerHTML = `Visar <strong class="text-zinc-900 font-bold">${renderedRecipes.length}</strong> av ${filtered.length} recept`;
+  }
+  grid.innerHTML = renderedRecipes.map((entry, i) => createRecipeCardHtml(entry, i)).join('');
+  moreBtn.classList.toggle('hidden', renderedRecipes.length >= filtered.length);
+}
+
+function setupRecipesView() {
+  window.addEventListener('hashchange', () => {
+    renderView();
+    window.scrollTo({ top: 0 });
+  });
+
+  document.getElementById('recipe-protein-pills')?.addEventListener('click', (e) => {
+    const pill = e.target.closest('[data-recipe-protein]');
+    if (!pill) return;
+    recipes.activeProtein = pill.dataset.recipeProtein;
+    recipes.shown = RECIPES_PAGE_SIZE;
+    renderRecipes();
+  });
+
+  document.getElementById('recipes-grid')?.addEventListener('click', (e) => {
+    const button = e.target.closest('[data-recipe-offer]');
+    if (!button) return;
+    const [recipeIndex, ingredientIndex] = button.dataset.recipeOffer.split(':').map(Number);
+    const ingredient = renderedRecipes[recipeIndex]?.ingredients[ingredientIndex];
+    if (ingredient) openProductModal(pickIngredientOffer(ingredient.available));
+  });
+
+  document.getElementById('btn-recipes-more')?.addEventListener('click', () => {
+    recipes.shown += RECIPES_PAGE_SIZE;
+    renderRecipes();
+  });
+
+  document.getElementById('btn-recipes-filter')?.addEventListener('click', openMobileFilterDrawer);
+
+  renderView();
+}
+
 // --- Helper Functions ---
 function escapeHtml(str) {
   if (!str) return '';
@@ -2891,6 +3152,7 @@ document.addEventListener('DOMContentLoaded', () => {
   state.cart = loadCartFromStorage();
   setupEventListeners();
   setupFacebookSection();
+  setupRecipesView();
   fetchDealsData();
   fetchFacebookPosts();
   updateCartUI();

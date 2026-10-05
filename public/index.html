@@ -16,7 +16,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Tailwind CSS (built from tailwind.config.js by .github/workflows/build_css.yml) -->
-  <link rel="stylesheet" href="tailwind.css?v=20260927_1200">
+  <link rel="stylesheet" href="tailwind.css?v=20261005_1200">
 
   <!-- Custom Styles for Store Badge Colors & Utilities -->
   <style>
@@ -87,12 +87,16 @@
   <div class="max-w-[1920px] w-full mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 py-5 sm:py-8">
 
     <!-- Top Navigation Header -->
-    <header class="flex justify-between items-center pb-5 border-b border-zinc-200/80 mb-5 sm:mb-8">
-      <div>
-        <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight text-zinc-900">
-          Veckans Deals
-        </h1>
-      </div>
+    <header class="flex flex-wrap justify-between items-center gap-x-6 gap-y-3 pb-5 border-b border-zinc-200/80 mb-5 sm:mb-8">
+      <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight text-zinc-900 whitespace-nowrap">
+        Veckans Deals
+      </h1>
+
+      <!-- Tabs: the offers or recipes built around them (#recept). Their own row on phones -->
+      <nav class="order-last sm:order-none w-full sm:w-auto sm:mr-auto flex p-1 bg-zinc-100 rounded-xl" aria-label="Flikar">
+        <a href="#" data-view-tab="offers" class="flex-1 sm:flex-none text-center px-3.5 py-1.5 rounded-lg text-sm font-semibold transition">Erbjudanden</a>
+        <a href="#recept" data-view-tab="recipes" class="flex-1 sm:flex-none text-center px-3.5 py-1.5 rounded-lg text-sm font-semibold transition">Recept</a>
+      </nav>
 
       <!-- Header Cart Button -->
       <button id="btn-open-cart" class="flex items-center gap-2 px-3.5 py-2 bg-zinc-900 hover:bg-zinc-800 text-white rounded-xl text-xs sm:text-sm font-semibold transition active:scale-95 shadow-sm cursor-pointer">
@@ -104,7 +108,8 @@
       </button>
     </header>
 
-    <!-- Veckans bästa deal (rendered by app.js, hidden when nothing qualifies) -->
+    <!-- Veckans bästa deal (rendered by app.js, hidden when nothing qualifies), not on the recipes tab -->
+    <div id="best-deal-wrapper">
     <section id="best-deal-section" class="hidden mb-6 sm:mb-8" aria-labelledby="best-deal-title">
       <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2 sm:gap-4 mb-3 sm:mb-4">
         <h2 id="best-deal-title" class="text-lg sm:text-xl font-extrabold tracking-tight text-zinc-900">Veckans bästa deal</h2>
@@ -118,6 +123,7 @@
         <div id="best-deal-runners" class="lg:col-span-2 grid grid-cols-2 gap-3 sm:gap-4"></div>
       </div>
     </section>
+    </div>
 
     <!-- Main Content Layout (Sidebar + Results) -->
     <div class="flex flex-col lg:flex-row gap-6 lg:gap-8 items-start">
@@ -378,8 +384,35 @@
       </aside>
 
       <!-- Main Column: Search Bar, Stats, Willys Reference Box, Deals Grid -->
-      <main class="flex-1 w-full min-w-0 space-y-4 sm:space-y-5">
-        
+      <main class="flex-1 w-full min-w-0">
+
+        <!-- Recipes from ica.se whose protein is on offer, most ingredients on offer first
+             (rendered by app.js from the recipes in deals.json, see scrapers/recipes.py) -->
+        <section id="recipes-view" class="hidden space-y-4 sm:space-y-5" aria-labelledby="recipes-title">
+          <div class="flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <h2 id="recipes-title" class="text-lg sm:text-xl font-extrabold tracking-tight text-zinc-900">Middagar med veckans erbjudanden</h2>
+              <p class="text-xs sm:text-sm text-zinc-500 mt-0.5">Recept från ICA där proteinet är på extrapris i dina valda butiker. Ju fler ingredienser på extrapris, desto högre upp.</p>
+            </div>
+            <button id="btn-recipes-filter" type="button" class="lg:hidden flex items-center gap-2 px-3.5 py-2 bg-white border border-zinc-200 rounded-xl text-xs font-semibold text-zinc-700 hover:bg-zinc-100 transition active:scale-95">
+              <svg class="w-4 h-4 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
+              </svg>
+              <span>Butiker</span>
+            </button>
+          </div>
+          <div class="overflow-x-auto pb-1.5 custom-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0">
+            <div id="recipe-protein-pills" class="flex items-center gap-1.5 min-w-max"></div>
+          </div>
+          <div id="recipes-count" class="px-1 text-xs sm:text-sm text-zinc-500 font-medium">Hämtar recept...</div>
+          <div id="recipes-grid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-5 items-start"></div>
+          <div class="text-center">
+            <button id="btn-recipes-more" type="button" class="hidden px-5 py-2.5 bg-white border border-zinc-200 hover:bg-zinc-100 rounded-xl text-xs sm:text-sm font-semibold text-zinc-800 transition active:scale-95 cursor-pointer">Visa fler recept</button>
+          </div>
+        </section>
+
+        <div id="offers-view" class="space-y-4 sm:space-y-5">
+
         <!-- Search, Filter & Sort Controls Bar -->
         <div class="bg-white p-3 sm:p-4 rounded-2xl border border-zinc-200/80 shadow-sm flex flex-col sm:flex-row gap-2.5 sm:gap-3 items-stretch sm:items-center justify-between">
           
@@ -505,6 +538,7 @@
           </button>
         </div>
 
+        </div>
       </main>
     </div>
 
@@ -742,7 +776,7 @@
   </div>
 
   <!-- Application Logic -->
-  <script src="app.js?v=20260927_1200"></script>
+  <script src="app.js?v=20261005_1200"></script>
 </body>
 </html>
 

@@ -8,7 +8,7 @@ import os
 import json
 import datetime
 import traceback
-from scrapers import ica, coop, willys, lidl, hemkop, willys_search, product_info, origin
+from scrapers import ica, coop, willys, lidl, hemkop, willys_search, product_info, origin, recipes
 from scrapers.categorizer import categorize_offer
 
 
@@ -114,6 +114,25 @@ def main():
 
     add_origins(all_offers, info["products"])
 
+    # Dinner recipes from ica.se whose protein is on offer -> public/recipes.json. Their
+    # ingredients point at the offers in deals.json by index, so this runs after the offers
+    # are sorted. The recipe pages don't change, so the previous ingredients are reused.
+    print("Fetching recipes from ica.se...")
+    recipes_path = os.path.join("public", "recipes.json")
+    previous_recipes = []
+    try:
+        with open(recipes_path, encoding="utf-8") as f:
+            previous_recipes = json.load(f).get("recipes", [])
+    except (OSError, ValueError, AttributeError):
+        pass
+
+    recipe_list = []
+    try:
+        recipe_list = recipes.build_recipes(all_offers, previous_recipes)
+    except Exception as e:
+        print(f"   [FAIL] Recipes: Failed with error: {e}")
+        traceback.print_exc()
+
     now = datetime.datetime.now(datetime.timezone.utc)
     payload = {
         "updated_at": now.isoformat(),
@@ -132,6 +151,11 @@ def main():
     # Always write the file so the workflow's `git add` finds it
     with open(info_path, "w", encoding="utf-8") as f:
         json.dump(info, f, ensure_ascii=False, indent=2)
+
+    # Without indentation: the offer indexes would take a line each
+    with open(recipes_path, "w", encoding="utf-8") as f:
+        json.dump({"offers_updated_at": payload["updated_at"], "recipes": recipe_list},
+                  f, ensure_ascii=False, separators=(",", ":"))
 
     print("-" * 60)
     print(f"Build complete! Total offers collected: {len(all_offers)}")
