@@ -2577,7 +2577,8 @@ const recipes = {
   status: 'idle', // 'idle' | 'loading' | 'loaded' | 'error'
   offersUpdatedAt: null,
   shown: RECIPES_PAGE_SIZE,
-  activeProtein: 'all'
+  activeProtein: 'all',
+  cheapMeat: false // only recipes whose meat is under 80 kr/kg ("Kött <80 kr/kg")
 };
 
 // Loaded the first time the recipes tab is opened
@@ -2661,7 +2662,9 @@ function getRankedRecipes() {
     if (!protein || protein.available.length === 0) continue;
     const onOffer = ingredients.filter(ingredient => ingredient.available.length > 0 && !ingredient.duplicate).length;
     const total = ingredients.filter(ingredient => !ingredient.duplicate).length;
-    ranked.push({ recipe, ingredients, onOffer, total, ratingScore: getRecipeRatingScore(recipe) });
+    // The protein's offers in "Kött <80 kr/kg" (raw meat under 80 kr/kg)
+    const cheapMeat = protein.available.filter(isMeatUnder80PerKg);
+    ranked.push({ recipe, ingredients, onOffer, total, cheapMeat, ratingScore: getRecipeRatingScore(recipe) });
   }
   return ranked.sort((a, b) => b.onOffer - a.onOffer || b.ratingScore - a.ratingScore);
 }
@@ -2669,7 +2672,12 @@ function getRankedRecipes() {
 function createRecipeOfferHtml(ingredient, recipeIndex, ingredientIndex) {
   const offer = pickIngredientOffer(ingredient.available);
   const perKg = getPricePerKg(offer);
-  const priceText = perKg && /kg/i.test(offer.price || '') ? formatPricePerKg(perKg) : (offer.price || '');
+  const isPerKg = /kg/i.test(offer.price || '');
+  const priceText = perKg && isPerKg ? formatPricePerKg(perKg) : (offer.price || '');
+  // The protein's price per kg also when it is sold per piece
+  const perKgHtml = ingredient.protein && perKg && !isPerKg
+    ? `<span class="block text-[10px] font-semibold text-zinc-500 text-right">${escapeHtml(formatPricePerKg(perKg))}</span>`
+    : '';
   const more = ingredient.available.length > 1 ? ` <span class="text-zinc-400 font-medium">+${ingredient.available.length - 1}</span>` : '';
   return `
     <li>
@@ -2679,7 +2687,10 @@ function createRecipeOfferHtml(ingredient, recipeIndex, ingredientIndex) {
           <span class="block text-xs font-semibold text-zinc-900 truncate">${escapeHtml(ingredient.text)}</span>
           <span class="block text-[11px] text-zinc-500 truncate">${escapeHtml(offer.product || '')} · ${escapeHtml(getShortStoreName(offer.store))}${more}</span>
         </span>
-        <span class="text-xs font-extrabold text-rose-600 whitespace-nowrap">${escapeHtml(priceText)}</span>
+        <span class="whitespace-nowrap">
+          <span class="block text-xs font-extrabold text-rose-600 text-right">${escapeHtml(priceText)}</span>
+          ${perKgHtml}
+        </span>
       </button>
     </li>`;
 }
@@ -2734,7 +2745,7 @@ function createRecipeCardHtml(entry, recipeIndex) {
     </article>`;
 }
 
-function renderRecipeProteinPills(ranked) {
+function renderRecipeProteinPills(ranked, cheapMeatCount) {
   const container = document.getElementById('recipe-protein-pills');
   if (!container) return;
   const counts = new Map();
@@ -2750,7 +2761,17 @@ function renderRecipeProteinPills(ranked) {
         <span class="px-1.5 py-0.2 rounded-full text-[10px] font-bold ${active ? 'bg-zinc-700 text-zinc-100' : 'bg-zinc-100 text-zinc-600'}">${count}</span>
       </button>`;
   };
-  container.innerHTML = pill('all', 'Alla', ranked.length) +
+  // Turned on and off on its own, so it combines with a protein ("Kycklingfilé" under 80 kr/kg)
+  const cheapActive = recipes.cheapMeat;
+  const cheapMeatPill = `
+    <button type="button" data-recipe-cheap-meat aria-pressed="${cheapActive}" class="cursor-pointer select-none px-3 py-1.5 rounded-full text-xs font-bold border transition-all duration-150 flex items-center gap-1.5 ${
+      cheapActive ? 'bg-rose-700 text-white border-rose-700 shadow-sm' : 'bg-rose-50 text-rose-900 border-rose-200/90 hover:bg-rose-100 hover:border-rose-300'
+    }">
+      <span>Kött &lt;80 kr/kg</span>
+      <span class="px-1.5 py-0.2 rounded-full text-[10px] font-bold ${cheapActive ? 'bg-rose-900 text-rose-100' : 'bg-rose-200/80 text-rose-900'}">${cheapMeatCount}</span>
+    </button>
+    <span class="w-px h-5 bg-zinc-200 mx-1" aria-hidden="true"></span>`;
+  container.innerHTML = cheapMeatPill + pill('all', 'Alla', ranked.length) +
     [...counts.entries()].sort((a, b) => b[1] - a[1]).map(([protein, count]) => pill(protein, protein, count)).join('');
 }
 
@@ -2774,11 +2795,21 @@ function renderRecipes() {
     return;
   }
 
-  const ranked = getRankedRecipes();
+  let ranked = getRankedRecipes();
+  const cheapMeatCount = ranked.filter(entry => entry.cheapMeat.length > 0).length;
+  if (recipes.cheapMeat) {
+    // Only the meat offers under 80 kr/kg count for the protein
+    ranked = ranked
+      .filter(entry => entry.cheapMeat.length > 0)
+      .map(entry => ({
+        ...entry,
+        ingredients: entry.ingredients.map(ingredient => ingredient.protein ? { ...ingredient, available: entry.cheapMeat } : ingredient)
+      }));
+  }
   if (recipes.activeProtein !== 'all' && !ranked.some(({ recipe }) => recipe.protein === recipes.activeProtein)) {
     recipes.activeProtein = 'all';
   }
-  renderRecipeProteinPills(ranked);
+  renderRecipeProteinPills(ranked, cheapMeatCount);
 
   const filtered = recipes.activeProtein === 'all' ? ranked : ranked.filter(({ recipe }) => recipe.protein === recipes.activeProtein);
   renderedRecipes = filtered.slice(0, recipes.shown);
@@ -2786,7 +2817,9 @@ function renderRecipes() {
   if (filtered.length === 0) {
     countEl.textContent = recipes.all.length === 0
       ? 'Inga recept den här veckan.'
-      : 'Inget protein i recepten är på extrapris i de valda butikerna.';
+      : recipes.cheapMeat
+        ? 'Inget kött i recepten kostar under 80 kr/kg i de valda butikerna.'
+        : 'Inget protein i recepten är på extrapris i de valda butikerna.';
   } else {
     countEl.innerHTML = `Visar <strong class="text-zinc-900 font-bold">${renderedRecipes.length}</strong> av ${filtered.length} recept`;
   }
@@ -2801,9 +2834,13 @@ function setupRecipesView() {
   });
 
   document.getElementById('recipe-protein-pills')?.addEventListener('click', (e) => {
-    const pill = e.target.closest('[data-recipe-protein]');
-    if (!pill) return;
-    recipes.activeProtein = pill.dataset.recipeProtein;
+    if (e.target.closest('[data-recipe-cheap-meat]')) {
+      recipes.cheapMeat = !recipes.cheapMeat;
+    } else {
+      const pill = e.target.closest('[data-recipe-protein]');
+      if (!pill) return;
+      recipes.activeProtein = pill.dataset.recipeProtein;
+    }
     recipes.shown = RECIPES_PAGE_SIZE;
     renderRecipes();
   });
