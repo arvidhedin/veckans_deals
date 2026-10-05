@@ -267,7 +267,7 @@ FROZEN = re.compile(r"\b(?:fryst|frysta|djupfryst|findus|freshona|apetit)\b")
 # ICA: "Chark", "Skafferivaror" (see the scrapers).
 STORE_CATEGORIES = [
     (r"färdigrätt", "Frys & Färdigmat"),
-    (r"frukt|grönt|grönsaker", "Frukt & Grönt"),
+    (r"frukt(?!gummi)|grönt|grönsaker", "Frukt & Grönt"),  # not Lidl's "Godis & fruktgummi"
     (r"blommor|växter|trädgård", "Övrigt"),
     (r"korv|chark", "Chark & Pålägg"),
     (r"fryst|djupfryst", "Frys & Färdigmat"),
