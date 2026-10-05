@@ -1561,6 +1561,12 @@ function sortOffers(offers, sortBy) {
       const pctB = parseFloat(b.discount_percentage) || 0;
       return pctB - pctA;
     }
+    if (sortBy === 'price-per-kg-asc') {
+      // Offers without a price per kg come last
+      const perKgA = getPricePerKg(a)?.min ?? Infinity;
+      const perKgB = getPricePerKg(b)?.min ?? Infinity;
+      return perKgA === perKgB ? 0 : perKgA - perKgB;
+    }
     if (sortBy === 'price-asc') {
       return extractPerUnitDealPriceJS(a.price).pricePerUnit - extractPerUnitDealPriceJS(b.price).pricePerUnit;
     }
@@ -1771,6 +1777,12 @@ function createDealCardHtml(offer, index) {
     ? `<div class="text-[9px] sm:text-xs line-through text-zinc-400 font-medium leading-none">${escapeHtml(offer.original_price)}</div>` 
     : '';
 
+  // The price per kg to compare with, unless the price already is per kg
+  const pricePerKg = extractPerUnitDealPriceJS(offer.price).isExplicitPerKg ? '' : describePricePerKg(offer);
+  const pricePerKgHtml = pricePerKg
+    ? `<div class="text-[8px] sm:text-[10px] md:text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/70 px-1 sm:px-2 py-0.5 rounded w-fit mt-1 truncate max-w-full" title="Jämförpris">${escapeHtml(pricePerKg)}</div>`
+    : '';
+
   const discountTagHtml = offer.discount 
     ? `<div class="text-[8px] sm:text-[10px] md:text-[11px] font-semibold bg-rose-50 text-rose-600 border border-rose-200/60 px-1 sm:px-2 py-0.5 rounded w-fit mt-1 truncate max-w-full">${escapeHtml(offer.discount)}</div>` 
     : '';
@@ -1799,7 +1811,7 @@ function createDealCardHtml(offer, index) {
        </div>`;
 
   return `
-    <div data-deal-index="${index}" class="deal-card cursor-pointer group bg-white rounded-xl sm:rounded-2xl border border-zinc-200/80 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-200 flex flex-col h-[320px] sm:h-[390px] md:h-[430px] relative overflow-hidden">
+    <div data-deal-index="${index}" class="deal-card cursor-pointer group bg-white rounded-xl sm:rounded-2xl border border-zinc-200/80 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-200 flex flex-col min-h-[320px] sm:min-h-[390px] md:min-h-[430px] relative overflow-hidden">
       <!-- Store Badge Overlay -->
       <span class="absolute top-1.5 left-1.5 sm:top-2.5 sm:left-2.5 px-1.5 py-0.5 sm:px-2 sm:py-0.75 rounded text-[7.5px] leading-[1.1] sm:text-[10px] md:text-[11px] font-bold tracking-wide uppercase text-white shadow-sm z-10 max-w-[calc(100%-42px)] sm:max-w-none line-clamp-2 break-words text-left" style="background-color: ${storeBadgeColor};" title="${escapeHtml(store)}">
         ${escapeHtml(shortStore)}
@@ -1841,6 +1853,7 @@ function createDealCardHtml(offer, index) {
           <div class="text-xs sm:text-base md:text-xl font-black text-rose-600 tracking-tight leading-none mt-0.5">
             ${priceStr}
           </div>
+          ${pricePerKgHtml}
           ${discountTagHtml}
           ${restrictionBadgeHtml}
           ${cartButtonHtml}
