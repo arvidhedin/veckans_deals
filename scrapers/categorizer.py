@@ -64,7 +64,7 @@ KEYWORDS = {
         sillsallad strömming strömming* surströmming* makrill makrill* tonfisk* tuna
         räkor räka räk* kräftor kräfta kräft* hummer krabba krabb* musslor ostron
         skaldjur scampi calamares calamari bläckfisk gös abborre röding öring gädda
-        hälleflundra spätta rödspätta* pollock kolja kummel pangasius* tilapia hoki
+        flundra spätta rödspätta* pollock kolja kummel pangasius* tilapia hoki
         sjötunga rödtunga piggvar havskatt surimi surimi* sardeller ansjovis kaviar
         caviar =rom löjrom stenbitsrom torskrom laxrom forellrom sikrom
     """,
@@ -139,7 +139,8 @@ KEYWORDS = {
         chips snacks snack popcorn popcornkärnor bågar krokar nachos cheez_doodles
         doodles flips nötter nötmix nötblandning mandlar cashew cashew* pistage*
         macadamia djungelmix lakritsmix godismix partymix godis godis* lösviktgodis
-        choklad choklad* chokladkaka chokladkakor chokladägg påskägg godisägg
+        godisben choklad choklad* chokladkaka chokladkakor chokladägg påskägg godisägg
+        =klubba =klubbor chokladklubba chokladklubbor godisklubba godisklubbor karameller
         marsipanbröd praliner tryffel =kola kolor tuggummi pastiller halstabletter
         marshmallows skumtomtar skumbollar gelehallon sega_råttor =bilar ferrari
         ferrari* s-märken gott_&_blandat delicato delicato* mozartkulor nougat marsipan
