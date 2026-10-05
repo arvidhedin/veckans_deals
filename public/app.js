@@ -1394,6 +1394,79 @@ function filterLidlOffers(lidlOffers, period) {
   return filtered;
 }
 
+// --- Chosen stores, Lidl period and sort order (remembered until the next visit) ---
+const FILTERS_STORAGE_KEY = 'veckans_deals_filters_v1';
+
+// Names some stores had in older data, chosen together with the store's checkbox
+const STORE_ALIASES = {
+  'Hemköp (Svava)': 'Hemköp',
+  'Coop (Centralhuset)': 'Coop',
+  'Willys': 'Willys (Björkgatan)'
+};
+
+function setStoreSelected(storeName, selected) {
+  for (const name of [storeName, STORE_ALIASES[storeName]]) {
+    if (!name) continue;
+    if (selected) state.selectedStores.add(name);
+    else state.selectedStores.delete(name);
+  }
+}
+
+// The Lidl period can only be chosen when Lidl is
+function updateLidlPeriodSection() {
+  const lidlSection = document.getElementById('lidl-filter-section');
+  if (!lidlSection) return;
+  const lidlSelected = state.selectedStores.has('Lidl');
+  lidlSection.classList.toggle('opacity-40', !lidlSelected);
+  lidlSection.classList.toggle('pointer-events-none', !lidlSelected);
+}
+
+// The unticked stores are saved rather than the ticked ones, so a store added to the site later is shown
+function saveFiltersToStorage() {
+  const deselectedStores = [...document.querySelectorAll('.store-filter')]
+    .filter(cb => !cb.checked)
+    .map(cb => cb.dataset.store);
+  try {
+    localStorage.setItem(FILTERS_STORAGE_KEY, JSON.stringify({
+      deselectedStores,
+      lidlPeriod: state.lidlPeriod,
+      sortBy: state.sortBy
+    }));
+  } catch (e) {
+    console.error('Failed to save filters to localStorage', e);
+  }
+}
+
+function restoreFiltersFromStorage() {
+  let saved = null;
+  try {
+    saved = JSON.parse(localStorage.getItem(FILTERS_STORAGE_KEY));
+  } catch (e) {
+    console.error('Failed to load filters from localStorage', e);
+  }
+  if (!saved || typeof saved !== 'object') return;
+
+  const deselectedStores = new Set(Array.isArray(saved.deselectedStores) ? saved.deselectedStores : []);
+  document.querySelectorAll('.store-filter').forEach(cb => {
+    if (!deselectedStores.has(cb.dataset.store)) return;
+    cb.checked = false;
+    setStoreSelected(cb.dataset.store, false);
+  });
+  updateLidlPeriodSection();
+
+  const lidlRadio = [...document.querySelectorAll('input[name="lidl-period"]')].find(radio => radio.value === saved.lidlPeriod);
+  if (lidlRadio) {
+    lidlRadio.checked = true;
+    state.lidlPeriod = lidlRadio.value;
+  }
+
+  const sortSelect = document.getElementById('sort-select');
+  if (sortSelect && [...sortSelect.options].some(option => option.value === saved.sortBy)) {
+    sortSelect.value = saved.sortBy;
+    state.sortBy = saved.sortBy;
+  }
+}
+
 // --- Filtering & Sorting Core ---
 // Offers from the selected stores (Lidl also limited to the chosen period)
 function getStoreFilteredOffers() {
@@ -1462,12 +1535,16 @@ function applyFilters() {
   renderDeals();
   renderResultsCount();
   updateMobileFilterBadge();
+  updateLidlPeriodSection();
 
   // 7. Willys Reference Prices
   updateWillysReferenceBox(q);
 
   // 8. The recipes count the offers in the chosen stores
   renderRecipes();
+
+  // 9. The chosen stores, Lidl period and sort order are kept until the next visit
+  saveFiltersToStorage();
 }
 
 function parsePriceNumeric(priceStr) {
@@ -3058,28 +3135,7 @@ function setupEventListeners() {
   const storeCheckboxes = document.querySelectorAll('.store-filter');
   storeCheckboxes.forEach(cb => {
     cb.addEventListener('change', (e) => {
-      const storeName = e.target.dataset.store;
-      if (e.target.checked) {
-        state.selectedStores.add(storeName);
-        if (storeName === 'Hemköp (Svava)') state.selectedStores.add('Hemköp');
-        if (storeName === 'Coop (Centralhuset)') state.selectedStores.add('Coop');
-        if (storeName === 'Willys') state.selectedStores.add('Willys (Björkgatan)');
-      } else {
-        state.selectedStores.delete(storeName);
-        if (storeName === 'Hemköp (Svava)') state.selectedStores.delete('Hemköp');
-        if (storeName === 'Coop (Centralhuset)') state.selectedStores.delete('Coop');
-        if (storeName === 'Willys') state.selectedStores.delete('Willys (Björkgatan)');
-      }
-      
-      const lidlSection = document.getElementById('lidl-filter-section');
-      if (lidlSection) {
-        if (state.selectedStores.has('Lidl')) {
-          lidlSection.classList.remove('opacity-40', 'pointer-events-none');
-        } else {
-          lidlSection.classList.add('opacity-40', 'pointer-events-none');
-        }
-      }
-
+      setStoreSelected(e.target.dataset.store, e.target.checked);
       applyFilters();
     });
   });
@@ -3101,11 +3157,8 @@ function setupEventListeners() {
     btnSelectAll.addEventListener('click', () => {
       storeCheckboxes.forEach(cb => {
         cb.checked = true;
-        state.selectedStores.add(cb.dataset.store);
+        setStoreSelected(cb.dataset.store, true);
       });
-      state.selectedStores.add('Hemköp');
-      state.selectedStores.add('Coop');
-      state.selectedStores.add('Willys (Björkgatan)');
       applyFilters();
     });
   }
@@ -3171,7 +3224,7 @@ function setupEventListeners() {
     btnReset.addEventListener('click', () => {
       storeCheckboxes.forEach(cb => {
         cb.checked = true;
-        state.selectedStores.add(cb.dataset.store);
+        setStoreSelected(cb.dataset.store, true);
       });
       ALL_CATEGORIES.forEach(c => state.selectedCategories.add(c));
       state.activeCategoryPill = 'all';
@@ -3193,6 +3246,7 @@ function setupEventListeners() {
 // --- Initialization on DOM Load ---
 document.addEventListener('DOMContentLoaded', () => {
   state.cart = loadCartFromStorage();
+  restoreFiltersFromStorage();
   setupEventListeners();
   setupFacebookSection();
   setupRecipesView();
