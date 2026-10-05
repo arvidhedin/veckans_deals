@@ -3,10 +3,10 @@ name: Scrape Offers and Deploy Data
 on:
   schedule:
     # GitHub often starts scheduled runs hours late, especially on the hour (the old
-    # 02:00 UTC run started at 07–09 UTC). Two runs at odd minutes, both after midnight
-    # Swedish time (UTC+2 in summer, UTC+1 in winter), so the data is fresh by morning:
+    # 02:00 UTC run started at 07–09 UTC). Once a night at an odd minute, early enough
+    # after midnight Swedish time (UTC+2 in summer, UTC+1 in winter) that the data is
+    # fresh by morning even when the run starts late:
     - cron: '17 23 * * *'  # 01:17 summer time / 00:17 winter time
-    - cron: '47 1 * * *'   # 03:47 summer time / 02:47 winter time
   workflow_dispatch: # Allows manual trigger from GitHub Actions tab
 
 permissions:
