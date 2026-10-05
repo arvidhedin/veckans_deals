@@ -1514,11 +1514,14 @@ function applyFilters() {
       const product = (offer.product || '').toLowerCase();
       const brand = (offer.brand || '').toLowerCase();
       const desc = (offer.description || '').toLowerCase();
-      const cat = (offer.category || '').toLowerCase();
-      const combined = `${product} ${brand} ${desc} ${cat}`;
+      const combined = `${product} ${brand} ${desc}`;
+      // A category matches from the start of a word only: "fisk" finds Fisk & Skaldjur,
+      // but "kaffe" not all of Skafferi and "ägg" not all of Chark & Pålägg
+      const category = ` ${(offer.category || '').toLowerCase()}`;
+      const matches = text => combined.includes(text) || category.includes(` ${text}`);
       
-      if (combined.includes(q)) return true;
-      return queryTokens.every(token => combined.includes(token));
+      if (matches(q)) return true;
+      return queryTokens.every(matches);
     });
   }
 
