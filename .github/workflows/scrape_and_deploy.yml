@@ -44,7 +44,7 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add public/deals.json public/product_info.json public/recipes.json
+          git add public/deals.json public/product_info.json public/recipes.json data/ingredient_prices.json
 
           # Only commit and push if the data files have changes
           if git diff --staged --quiet; then

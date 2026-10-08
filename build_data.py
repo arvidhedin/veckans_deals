@@ -8,7 +8,7 @@ import os
 import json
 import datetime
 import traceback
-from scrapers import ica, coop, willys, lidl, hemkop, willys_search, product_info, origin, recipes
+from scrapers import ica, coop, willys, lidl, hemkop, willys_search, product_info, origin, recipes, recipe_costs
 from scrapers.categorizer import categorize_offer
 
 
@@ -133,6 +133,22 @@ def main():
         print(f"   [FAIL] Recipes: Failed with error: {e}")
         traceback.print_exc()
 
+    # What the recipes cost per portion, roughly: every ingredient's amount and its ordinary
+    # price at Willys. The prices are kept between builds in data/ingredient_prices.json.
+    print("Pricing the recipes' ingredients at Willys...")
+    prices_path = os.path.join("data", "ingredient_prices.json")
+    ingredient_prices = {}
+    try:
+        with open(prices_path, encoding="utf-8") as f:
+            ingredient_prices = json.load(f)
+    except (OSError, ValueError):
+        pass
+    try:
+        ingredient_prices = recipe_costs.add_costs(recipe_list, ingredient_prices)
+    except Exception as e:
+        print(f"   [FAIL] Recipe costs: Failed with error: {e}")
+        traceback.print_exc()
+
     now = datetime.datetime.now(datetime.timezone.utc)
     payload = {
         "updated_at": now.isoformat(),
@@ -156,6 +172,10 @@ def main():
     with open(recipes_path, "w", encoding="utf-8") as f:
         json.dump({"offers_updated_at": payload["updated_at"], "recipes": recipe_list},
                   f, ensure_ascii=False, separators=(",", ":"))
+
+    os.makedirs("data", exist_ok=True)
+    with open(prices_path, "w", encoding="utf-8") as f:
+        json.dump(ingredient_prices, f, ensure_ascii=False, indent=1)
 
     print("-" * 60)
     print(f"Build complete! Total offers collected: {len(all_offers)}")

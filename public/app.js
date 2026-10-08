@@ -2665,13 +2665,17 @@ const RECIPES_PAGE_SIZE = 24;
 
 const RECIPES_URL = 'recipes.json';
 
+// "Under 20 kr/port": the estimated price per portion, rounded to whole kronor, is below this
+const CHEAP_PORTION_LIMIT = 20;
+
 const recipes = {
   all: [],
   status: 'idle', // 'idle' | 'loading' | 'loaded' | 'error'
   offersUpdatedAt: null,
   shown: RECIPES_PAGE_SIZE,
   activeProtein: 'all',
-  cheapMeat: false // only recipes whose meat is under 80 kr/kg ("Kött <80 kr/kg")
+  cheapMeat: false, // only recipes whose meat is under 80 kr/kg ("Kött <80 kr/kg")
+  cheapPortion: false // only recipes estimated under 20 kr per portion ("Under 20 kr/port")
 };
 
 // Loaded the first time the recipes tab is opened
@@ -2731,6 +2735,45 @@ function pickIngredientOffer(offers) {
   )[0];
 }
 
+// What an ingredient line costs with an offer: its amount (kg, from scrapers/recipe_costs.py) at
+// the offer's price per kg, or whole packages ("1 förp räkor") at the offer's price
+function getOfferCost(ingredient, offer) {
+  const costs = [];
+  const perKg = getPricePerKg(offer);
+  if (ingredient.kg && perKg) costs.push(ingredient.kg * perKg.min);
+  if (ingredient.pack && ingredient.st) {
+    const { pricePerUnit, isExplicitPerKg } = extractPerUnitDealPriceJS(offer.price);
+    if (pricePerUnit > 0 && !isExplicitPerKg) costs.push(ingredient.st * pricePerUnit);
+  }
+  return costs.length > 0 ? Math.min(...costs) : null;
+}
+
+// What an ingredient line costs, roughly: the cheapest of its offers in the chosen stores and
+// Willys' ordinary price ("cost"). A store's price per kg can be misleading ("Kokosmjölk,
+// Asiatisk/Indisk kryddmix" at the kryddmix's 292 kr/kg), so an offer never makes a line cost
+// more than the ordinary price. null when unknown.
+function getIngredientCost(ingredient) {
+  const costs = ingredient.available.map(offer => getOfferCost(ingredient, offer)).filter(cost => cost !== null);
+  if (typeof ingredient.cost === 'number') costs.push(ingredient.cost);
+  return costs.length > 0 ? Math.min(...costs) : null;
+}
+
+// The estimated price per portion, or null when the recipe doesn't say how many it serves (or
+// the build couldn't price its ingredients)
+function getCostPerPortion(recipe, ingredients) {
+  if (!(recipe.portions > 0) || !ingredients.some(ingredient => typeof ingredient.cost === 'number')) return null;
+  const total = ingredients.reduce((sum, ingredient) => sum + (getIngredientCost(ingredient) || 0), 0);
+  return total / recipe.portions;
+}
+
+function isCheapPortion(entry) {
+  return entry.costPerPortion !== null && Math.round(entry.costPerPortion) < CHEAP_PORTION_LIMIT;
+}
+
+function formatCost(kr) {
+  return kr < 1 ? '<1 kr' : `${Math.round(kr)} kr`;
+}
+
 // A rating with few votes counts less (3.5 stars from 20 votes are added)
 function getRecipeRatingScore(recipe) {
   const votes = recipe.votes || 0;
@@ -2757,9 +2800,20 @@ function getRankedRecipes() {
     const total = ingredients.filter(ingredient => !ingredient.duplicate).length;
     // The protein's offers in "Kött <80 kr/kg" (raw meat under 80 kr/kg)
     const cheapMeat = protein.available.filter(isMeatUnder80PerKg);
-    ranked.push({ recipe, ingredients, onOffer, total, cheapMeat, ratingScore: getRecipeRatingScore(recipe) });
+    const costPerPortion = getCostPerPortion(recipe, ingredients);
+    ranked.push({ recipe, ingredients, onOffer, total, cheapMeat, costPerPortion, ratingScore: getRecipeRatingScore(recipe) });
   }
   return ranked.sort((a, b) => b.onOffer - a.onOffer || b.ratingScore - a.ratingScore);
+}
+
+// "Kött <80 kr/kg": the recipes whose meat is under 80 kr/kg, and only those offers count for it
+function withCheapMeat(ranked) {
+  return ranked
+    .filter(entry => entry.cheapMeat.length > 0)
+    .map(entry => {
+      const ingredients = entry.ingredients.map(ingredient => ingredient.protein ? { ...ingredient, available: entry.cheapMeat } : ingredient);
+      return { ...entry, ingredients, costPerPortion: getCostPerPortion(entry.recipe, ingredients) };
+    });
 }
 
 function createRecipeOfferHtml(ingredient, recipeIndex, ingredientIndex) {
@@ -2789,7 +2843,7 @@ function createRecipeOfferHtml(ingredient, recipeIndex, ingredientIndex) {
 }
 
 function createRecipeCardHtml(entry, recipeIndex) {
-  const { recipe, ingredients, onOffer, total } = entry;
+  const { recipe, ingredients, onOffer, total, costPerPortion } = entry;
   const offered = ingredients
     .map((ingredient, i) => ({ ingredient, i }))
     .filter(({ ingredient }) => ingredient.available.length > 0 && !ingredient.duplicate)
@@ -2811,6 +2865,7 @@ function createRecipeCardHtml(entry, recipeIndex) {
       <a href="${escapeHtml(recipe.url)}" target="_blank" rel="noopener" class="block relative aspect-[4/3] bg-zinc-100 overflow-hidden group">
         ${recipe.image_url ? `<img src="${escapeHtml(recipe.image_url)}" alt="" loading="lazy" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105">` : ''}
         <span class="absolute top-2.5 left-2.5 px-2 py-1 rounded-lg bg-rose-600 text-white text-[11px] font-extrabold shadow-sm">${onOffer} av ${total} på extrapris</span>
+        ${costPerPortion !== null ? `<span class="absolute top-2.5 right-2.5 px-2 py-1 rounded-lg bg-white/95 text-zinc-900 text-[11px] font-extrabold shadow-sm" title="Uppskattat pris per portion: extrapriset i dina valda butiker, annars Willys ordinarie pris">ca ${formatCost(costPerPortion)}/port</span>` : ''}
       </a>
       <div class="p-3.5 sm:p-4 flex flex-col gap-3 flex-grow">
         <div>
@@ -2827,7 +2882,10 @@ function createRecipeCardHtml(entry, recipeIndex) {
           <details class="text-xs text-zinc-600 group/details">
             <summary class="cursor-pointer select-none font-semibold text-zinc-500 hover:text-zinc-800">Övriga ingredienser (${others.length})</summary>
             <ul class="mt-1.5 space-y-0.5 pl-1">
-              ${others.map(ingredient => `<li>${escapeHtml(ingredient.text)}</li>`).join('')}
+              ${others.map(ingredient => {
+                const cost = getIngredientCost(ingredient);
+                return `<li class="flex justify-between gap-3"><span>${escapeHtml(ingredient.text)}</span>${cost !== null ? `<span class="shrink-0 text-zinc-400">${formatCost(cost)}</span>` : ''}</li>`;
+              }).join('')}
             </ul>
           </details>` : ''}
         <a href="${escapeHtml(recipe.url)}" target="_blank" rel="noopener" class="mt-auto inline-flex items-center gap-1 text-xs font-semibold text-rose-600 hover:underline">
@@ -2838,7 +2896,7 @@ function createRecipeCardHtml(entry, recipeIndex) {
     </article>`;
 }
 
-function renderRecipeProteinPills(ranked, cheapMeatCount) {
+function renderRecipeProteinPills(ranked, cheapMeatCount, cheapPortionCount) {
   const container = document.getElementById('recipe-protein-pills');
   if (!container) return;
   const counts = new Map();
@@ -2854,17 +2912,26 @@ function renderRecipeProteinPills(ranked, cheapMeatCount) {
         <span class="px-1.5 py-0.2 rounded-full text-[10px] font-bold ${active ? 'bg-zinc-700 text-zinc-100' : 'bg-zinc-100 text-zinc-600'}">${count}</span>
       </button>`;
   };
-  // Turned on and off on its own, so it combines with a protein ("Kycklingfilé" under 80 kr/kg)
-  const cheapActive = recipes.cheapMeat;
+  // Turned on and off on their own, so they combine with each other and with a protein
+  // ("Kycklingfilé" under 80 kr/kg)
+  const cheapMeatActive = recipes.cheapMeat;
   const cheapMeatPill = `
-    <button type="button" data-recipe-cheap-meat aria-pressed="${cheapActive}" class="cursor-pointer select-none px-3 py-1.5 rounded-full text-xs font-bold border transition-all duration-150 flex items-center gap-1.5 ${
-      cheapActive ? 'bg-rose-700 text-white border-rose-700 shadow-sm' : 'bg-rose-50 text-rose-900 border-rose-200/90 hover:bg-rose-100 hover:border-rose-300'
+    <button type="button" data-recipe-cheap-meat aria-pressed="${cheapMeatActive}" class="cursor-pointer select-none px-3 py-1.5 rounded-full text-xs font-bold border transition-all duration-150 flex items-center gap-1.5 ${
+      cheapMeatActive ? 'bg-rose-700 text-white border-rose-700 shadow-sm' : 'bg-rose-50 text-rose-900 border-rose-200/90 hover:bg-rose-100 hover:border-rose-300'
     }">
       <span>Kött &lt;80 kr/kg</span>
-      <span class="px-1.5 py-0.2 rounded-full text-[10px] font-bold ${cheapActive ? 'bg-rose-900 text-rose-100' : 'bg-rose-200/80 text-rose-900'}">${cheapMeatCount}</span>
+      <span class="px-1.5 py-0.2 rounded-full text-[10px] font-bold ${cheapMeatActive ? 'bg-rose-900 text-rose-100' : 'bg-rose-200/80 text-rose-900'}">${cheapMeatCount}</span>
+    </button>`;
+  const cheapPortionActive = recipes.cheapPortion;
+  const cheapPortionPill = `
+    <button type="button" data-recipe-cheap-portion aria-pressed="${cheapPortionActive}" title="Uppskattat pris per portion: extrapriset i dina valda butiker, annars Willys ordinarie pris" class="cursor-pointer select-none px-3 py-1.5 rounded-full text-xs font-bold border transition-all duration-150 flex items-center gap-1.5 ${
+      cheapPortionActive ? 'bg-emerald-700 text-white border-emerald-700 shadow-sm' : 'bg-emerald-50 text-emerald-900 border-emerald-200/90 hover:bg-emerald-100 hover:border-emerald-300'
+    }">
+      <span>Under ${CHEAP_PORTION_LIMIT} kr/port</span>
+      <span class="px-1.5 py-0.2 rounded-full text-[10px] font-bold ${cheapPortionActive ? 'bg-emerald-900 text-emerald-100' : 'bg-emerald-200/80 text-emerald-900'}">${cheapPortionCount}</span>
     </button>
     <span class="w-px h-5 bg-zinc-200 mx-1" aria-hidden="true"></span>`;
-  container.innerHTML = cheapMeatPill + pill('all', 'Alla', ranked.length) +
+  container.innerHTML = cheapMeatPill + cheapPortionPill + pill('all', 'Alla', ranked.length) +
     [...counts.entries()].sort((a, b) => b[1] - a[1]).map(([protein, count]) => pill(protein, protein, count)).join('');
 }
 
@@ -2888,21 +2955,17 @@ function renderRecipes() {
     return;
   }
 
-  let ranked = getRankedRecipes();
-  const cheapMeatCount = ranked.filter(entry => entry.cheapMeat.length > 0).length;
-  if (recipes.cheapMeat) {
-    // Only the meat offers under 80 kr/kg count for the protein
-    ranked = ranked
-      .filter(entry => entry.cheapMeat.length > 0)
-      .map(entry => ({
-        ...entry,
-        ingredients: entry.ingredients.map(ingredient => ingredient.protein ? { ...ingredient, available: entry.cheapMeat } : ingredient)
-      }));
-  }
+  // Each filter button counts the recipes it would show together with the other one
+  const all = getRankedRecipes();
+  const cheapMeat = withCheapMeat(all);
+  const meatFiltered = recipes.cheapMeat ? cheapMeat : all;
+  const cheapMeatCount = (recipes.cheapPortion ? cheapMeat.filter(isCheapPortion) : cheapMeat).length;
+  const cheapPortionCount = meatFiltered.filter(isCheapPortion).length;
+  const ranked = recipes.cheapPortion ? meatFiltered.filter(isCheapPortion) : meatFiltered;
   if (recipes.activeProtein !== 'all' && !ranked.some(({ recipe }) => recipe.protein === recipes.activeProtein)) {
     recipes.activeProtein = 'all';
   }
-  renderRecipeProteinPills(ranked, cheapMeatCount);
+  renderRecipeProteinPills(ranked, cheapMeatCount, cheapPortionCount);
 
   const filtered = recipes.activeProtein === 'all' ? ranked : ranked.filter(({ recipe }) => recipe.protein === recipes.activeProtein);
   renderedRecipes = filtered.slice(0, recipes.shown);
@@ -2910,9 +2973,11 @@ function renderRecipes() {
   if (filtered.length === 0) {
     countEl.textContent = recipes.all.length === 0
       ? 'Inga recept den här veckan.'
-      : recipes.cheapMeat
-        ? 'Inget kött i recepten kostar under 80 kr/kg i de valda butikerna.'
-        : 'Inget protein i recepten är på extrapris i de valda butikerna.';
+      : recipes.cheapPortion
+        ? `Inga recept${recipes.cheapMeat ? ' med kött under 80 kr/kg' : ''} kostar under ${CHEAP_PORTION_LIMIT} kr/portion i de valda butikerna.`
+        : recipes.cheapMeat
+          ? 'Inget kött i recepten kostar under 80 kr/kg i de valda butikerna.'
+          : 'Inget protein i recepten är på extrapris i de valda butikerna.';
   } else {
     countEl.innerHTML = `Visar <strong class="text-zinc-900 font-bold">${renderedRecipes.length}</strong> av ${filtered.length} recept`;
   }
@@ -2929,6 +2994,8 @@ function setupRecipesView() {
   document.getElementById('recipe-protein-pills')?.addEventListener('click', (e) => {
     if (e.target.closest('[data-recipe-cheap-meat]')) {
       recipes.cheapMeat = !recipes.cheapMeat;
+    } else if (e.target.closest('[data-recipe-cheap-portion]')) {
+      recipes.cheapPortion = !recipes.cheapPortion;
     } else {
       const pill = e.target.closest('[data-recipe-protein]');
       if (!pill) return;
