@@ -268,6 +268,31 @@ function extractPackageWeightInKgJS(text) {
   return 0;
 }
 
+// Package volume in litres (e.g. "5 dl", "2,5dl", "1,5 l", "2x200 ml"), 0 when unknown.
+// A unit must not run on into a word ("3 lök" is not 3 l).
+function extractPackageVolumeInLitresJS(text) {
+  if (!text) return 0;
+  const s = String(text).toLowerCase().replace(/\s+/g, ' ');
+  const litresPerUnit = { ml: 0.001, cl: 0.01, dl: 0.1, l: 1, liter: 1 };
+
+  // Range (e.g. 50-300ml, 1-1,5 l): the package size is unknown
+  if (/\d\s*(?:ml|cl|dl|liter|l)?\s*[-–—]\s*\d+(?:[.,]\d+)?\s*(?:ml|cl|dl|liter|l)(?![a-zåäö])/.test(s)) return 0;
+
+  // Multipack (e.g. 2x200 ml, 4 x 1 l)
+  const mMulti = s.match(/(\d+)\s*[x×]\s*(\d+(?:[.,]\d+)?)\s*(ml|cl|dl|liter|l)(?![a-zåäö])/);
+  if (mMulti) {
+    return parseFloat(mMulti[1]) * parseFloat(mMulti[2].replace(',', '.')) * litresPerUnit[mMulti[3]];
+  }
+
+  // Single volume (e.g. 5 dl, 2,5dl, 1,5 l)
+  const mSingle = s.match(/(\d+(?:[.,]\d+)?)\s*(ml|cl|dl|liter|l)(?![a-zåäö])/);
+  if (mSingle) {
+    return parseFloat(mSingle[1].replace(',', '.')) * litresPerUnit[mSingle[2]];
+  }
+
+  return 0;
+}
+
 // --- Shopping List (Inköpslista) & Savings Calculator Engine ---
 const CART_STORAGE_KEY = 'veckans_deals_cart_v1';
 
@@ -2727,20 +2752,30 @@ function getIngredientOffers(ingredient, available) {
   return (ingredient.offers || []).map(i => state.allOffers[i]).filter(offer => offer && available.has(offer));
 }
 
-// The best offer for an ingredient: the lowest price per kg, otherwise the biggest discount
-function pickIngredientOffer(offers) {
+// The best offer for an ingredient: the one that makes its line cheapest, so the card shows the
+// offer the estimate uses, otherwise the lowest price per kg, otherwise the biggest discount
+function pickIngredientOffer(offers, ingredient = null) {
+  const lineCost = offer => (ingredient && getOfferCost(ingredient, offer)) ?? Infinity;
   const perKg = offer => getPricePerKg(offer)?.min ?? Infinity;
   return [...offers].sort((a, b) =>
-    perKg(a) - perKg(b) || (parseFloat(b.discount_percentage) || 0) - (parseFloat(a.discount_percentage) || 0)
+    lineCost(a) - lineCost(b) || perKg(a) - perKg(b) ||
+    (parseFloat(b.discount_percentage) || 0) - (parseFloat(a.discount_percentage) || 0)
   )[0];
 }
 
 // What an ingredient line costs with an offer: its amount (kg, from scrapers/recipe_costs.py) at
-// the offer's price per kg, or whole packages ("1 förp räkor") at the offer's price
+// the offer's price per kg – or per litre for liquids, which have no weight ("2 för 45:-" for
+// "5 dl" grädde is 45 kr/l, and a litre is stored as 1 kg) – or whole packages ("1 förp räkor")
+// at the offer's price
 function getOfferCost(ingredient, offer) {
   const costs = [];
   const perKg = getPricePerKg(offer);
   if (ingredient.kg && perKg) costs.push(ingredient.kg * perKg.min);
+  if (ingredient.kg && !perKg) {
+    const { pricePerUnit } = extractPerUnitDealPriceJS(offer.price);
+    const litres = extractPackageVolumeInLitresJS(`${offer.description || ''} ${offer.product || ''}`);
+    if (pricePerUnit > 0 && litres > 0) costs.push(ingredient.kg * pricePerUnit / litres);
+  }
   if (ingredient.pack && ingredient.st) {
     const { pricePerUnit, isExplicitPerKg } = extractPerUnitDealPriceJS(offer.price);
     if (pricePerUnit > 0 && !isExplicitPerKg) costs.push(ingredient.st * pricePerUnit);
@@ -2817,13 +2852,19 @@ function withCheapMeat(ranked) {
 }
 
 function createRecipeOfferHtml(ingredient, recipeIndex, ingredientIndex) {
-  const offer = pickIngredientOffer(ingredient.available);
+  const offer = pickIngredientOffer(ingredient.available, ingredient);
   const perKg = getPricePerKg(offer);
   const isPerKg = /kg/i.test(offer.price || '');
   const priceText = perKg && isPerKg ? formatPricePerKg(perKg) : (offer.price || '');
-  // The protein's price per kg also when it is sold per piece
-  const perKgHtml = ingredient.protein && perKg && !isPerKg
-    ? `<span class="block text-[10px] font-semibold text-zinc-500 text-right">${escapeHtml(formatPricePerKg(perKg))}</span>`
+  // Under the price: the protein's price per kg also when it is sold per piece, and what the line
+  // costs ("ca 40 kr")
+  const cost = getIngredientCost(ingredient);
+  const underPrice = [
+    ingredient.protein && perKg && !isPerKg ? formatPricePerKg(perKg) : '',
+    cost === null ? '' : cost < 1 ? formatCost(cost) : `ca ${formatCost(cost)}`
+  ].filter(Boolean).join(' · ');
+  const underPriceHtml = underPrice
+    ? `<span class="block text-[10px] font-semibold text-zinc-500 text-right">${escapeHtml(underPrice)}</span>`
     : '';
   const more = ingredient.available.length > 1 ? ` <span class="text-zinc-400 font-medium">+${ingredient.available.length - 1}</span>` : '';
   return `
@@ -2836,7 +2877,7 @@ function createRecipeOfferHtml(ingredient, recipeIndex, ingredientIndex) {
         </span>
         <span class="whitespace-nowrap">
           <span class="block text-xs font-extrabold text-rose-600 text-right">${escapeHtml(priceText)}</span>
-          ${perKgHtml}
+          ${underPriceHtml}
         </span>
       </button>
     </li>`;
@@ -3010,7 +3051,7 @@ function setupRecipesView() {
     if (!button) return;
     const [recipeIndex, ingredientIndex] = button.dataset.recipeOffer.split(':').map(Number);
     const ingredient = renderedRecipes[recipeIndex]?.ingredients[ingredientIndex];
-    if (ingredient) openProductModal(pickIngredientOffer(ingredient.available));
+    if (ingredient) openProductModal(pickIngredientOffer(ingredient.available, ingredient));
   });
 
   document.getElementById('btn-recipes-more')?.addEventListener('click', () => {
