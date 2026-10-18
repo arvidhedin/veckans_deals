@@ -6,9 +6,41 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <title>Veckans Deals | Jämför matpriser</title>
-  <meta name="description" content="Hitta och jämför veckans bästa erbjudanden från ICA, Willys, Hemköp, Coop och Lidl i Uppsala.">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23E11D48'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z'/></svg>">
+  <title>Veckans Deals Uppsala – erbjudanden på ICA, Willys, Coop & Lidl</title>
+  <meta name="description" content="Veckans deals i Uppsala på ett ställe: jämför extrapriser från ICA, Willys, Hemköp, Coop och Lidl per kilo och hitta billiga middagar. Uppdateras varje dag.">
+  <link rel="canonical" href="https://uppsaladeals.se/">
+  <meta name="theme-color" content="#E11D48">
+
+  <!-- Icons (Google Search and Safari need real files, not a data: URL) -->
+  <link rel="icon" href="/favicon.ico" sizes="48x48">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
+  <!-- Link previews (Facebook, Messenger, iMessage, Slack...) -->
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="sv_SE">
+  <meta property="og:site_name" content="Veckans Deals">
+  <meta property="og:url" content="https://uppsaladeals.se/">
+  <meta property="og:title" content="Veckans Deals Uppsala – matpriser och erbjudanden">
+  <meta property="og:description" content="Veckans erbjudanden från ICA, Willys, Hemköp, Coop och Lidl i Uppsala, jämförda per kilo. Uppdateras varje dag.">
+  <meta property="og:image" content="https://uppsaladeals.se/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Veckans Deals Uppsala – erbjudanden från ICA, Willys, Hemköp, Coop och Lidl">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <!-- Site name for Google's search results -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Veckans Deals",
+    "alternateName": ["Uppsala Deals", "uppsaladeals.se"],
+    "url": "https://uppsaladeals.se/",
+    "inLanguage": "sv-SE",
+    "description": "Veckans erbjudanden och extrapriser från ICA, Willys, Hemköp, Coop och Lidl i Uppsala, jämförda per kilo."
+  }
+  </script>
 
   <!-- Google Fonts: Plus Jakarta Sans -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -16,7 +48,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Tailwind CSS (built from tailwind.config.js by .github/workflows/build_css.yml) -->
-  <link rel="stylesheet" href="tailwind.css?v=20261008_0830">
+  <link rel="stylesheet" href="tailwind.css?v=20261018_1515">
 
   <!-- Custom Styles for Store Badge Colors & Utilities -->
   <style>
@@ -88,8 +120,9 @@
 
     <!-- Top Navigation Header -->
     <header class="flex flex-wrap justify-between items-center gap-x-6 gap-y-3 pb-5 border-b border-zinc-200/80 mb-5 sm:mb-8">
-      <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight text-zinc-900 whitespace-nowrap">
+      <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight text-zinc-900 whitespace-nowrap leading-tight">
         Veckans Deals
+        <span class="block text-xs sm:text-sm font-semibold tracking-normal text-zinc-500">Matpriser i Uppsala</span>
       </h1>
 
       <!-- Tabs: the offers or recipes built around them (#recept). Their own row on phones -->
@@ -545,7 +578,14 @@
 
     <!-- Footer -->
     <footer class="mt-16 pt-6 border-t border-zinc-200/80 text-center text-xs text-zinc-400 pb-12">
-      <p>Veckans Deals • Automatisk matprisbevakning för Uppsala & Sverige • Uppdateras dagligen</p>
+      <p class="max-w-3xl mx-auto leading-relaxed">
+        Veckans Deals samlar veckans erbjudanden och extrapriser från matbutikerna i Uppsala:
+        ICA Nära Råbyvägen, ICA Supermarket Torgkassen, ICA Nära Rosendal, ICA Supermarket Väst, ICA Vretgränd,
+        ICA Supermarket City, ICA Supermarket Luthagens Livs, ICA Folkes Livs, ICA Nära Hörnan, Willys,
+        Hemköp Svava, Hemköp Rosendal, Coop Centralhuset, Coop Liljegatan, Coop Ekeby och Lidl.
+        Jämför priset per kilo, hitta billiga middagar och gör din inköpslista.
+      </p>
+      <p class="mt-3">Veckans Deals • Automatisk matprisbevakning för Uppsala • Uppdateras dagligen</p>
     </footer>
   </div>
 
