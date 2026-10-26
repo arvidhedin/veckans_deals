@@ -299,6 +299,10 @@ th {
 }
 td { text-align: right; padding: 10px 8px; border-bottom: 1px solid var(--grid); vertical-align: top; }
 th:first-child, td:first-child { text-align: left; padding-left: 0; }
+th button.sort { all: unset; cursor: pointer; display: inline-flex; gap: 3px; align-items: center; border-radius: 4px; }
+th button.sort:hover, th button.sort.active { color: var(--text); }
+th button.sort:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.sort-arrow { font-size: 9px; min-width: 9px; }
 th:last-child, td:last-child { padding-right: 0; }
 tbody tr.holding { cursor: pointer; }
 tbody tr.holding:hover td, tbody tr.tx:hover td { background: var(--surface-2); }

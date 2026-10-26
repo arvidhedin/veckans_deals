@@ -152,6 +152,7 @@ const state = {
   tab: 'holdings',
   expanded: new Set(),
   showClosed: false,
+  sort: { key: pref('sortKey', 'value'), dir: pref('sortDir', 'desc') },
   addingCash: false,
   refreshing: false
 };
@@ -733,8 +734,8 @@ function renderHoldings(groups, totalValue) {
     ));
     return;
   }
-  const open = groups.filter(g => g.qty > 0).sort((a, b) => b.value - a.value);
-  const closed = groups.filter(g => g.qty === 0).sort((a, b) => b.profit - a.profit);
+  const open = groups.filter(g => g.qty > 0).sort(compareHoldings);
+  const closed = groups.filter(g => g.qty === 0).sort(compareHoldings);
   const rows = [];
   for (const g of open) rows.push(...holdingRows(g, totalValue));
   if (state.showClosed) for (const g of closed) rows.push(...holdingRows(g, totalValue));
@@ -743,16 +744,54 @@ function renderHoldings(groups, totalValue) {
   $('closed-toggle').hidden = !closed.length;
   container.replaceChildren(el('div', { class: 'table-wrap' }, el('table', {},
     el('thead', {}, el('tr', {},
-      el('th', {}, 'Innehav'),
-      el('th', { class: 'col-opt' }, 'Antal'),
+      sortHeader('name', 'Innehav'),
+      sortHeader('qty', 'Antal', 'col-opt'),
       el('th', { class: 'col-opt' }, 'GAV'),
-      el('th', { class: 'col-opt' }, 'Kurs'),
-      el('th', {}, 'Värde'),
-      el('th', {}, 'Vinst'),
+      sortHeader('dayPct', 'Kurs', 'col-opt', 'Sortera på dagens kursändring'),
+      sortHeader('value', 'Värde'),
+      sortHeader('profit', 'Vinst'),
       el('th', { class: 'col-opt' }, 'Andel')
     )),
     el('tbody', {}, rows)
   )));
+}
+
+// Holdings table sorting: click a heading to sort on it, click again to flip the order
+const SORT_VALUES = {
+  name: g => instrumentName(g.key),
+  qty: g => g.qty,
+  dayPct: g => {
+    const q = g.positions[0].quote;
+    return q && isNum(q.price) && q.prevClose > 0 ? q.price / q.prevClose - 1 : null;
+  },
+  value: g => g.value,
+  profit: g => g.profit
+};
+
+function compareHoldings(a, b) {
+  const { key, dir } = state.sort;
+  const valueOf = SORT_VALUES[key] || SORT_VALUES.value;
+  const x = valueOf(a);
+  const y = valueOf(b);
+  if (x == null || y == null) return (x == null) - (y == null); // missing values last
+  const order = typeof x === 'string' ? x.localeCompare(y, 'sv') : x - y;
+  return dir === 'asc' ? order : -order;
+}
+
+function sortHeader(key, label, className = '', title = null) {
+  const active = state.sort.key === key;
+  const onclick = () => {
+    const dir = active ? (state.sort.dir === 'asc' ? 'desc' : 'asc') : (key === 'name' ? 'asc' : 'desc');
+    state.sort = { key, dir };
+    savePref('sortKey', key);
+    savePref('sortDir', dir);
+    render();
+  };
+  return el('th', { class: className, 'aria-sort': active ? (state.sort.dir === 'asc' ? 'ascending' : 'descending') : null },
+    el('button', { type: 'button', class: `sort${active ? ' active' : ''}`, title, onclick },
+      label, el('span', { class: 'sort-arrow', 'aria-hidden': 'true' }, active ? (state.sort.dir === 'asc' ? '▲' : '▼') : '')
+    )
+  );
 }
 
 function holdingRows(g, totalValue) {
