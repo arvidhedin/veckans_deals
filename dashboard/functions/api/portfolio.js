@@ -20,7 +20,8 @@ async function load(env) {
 function isValid(data) {
   return data && typeof data === 'object' && !Array.isArray(data)
     && data.instruments && typeof data.instruments === 'object' && !Array.isArray(data.instruments)
-    && Array.isArray(data.transactions);
+    && Array.isArray(data.transactions)
+    && (data.cash === undefined || Array.isArray(data.cash));
 }
 
 export async function onRequestGet({ env, data: requestData }) {

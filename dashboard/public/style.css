@@ -271,6 +271,17 @@ main {
 .platform-row { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
 .platform-name { font-weight: 600; }
 .platform-meta { display: flex; justify-content: space-between; font-size: 13px; color: var(--text-2); margin-top: 2px; }
+
+.card-sub-head { font-size: 13px; margin: 18px 0 6px; padding-top: 12px; border-top: 1px solid var(--grid); color: var(--text-2); font-weight: 600; }
+.cash-list { display: grid; gap: 8px; margin-bottom: 10px; }
+.cash-row { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; }
+.cash-name { flex: 1 1 140px; min-width: 0; font-weight: 600; overflow-wrap: anywhere; }
+.cash-amount { flex: none; display: inline-flex; align-items: center; gap: 4px; font-size: 13px; color: var(--text-2); }
+.cash-row .cash-amount input { width: 110px; text-align: right; font-variant-numeric: tabular-nums; }
+.cash-row .btn.icon { flex: none; }
+.cash-add { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; margin-bottom: 8px; }
+.cash-add input { min-width: 0; }
+.cash-add button { justify-self: start; align-self: center; }
 .bar-track { height: 8px; margin-top: 6px; }
 .bar { height: 8px; background: var(--series-1); border-radius: 0 4px 4px 0; min-width: 2px; }
 

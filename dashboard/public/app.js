@@ -138,7 +138,7 @@ async function api(path, { method = 'GET', body } = {}) {
 // --- State ---
 
 const state = {
-  data: { instruments: {}, transactions: [] },
+  data: { instruments: {}, transactions: [], cash: [] },
   version: 0,
   email: '',
   quotes: {},
@@ -152,13 +152,15 @@ const state = {
   tab: 'holdings',
   expanded: new Set(),
   showClosed: false,
+  addingCash: false,
   refreshing: false
 };
 
 function normalize(data) {
   return {
     instruments: data && typeof data.instruments === 'object' && !Array.isArray(data.instruments) ? data.instruments : {},
-    transactions: Array.isArray(data?.transactions) ? data.transactions : []
+    transactions: Array.isArray(data?.transactions) ? data.transactions : [],
+    cash: Array.isArray(data?.cash) ? data.cash : [] // [{ id, name, platform, amount, updatedAt }]
   };
 }
 
@@ -251,7 +253,26 @@ function computePositions() {
   return [...positions.values()];
 }
 
+// An own holding can follow a similar Avanza fund: its price is that fund's price times a
+// factor, which is set again every time you enter a price yourself
+function trackedQuote(instrument) {
+  const source = state.quotes[instrument.track.id];
+  if (!source || !isNum(source.price)) return null;
+  const { factor } = instrument.track;
+  return {
+    price: source.price * factor,
+    prevClose: (source.prevClose ?? source.price) * factor,
+    currency: instrument.currency || 'SEK',
+    time: source.time,
+    tracked: true
+  };
+}
+
 function manualQuote(instrument) {
+  if (instrument.track) {
+    const tracked = trackedQuote(instrument);
+    if (tracked) return tracked;
+  }
   const prices = [...(instrument.prices || [])].sort((a, b) => a.date.localeCompare(b.date));
   const last = prices.at(-1);
   if (!last) return null;
@@ -322,11 +343,18 @@ function emptyTotal() {
 
 // --- Prices ---
 
-// Instruments that need a live price: everything held, plus anything traded today
+// The Avanza orderbook a holding gets its price from, or null for a price you enter yourself
+function priceSourceId(id) {
+  const track = state.data.instruments[id]?.track;
+  if (track) return track.id;
+  return id.startsWith('avanza:') ? id : null;
+}
+
+// Orderbooks that need a live price: for everything held, plus anything traded today
 function quotedIds() {
   const ids = new Set();
-  computePositions().forEach(p => { if (p.qty > 0 || p.flowToday !== 0) ids.add(p.instrumentId); });
-  return [...ids].filter(id => id.startsWith('avanza:'));
+  computePositions().forEach(p => { if (p.qty > 0 || p.flowToday !== 0) ids.add(priceSourceId(p.instrumentId)); });
+  return [...ids].filter(Boolean);
 }
 
 async function refreshQuotes() {
@@ -414,7 +442,7 @@ async function ensureHistory(period, ids, currencies) {
 
 async function loadChart() {
   const { period } = rangeInfo();
-  const ids = chartInstruments().filter(id => id.startsWith('avanza:'));
+  const ids = [...new Set(chartInstruments().map(priceSourceId).filter(Boolean))];
   const currencies = [...new Set(ids.map(id => state.data.instruments[id]?.currency).filter(c => c && c !== 'SEK'))];
   $('chart').classList.add('loading');
   try {
@@ -441,6 +469,9 @@ const byDate = (a, b) => a[0].localeCompare(b[0]);
 
 function priceSeries(id, h) {
   const instrument = state.data.instruments[id];
+  if (instrument?.track) {
+    return (h.series[instrument.track.id] || []).map(([ts, close]) => [tsToDate(ts), close * instrument.track.factor]).sort(byDate);
+  }
   if (instrument?.kind === 'manual') return (instrument.prices || []).map(p => [p.date, p.price]).sort(byDate);
   return (h.series[id] || []).map(([ts, close]) => [tsToDate(ts), close]).sort(byDate);
 }
@@ -518,10 +549,12 @@ function render() {
   const valued = computePositions().map(valuePosition);
   const total = aggregate(valued, () => 'total')[0] || emptyTotal();
   state.total = total;
+  const cash = cashTotal();
   renderStatus();
-  renderKpis(total);
-  renderPlatforms(aggregate(valued.filter(p => p.qty > 0), p => p.platform), total.value);
-  renderHoldings(aggregate(valued, p => p.instrumentId), total.value);
+  renderKpis(total, cash);
+  renderPlatforms(aggregate(valued.filter(p => p.qty > 0), p => p.platform), total.value + cash);
+  renderCash();
+  renderHoldings(aggregate(valued, p => p.instrumentId), total.value + cash);
   renderTransactions();
   renderChart();
 }
@@ -544,14 +577,18 @@ function kpiTile({ label, value, valueClass = '', delta, deltaClass = '', sub, h
   );
 }
 
-function renderKpis(total) {
+function renderKpis(total, cash) {
   const profitParts = [`varav utdelningar ${kr(total.dividends)}`];
   if (Math.abs(total.realized) >= 1) profitParts.push(`sålt ${signedKr(total.realized)}`);
   $('kpis').replaceChildren(
     kpiTile({
       label: 'Totalt värde',
-      value: kr(total.value),
-      sub: `Anskaffningsvärde ${kr(total.cost)}${total.stale ? ' · vissa kurser saknas' : ''}`,
+      value: kr(total.value + cash),
+      sub: [
+        `Anskaffningsvärde ${kr(total.cost)}`,
+        cash ? `kontanter ${kr(cash)}` : null,
+        total.stale ? 'vissa kurser saknas' : null
+      ].filter(Boolean).join(' · '),
       hero: true
     }),
     kpiTile({
@@ -577,8 +614,17 @@ function renderKpis(total) {
   );
 }
 
-function renderPlatforms(platforms, totalValue) {
+// Holdings plus cash per platform
+function renderPlatforms(groups, totalValue) {
   const container = $('platforms');
+  const byName = new Map(groups.map(g => [g.key, { key: g.key, value: g.value, today: g.today, cash: 0 }]));
+  for (const c of state.data.cash) {
+    if (!byName.has(c.platform)) byName.set(c.platform, { key: c.platform, value: 0, today: 0, cash: 0 });
+    const p = byName.get(c.platform);
+    p.cash += c.amount;
+    p.value += c.amount;
+  }
+  const platforms = [...byName.values()];
   if (!platforms.length) {
     container.replaceChildren(el('p', { class: 'muted' }, 'Inga innehav ännu.'));
     return;
@@ -594,10 +640,79 @@ function renderPlatforms(platforms, totalValue) {
       el('div', { class: 'bar', style: `width:${Math.max(0, (p.value / max) * 100).toFixed(1)}%` })
     ),
     el('div', { class: 'platform-meta' },
-      el('span', {}, `${share(totalValue > 0 ? p.value / totalValue : null)} av portföljen`),
+      el('span', {}, `${share(totalValue > 0 ? p.value / totalValue : null)} av portföljen${p.cash ? ` · ${kr(p.cash)} kontant` : ''}`),
       el('span', { class: `num ${dirClass(p.today)}` }, `Idag ${signedKr(p.today)}`)
     )
   )));
+}
+
+// --- Cash (savings accounts and uninvested money): counts in the total, not in profit ---
+
+function cashTotal() {
+  return state.data.cash.reduce((sum, c) => sum + (isNum(c.amount) ? c.amount : 0), 0);
+}
+
+async function saveCash(change) {
+  try {
+    await mutate(data => { change(data.cash); });
+  } catch (err) {
+    showBanner(`Kunde inte spara: ${err.message}`);
+  }
+}
+
+function renderCash() {
+  const rows = state.data.cash.map(c => {
+    const input = el('input', {
+      type: 'text', inputmode: 'decimal', value: numInput(c.amount), 'aria-label': `Saldo på ${c.name}, ${c.platform}`,
+      onchange: () => {
+        const amount = parseNum(input.value);
+        if (!isNum(amount)) { input.classList.add('invalid'); return; }
+        saveCash(cash => {
+          const entry = cash.find(e => e.id === c.id);
+          if (entry) Object.assign(entry, { amount, updatedAt: today() });
+        });
+      },
+      onkeydown: e => { if (e.key === 'Enter') input.blur(); }
+    });
+    return el('div', { class: 'cash-row' },
+      el('div', { class: 'cash-name' }, c.name, el('span', { class: 'sub' }, `${c.platform}${c.updatedAt ? ` · ändrat ${formatDate(c.updatedAt)}` : ''}`)),
+      el('span', { class: 'cash-amount' }, input, ' kr'),
+      el('button', {
+        type: 'button', class: 'btn ghost icon small', title: 'Ta bort', 'aria-label': `Ta bort ${c.name}`,
+        onclick: () => { if (confirm(`Ta bort ${c.name} (${c.platform})?`)) saveCash(cash => { cash.splice(cash.findIndex(e => e.id === c.id), 1); }); }
+      }, '✕')
+    );
+  });
+
+  const name = el('input', { type: 'text', placeholder: 'Konto, t.ex. Sparkonto', 'aria-label': 'Kontots namn' });
+  const platform = el('input', { type: 'text', list: 'cash-platforms', placeholder: 'Plattform', 'aria-label': 'Plattform' });
+  const amount = el('input', { type: 'text', inputmode: 'decimal', placeholder: 'Belopp', 'aria-label': 'Belopp i kronor' });
+  const form = el('form', {
+    class: 'cash-add',
+    hidden: !state.addingCash,
+    onsubmit: e => {
+      e.preventDefault();
+      const value = parseNum(amount.value);
+      [name, platform].forEach(i => i.classList.toggle('invalid', !i.value.trim()));
+      amount.classList.toggle('invalid', !isNum(value));
+      if (!name.value.trim() || !platform.value.trim() || !isNum(value)) return;
+      state.addingCash = false;
+      saveCash(cash => { cash.push({ id: crypto.randomUUID(), name: name.value.trim(), platform: platform.value.trim(), amount: value, updatedAt: today() }); });
+    }
+  },
+    name, platform, amount,
+    el('datalist', { id: 'cash-platforms' }, platformNames().map(n => el('option', { value: n }))),
+    el('button', { type: 'submit', class: 'btn small primary' }, 'Lägg till')
+  );
+  const addButton = el('button', {
+    type: 'button', class: 'btn small', hidden: state.addingCash,
+    onclick: () => { state.addingCash = true; renderCash(); $('cash').querySelector('.cash-add input')?.focus(); }
+  }, '+ Lägg till konto');
+
+  $('cash').replaceChildren(
+    rows.length ? el('div', { class: 'cash-list' }, rows) : el('p', { class: 'muted' }, 'Pengar på sparkonton och likvida medel räknas in i totalen.'),
+    form, addButton
+  );
 }
 
 function instrumentName(id) {
@@ -703,7 +818,8 @@ function detailRow(g, instrument, currency) {
   );
 
   let quoteInfo = '';
-  if (q?.manual) quoteInfo = `Egen kurs, senast satt ${formatDate(tsToDate(q.time))}.`;
+  if (q?.tracked) quoteInfo = `Kursen följer ${instrument.track.name} (NAV från ${formatDate(tsToDate(q.time))}) sedan du senast satte den själv.`;
+  else if (q?.manual) quoteInfo = `Egen kurs, senast satt ${formatDate(tsToDate(q.time))}.`;
   else if (q && instrument.kind === 'fund') quoteInfo = `Fondkurs (NAV) från ${formatDate(tsToDate(q.time))}.`;
   else if (q?.time) quoteInfo = `Senaste avslut ${new Date(q.time).toLocaleString('sv-SE', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}${q.realTime ? '' : ', fördröjd kurs'}.`;
   if (currency !== 'SEK' && state.fx[currency]) quoteInfo += ` ${currency}/SEK ${price(state.fx[currency].rate)}.`;
@@ -745,6 +861,8 @@ function manualPriceForm(id, q) {
         const todayStr = today();
         instrument.prices = (instrument.prices || []).filter(p => p.date !== todayStr);
         instrument.prices.push({ date: todayStr, price: value });
+        const source = instrument.track && state.quotes[instrument.track.id];
+        if (source?.price > 0) instrument.track.factor = value / source.price;
       });
     } catch (err) {
       showBanner(`Kunde inte spara: ${err.message}`);
@@ -991,7 +1109,7 @@ function renderChartTable(points, series) {
 const dialog = { type: 'buy', instrument: null, editing: null, fxTouched: false, openingTouched: false, prefilledPrice: '', searchSeq: 0, fxSeq: 0 };
 
 function platformNames() {
-  const used = state.data.transactions.map(t => t.platform);
+  const used = [...state.data.transactions, ...state.data.cash].map(t => t.platform);
   return [...new Set([...DEFAULT_PLATFORMS, ...used].filter(Boolean))];
 }
 
@@ -1346,6 +1464,7 @@ async function importJson(file) {
     await mutate(data => {
       data.instruments = imported.instruments;
       data.transactions = imported.transactions;
+      data.cash = Array.isArray(imported.cash) ? imported.cash : [];
     });
   } catch (err) {
     showBanner(`Importen misslyckades: ${err.message}`);
