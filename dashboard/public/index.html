@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="sv">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#f9f9f7" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0d0d0d" media="(prefers-color-scheme: dark)">
+  <title>Portfölj</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css">
+  <script type="module" src="app.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <h1>Portfölj</h1>
+    <span class="status" id="status" aria-live="polite">Laddar…</span>
+    <button type="button" class="btn ghost icon" id="refresh" title="Uppdatera kurser" aria-label="Uppdatera kurser">
+      <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66M20 4v4.5h-4.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <button type="button" class="btn primary" id="new-tx">+ Ny affär</button>
+  </header>
+
+  <div class="banner" id="banner" role="alert" hidden>
+    <span id="banner-text"></span>
+    <button type="button" class="btn small" id="banner-action" hidden></button>
+  </div>
+
+  <main>
+    <section class="kpis" id="kpis" aria-label="Sammanfattning"></section>
+
+    <div class="layout">
+      <section class="card chart-card" aria-labelledby="chart-title">
+        <div class="card-head">
+          <h2 id="chart-title">Värdeutveckling</h2>
+          <div class="seg" id="mode" role="group" aria-label="Vad grafen visar">
+            <button type="button" data-mode="actual">Portföljen</button>
+            <button type="button" data-mode="current">Dagens innehav</button>
+          </div>
+        </div>
+        <div class="seg seg-wide" id="range" role="group" aria-label="Tidsperiod"></div>
+        <div class="legend" id="legend"></div>
+        <div class="chart" id="chart"></div>
+        <p class="hint" id="chart-hint" hidden></p>
+        <details class="chart-table">
+          <summary>Visa som tabell</summary>
+          <div id="chart-table"></div>
+        </details>
+      </section>
+
+      <section class="card" aria-labelledby="platforms-title">
+        <div class="card-head"><h2 id="platforms-title">Per plattform</h2></div>
+        <div id="platforms"></div>
+      </section>
+    </div>
+
+    <section class="card">
+      <div class="card-head">
+        <div class="tabs" role="tablist">
+          <button type="button" role="tab" data-tab="holdings" aria-selected="true">Innehav</button>
+          <button type="button" role="tab" data-tab="transactions" aria-selected="false">Affärer</button>
+        </div>
+        <label class="toggle" id="closed-toggle"><input type="checkbox" id="show-closed"> Visa sålda</label>
+      </div>
+      <div id="holdings"></div>
+      <div id="transactions" hidden></div>
+    </section>
+
+    <footer class="footer">
+      <p>Kurser från Avanza. Aktier och ETF:er är fördröjda ca 15 min, fonder har en kurs per dag. Utländska innehav räknas om till kronor med aktuell växelkurs.</p>
+      <p class="footer-actions">
+        <span id="whoami"></span>
+        <button type="button" class="btn small ghost" id="export">Exportera JSON</button>
+        <label class="btn small ghost">Importera JSON<input type="file" id="import" accept="application/json,.json" hidden></label>
+        <a class="btn small ghost" href="/cdn-cgi/access/logout">Logga ut</a>
+      </p>
+    </footer>
+  </main>
+
+  <dialog id="tx-dialog" aria-labelledby="tx-title">
+    <form id="tx-form" novalidate>
+      <div class="dialog-head">
+        <h2 id="tx-title">Ny affär</h2>
+        <button type="button" class="btn ghost icon" data-close aria-label="Stäng">✕</button>
+      </div>
+
+      <div class="seg seg-wide" id="tx-type" role="group" aria-label="Typ av affär">
+        <button type="button" data-type="buy">Köp</button>
+        <button type="button" data-type="sell">Sälj</button>
+        <button type="button" data-type="dividend">Utdelning</button>
+      </div>
+
+      <div class="field">
+        <span class="label" id="instrument-label">Värdepapper</span>
+        <div class="picked" id="instrument-picked" hidden>
+          <div>
+            <strong id="picked-name"></strong>
+            <span class="muted" id="picked-meta"></span>
+          </div>
+          <button type="button" class="btn small ghost" id="picked-change">Byt</button>
+        </div>
+        <div class="search" id="instrument-search-wrap">
+          <input type="search" id="instrument-search" placeholder="Sök aktie, fond eller ETF" autocomplete="off" aria-labelledby="instrument-label" aria-controls="instrument-results">
+          <ul class="results" id="instrument-results" role="listbox"></ul>
+        </div>
+      </div>
+
+      <div class="row">
+        <label class="field">
+          <span class="label">Plattform</span>
+          <input type="text" id="tx-platform" list="platform-list" autocomplete="off" required>
+          <datalist id="platform-list"></datalist>
+        </label>
+        <label class="field">
+          <span class="label">Datum</span>
+          <input type="date" id="tx-date" required>
+        </label>
+      </div>
+
+      <label class="check buy-only">
+        <input type="checkbox" id="tx-opening">
+        <span>Startläge: jag äger det här sedan tidigare<span class="field-note">Ange antal och ditt GAV (snittpris) från plattformen. Räknas inte in i dagens förändring.</span></span>
+      </label>
+
+      <div class="row trade-only">
+        <label class="field">
+          <span class="label">Antal</span>
+          <input type="text" inputmode="decimal" id="tx-quantity" autocomplete="off">
+          <span class="field-note" id="held-note"></span>
+        </label>
+        <label class="field">
+          <span class="label"><span id="price-label">Kurs</span> <span id="price-currency">SEK</span></span>
+          <input type="text" inputmode="decimal" id="tx-price" autocomplete="off">
+        </label>
+      </div>
+
+      <div class="row trade-only">
+        <label class="field" id="fx-field" hidden>
+          <span class="label">Växelkurs <span id="fx-label">SEK/USD</span></span>
+          <input type="text" inputmode="decimal" id="tx-fx" autocomplete="off">
+        </label>
+        <label class="field">
+          <span class="label">Courtage (kr)</span>
+          <input type="text" inputmode="decimal" id="tx-fee" autocomplete="off" placeholder="0">
+        </label>
+      </div>
+
+      <label class="field dividend-only">
+        <span class="label">Belopp du fick (kr)</span>
+        <input type="text" inputmode="decimal" id="tx-amount" autocomplete="off">
+        <span class="field-note">Efter eventuell källskatt, som det syns på kontot.</span>
+      </label>
+
+      <label class="field">
+        <span class="label">Anteckning <span class="muted">(valfritt)</span></span>
+        <input type="text" id="tx-note" autocomplete="off" maxlength="200">
+      </label>
+
+      <p class="summary" id="tx-summary"></p>
+      <p class="error" id="tx-error" role="alert"></p>
+
+      <div class="dialog-actions">
+        <button type="button" class="btn danger ghost" id="tx-delete" hidden>Ta bort</button>
+        <span class="spacer"></span>
+        <button type="button" class="btn ghost" data-close>Avbryt</button>
+        <button type="submit" class="btn primary" id="tx-save">Spara</button>
+      </div>
+    </form>
+  </dialog>
+</body>
+</html>
