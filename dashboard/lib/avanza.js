@@ -83,7 +83,8 @@ function stockLikeQuote(data) {
     price: last,
     prevClose,
     time: q.timeOfLast || q.updated || null,
-    realTime: !!q.isRealTime
+    realTime: !!q.isRealTime,
+    leverage: data.keyIndicators?.leverage ?? null
   };
 }
 
@@ -174,6 +175,15 @@ function regionFromCountries(countries) {
   return nordic / total >= 0.8 ? 'Norden' : 'Global';
 }
 
+// Swap-based ETFs (e.g. Montrose Global Leverage 125) only report the swap as their holding.
+// What the index contains is then taken from a plain ETF that tracks the same index.
+const INDEX_PROXIES = [
+  [/ACWI/i, '384756', 'iShares MSCI ACWI'],
+  [/MSCI World/i, '384747', 'iShares Core MSCI World'],
+  [/S&P 500/i, '1063851', 'iShares Core S&P 500'],
+  [/Emerging Markets/i, '1063844', 'iShares Core MSCI EM IMI']
+];
+
 const DETAILS_TTL = 12 * 3600;
 
 export async function details(id) {
@@ -200,7 +210,18 @@ export async function details(id) {
 
   if (kind === 'etf') {
     const data = await getJson(`market-etf/${orderbookId}/details`, DETAILS_TTL);
-    const countries = (data.countryExposures?.exposures || []).map(c => ({ code: c.countryCode, name: c.countryName, weight: c.weight }));
+    let countries = (data.countryExposures?.exposures || []).map(c => ({ code: c.countryCode, name: c.countryName, weight: c.weight }));
+    let sectors = (data.sectorExposures?.exposures || []).map(s => ({ name: ETF_SECTORS[s.sector] || s.sector, weight: s.weight }));
+    let holdings = (data.fundExposures || []).map(h => ({ name: h.name, weight: h.exposure * 100, country: h.countryCode || null, orderbookId: h.orderbookId || null }));
+    let proxy = null;
+    const synthetic = !countries.length || holdings.every(h => !h.orderbookId);
+    const match = synthetic && INDEX_PROXIES.find(([pattern, id]) => pattern.test(data.subCategory || '') && id !== orderbookId);
+    if (match) {
+      const reference = await details(`avanza:etf:${match[1]}`);
+      ({ countries, holdings } = reference);
+      if (!sectors.length) sectors = reference.sectors;
+      proxy = { index: data.subCategory, via: match[2] };
+    }
     const equity = !data.assetCategory || data.assetCategory === 'Aktier';
     return {
       kind,
@@ -209,8 +230,9 @@ export async function details(id) {
       fee: null, // Avanza doesn't publish ETF fees in this API
       risk: RISK_SCORES[data.riskScore] ?? null,
       countries,
-      sectors: (data.sectorExposures?.exposures || []).map(s => ({ name: ETF_SECTORS[s.sector] || s.sector, weight: s.weight })),
-      holdings: (data.fundExposures || []).map(h => ({ name: h.name, weight: h.exposure * 100, country: h.countryCode || null, orderbookId: h.orderbookId || null })),
+      sectors,
+      holdings,
+      proxy,
       portfolioDate: data.portfolioDate || null
     };
   }

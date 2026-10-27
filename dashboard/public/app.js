@@ -1031,7 +1031,8 @@ function analysisHoldings() {
         assetClass: instrument.kind === 'manual' && instrument.track ? 'Fonder' : ASSET_CLASSES[instrument.kind] || 'Övrigt',
         category: isFund ? instrument.category || details?.category || null : null,
         avanzaFee: details && details.kind !== 'stock' ? details.fee : null,
-        fee: isFund ? (isNum(instrument.fee) ? instrument.fee : details?.fee ?? null) : null
+        fee: isFund ? (isNum(instrument.fee) ? instrument.fee : details?.fee ?? null) : null,
+        leverage: g.positions[0].quote?.leverage > 1 ? g.positions[0].quote.leverage : null
       };
     });
 }
@@ -1273,6 +1274,7 @@ function renderAnalysis() {
   riskLevels.rows.sort((a, b) => a.key.localeCompare(b.key, 'sv', { numeric: true }));
   const byValue = [...holdings].sort((a, b) => b.value - a.value);
   const top5 = byValue.slice(0, 5).reduce((acc, h) => acc + h.value, 0);
+  const leveraged = holdings.filter(h => h.leverage);
 
   // Dividends over the last twelve months, against today's value
   const yearAgo = shiftMonths(today(), 12);
@@ -1368,6 +1370,8 @@ function renderAnalysis() {
       });
       const sub = [
         h.instrument.track ? `följer ${h.instrument.track.name}` : null,
+        h.leverage ? `hävstång ${fmt(h.leverage, 0, 2)}×` : null,
+        h.details?.proxy ? `äger en swap på ${h.details.proxy.index}, innehållet visas enligt ${h.details.proxy.via}` : null,
         h.details?.fundType && h.details.fundType !== h.category ? h.details.fundType : null,
         h.instrument.kind === 'etf' && !isNum(h.fee) ? 'ange avgiften själv, Avanza visar den inte' : null
       ].filter(Boolean).join(' · ');
@@ -1417,7 +1421,9 @@ function renderAnalysis() {
           el('div', {}, el('span', { class: 'kpi-label' }, 'Fem största'), el('strong', {}, share(top5 / invested)))
         ),
         barList(riskLevels.rows, invested + cash),
-        el('p', { class: 'note' }, `Avanzas risknivå 1–7 för fonder och ETF:er, viktad på värdet. Aktier har ingen risknivå. Största innehavet är ${byValue[0]?.name || '–'}. Största och fem största räknas på värdepapperen, utan kontanter.`)
+        el('p', { class: 'note' }, `Avanzas risknivå 1–7 för fonder och ETF:er, viktad på värdet. Aktier har ingen risknivå. Största innehavet är ${byValue[0]?.name || '–'}. Största och fem största räknas på värdepapperen, utan kontanter.${leveraged.length
+          ? ` ${leveraged.map(h => `${h.name} har hävstång ${fmt(h.leverage, 0, 2)}×`).join(', ')}, så exponeringen är större än värdet; fördelningarna räknas på värdet.`
+          : ''}`)
       ]),
       analysisCard('Underliggande bolag', [
         companyTable,
