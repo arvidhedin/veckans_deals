@@ -150,6 +150,12 @@ const state = {
   range: pref('range', '1y'),
   mode: pref('mode', 'actual'),
   tab: 'holdings',
+  view: pref('view', 'overview'),
+  countryMode: pref('countryMode', 'lookthrough'),
+  dividendYear: null, // the year whose months the dividend chart shows; null = the latest
+  details: {}, // Avanza id -> countries, sectors, holdings, category, fee (null if it failed)
+  detailsLoading: false,
+  valued: [],
   expanded: new Set(),
   showClosed: false,
   sort: { key: pref('sortKey', 'value'), dir: pref('sortDir', 'desc') },
@@ -550,6 +556,7 @@ function render() {
   const valued = computePositions().map(valuePosition);
   const total = aggregate(valued, () => 'total')[0] || emptyTotal();
   state.total = total;
+  state.valued = valued;
   const cash = cashTotal();
   renderStatus();
   renderKpis(total, cash);
@@ -558,6 +565,10 @@ function render() {
   renderHoldings(aggregate(valued, p => p.instrumentId), total.value + cash);
   renderTransactions();
   renderChart();
+  if (state.view === 'analysis') {
+    renderAnalysis();
+    ensureDetails();
+  }
 }
 
 function renderStatus() {
@@ -952,6 +963,482 @@ function renderTransactions() {
   $('transactions').replaceChildren(transactionTable(txs, true));
 }
 
+// --- Analysis: what the portfolio is made of, looking through funds and ETFs ---
+
+const regionNames = (() => {
+  try { return new Intl.DisplayNames(['sv'], { type: 'region' }); } catch { return null; }
+})();
+
+function countryName(code, fallback) {
+  let name = null;
+  try { name = code ? regionNames?.of(code) : null; } catch { /* unknown code */ }
+  return name && name !== code ? name : fallback || code || 'Okänt';
+}
+
+function setView(view) {
+  state.view = view === 'analysis' ? 'analysis' : 'overview';
+  savePref('view', state.view);
+  document.querySelectorAll('#view-tabs button').forEach(b => b.setAttribute('aria-selected', String(b.dataset.view === state.view)));
+  $('view-overview').hidden = state.view !== 'overview';
+  $('view-analysis').hidden = state.view !== 'analysis';
+  if (state.view === 'analysis') {
+    renderAnalysis();
+    ensureDetails();
+  } else {
+    renderChart(); // the graph can't measure itself while hidden
+  }
+}
+
+// Fetches details for holdings that don't have them yet. A failure is remembered as null,
+// so it isn't asked for again on every render (the refresh button starts over).
+async function ensureDetails() {
+  const ids = [...new Set(computePositions().filter(p => p.qty > 0).map(p => priceSourceId(p.instrumentId)).filter(Boolean))];
+  const missing = ids.filter(id => !(id in state.details));
+  if (!missing.length || state.detailsLoading) return;
+  state.detailsLoading = true;
+  renderAnalysis();
+  try {
+    const results = await Promise.all(chunk(missing, BATCH_SIZE).map(batch => api(`/api/details?ids=${encodeURIComponent(batch.join(','))}`)));
+    for (const r of results) Object.assign(state.details, r.details);
+  } catch (err) {
+    if (err.status !== 401) showBanner(`Kunde inte hämta fonddata: ${err.message}`);
+  } finally {
+    missing.forEach(id => { if (!(id in state.details)) state.details[id] = null; });
+    state.detailsLoading = false;
+    renderAnalysis();
+  }
+}
+
+const ASSET_CLASSES = { stock: 'Aktier', fund: 'Fonder', etf: 'ETF:er', manual: 'Eget innehav' };
+
+// Every open holding with its value and the details it is analysed with: its own, or those
+// of the fund an own holding follows
+function analysisHoldings() {
+  return aggregate(state.valued.filter(p => p.qty > 0), p => p.instrumentId)
+    .filter(g => g.value > 0)
+    .map(g => {
+      const instrument = state.data.instruments[g.key] || {};
+      const sourceId = priceSourceId(g.key);
+      const details = (sourceId && state.details[sourceId]) || null;
+      const isFund = instrument.kind !== 'stock';
+      return {
+        id: g.key,
+        name: instrument.name || g.key,
+        instrument,
+        value: g.value,
+        details,
+        isFund,
+        assetClass: instrument.kind === 'manual' && instrument.track ? 'Fonder' : ASSET_CLASSES[instrument.kind] || 'Övrigt',
+        category: isFund ? instrument.category || details?.category || null : null,
+        avanzaFee: details && details.kind !== 'stock' ? details.fee : null,
+        fee: isFund ? (isNum(instrument.fee) ? instrument.fee : details?.fee ?? null) : null
+      };
+    });
+}
+
+// Spreads each holding's value over its entries ({ key, label, weight }), scaled so the
+// weights add up to the whole holding. Holdings without entries are summed as unknown.
+function spread(holdings, entriesOf) {
+  const totals = new Map();
+  const unknown = [];
+  for (const h of holdings) {
+    const entries = entriesOf(h) || [];
+    const sum = entries.reduce((acc, e) => acc + (e.weight > 0 ? e.weight : 0), 0);
+    if (!(sum > 0)) { unknown.push(h); continue; }
+    for (const e of entries) {
+      if (!(e.weight > 0)) continue;
+      if (!totals.has(e.key)) totals.set(e.key, { key: e.key, label: e.label, value: 0 });
+      totals.get(e.key).value += h.value * e.weight / sum;
+    }
+  }
+  const rows = [...totals.values()].sort((a, b) => b.value - a.value);
+  return { rows, known: rows.reduce((acc, r) => acc + r.value, 0), unknown };
+}
+
+const countryEntries = h => (h.details?.countries || []).map(c => ({ key: c.code || c.name, label: countryName(c.code, c.name), weight: c.weight }));
+
+// Where each holding is listed: a share by its company's country, a fund by its category.
+// Keyed by name, so Swedish shares and Swedish funds end up on the same "Sverige" row.
+function listingEntries(h) {
+  if (!h.isFund) return countryEntries(h).map(e => ({ ...e, key: e.label }));
+  return h.category ? [{ key: h.category, label: h.category, weight: 1 }] : null;
+}
+
+// Companies owned directly and through the funds' largest holdings, summed across everything
+function companies(holdings) {
+  const byKey = new Map();
+  for (const h of holdings) {
+    for (const c of h.details?.holdings || []) {
+      const key = c.orderbookId || c.name.toLowerCase();
+      if (!byKey.has(key)) byKey.set(key, { key, name: c.name, value: 0, via: [] });
+      const row = byKey.get(key);
+      const value = h.value * c.weight / 100;
+      row.value += value;
+      row.via.push({ name: h.isFund ? h.name : 'direkt', value });
+    }
+  }
+  return [...byKey.values()].sort((a, b) => b.value - a.value);
+}
+
+// How much two funds own of the same companies, counted on the largest holdings both report
+function overlaps(holdings) {
+  const funds = holdings.filter(h => h.isFund && h.details?.holdings?.length);
+  const weights = funds.map(h => new Map(h.details.holdings.map(c => [c.orderbookId || c.name.toLowerCase(), c])));
+  const pairs = [];
+  for (let i = 0; i < funds.length; i++) {
+    for (let j = i + 1; j < funds.length; j++) {
+      const common = [];
+      for (const [key, a] of weights[i]) {
+        const b = weights[j].get(key);
+        if (b) common.push({ name: a.name, weight: Math.min(a.weight, b.weight) });
+      }
+      if (!common.length) continue;
+      common.sort((a, b) => b.weight - a.weight);
+      pairs.push({ a: funds[i], b: funds[j], overlap: common.reduce((acc, c) => acc + c.weight, 0), common });
+    }
+  }
+  return pairs.sort((x, y) => y.overlap - x.overlap);
+}
+
+function barList(rows, base, limit = 10) {
+  if (!rows.length) return el('p', { class: 'muted' }, 'Ingen data ännu.');
+  let shown = rows;
+  if (rows.length > limit + 1) {
+    const rest = rows.slice(limit);
+    shown = [...rows.slice(0, limit), { key: '', label: `Övriga ${rest.length}`, value: rest.reduce((acc, r) => acc + r.value, 0), other: true }];
+  }
+  const max = Math.max(...shown.map(r => r.value), 1);
+  return el('div', { class: 'bars' }, shown.map(r => el('div', { class: `bar-row${r.other ? ' other' : ''}`, title: `${r.label}: ${kr(r.value)}` },
+    el('span', { class: 'bar-label' }, r.label),
+    el('span', { class: 'bar-value num' }, share(base > 0 ? r.value / base : null), el('span', { class: 'muted' }, ` · ${kr(r.value)}`)),
+    el('div', { class: 'bar-track', 'aria-hidden': 'true' }, el('div', { class: 'bar', style: `width:${Math.max(0, (r.value / max) * 100).toFixed(1)}%` }))
+  )));
+}
+
+// Which currency a country's shares trade in, for the currency exposure
+const EURO = ['DE', 'FR', 'NL', 'ES', 'IT', 'IE', 'FI', 'BE', 'AT', 'PT', 'LU', 'GR', 'SK', 'SI', 'EE', 'LV', 'LT', 'CY', 'MT', 'HR'];
+const COUNTRY_CURRENCY = {
+  SE: 'SEK', US: 'USD', JP: 'JPY', GB: 'GBP', CH: 'CHF', CA: 'CAD', AU: 'AUD', NO: 'NOK', DK: 'DKK',
+  HK: 'HKD', CN: 'CNY', TW: 'TWD', KR: 'KRW', IN: 'INR', SG: 'SGD', NZ: 'NZD', IL: 'ILS', BR: 'BRL', ZA: 'ZAR', MX: 'MXN',
+  ...Object.fromEntries(EURO.map(c => [c, 'EUR']))
+};
+const currencyNames = (() => {
+  try { return new Intl.DisplayNames(['sv'], { type: 'currency' }); } catch { return null; }
+})();
+function currencyLabel(code) {
+  let name = null;
+  try { name = currencyNames?.of(code); } catch { /* unknown code */ }
+  return name && name !== code ? `${code} · ${name}` : code;
+}
+
+const currencyEntries = h => (h.details?.countries || []).map(c => {
+  const code = COUNTRY_CURRENCY[c.code];
+  return { key: code || 'other', label: code ? currencyLabel(code) : 'Övriga valutor', weight: c.weight };
+});
+
+const RISK_TEXT = { 1: 'låg', 2: 'låg', 3: 'medel', 4: 'medel', 5: 'hög', 6: 'hög', 7: 'mycket hög' };
+const MONTHS = ['jan', 'feb', 'mar', 'apr', 'maj', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec'];
+
+function monthColumns(values) {
+  const max = Math.max(...values, 1);
+  return el('div', { class: 'months', role: 'img', 'aria-label': values.map((v, i) => `${MONTHS[i]} ${kr(v)}`).join(', ') },
+    values.map((v, i) => el('div', { class: 'month', title: `${MONTHS[i]}: ${kr(v)}` },
+      el('span', { class: 'month-value num' }, v > 0 ? (v >= 1000 ? `${fmt(v / 1000, 0, 1)}k` : fmt(v)) : ''),
+      el('div', { class: 'month-track' }, el('div', { class: 'month-bar', style: `height:${((v / max) * 100).toFixed(1)}%` })),
+      el('span', { class: 'month-label' }, MONTHS[i])
+    ))
+  );
+}
+
+function dividendsCard() {
+  const dividends = state.data.transactions.filter(t => t.type === 'dividend' && isNum(t.amount));
+  if (!dividends.length) {
+    return analysisCard('Utdelningar', el('p', { class: 'muted' }, 'Inga utdelningar inlagda ännu. Lägg in dem som affärer av typen Utdelning.'), { wide: true });
+  }
+  const byYear = new Map();
+  const byInstrument = new Map();
+  for (const t of dividends) {
+    const year = t.date.slice(0, 4);
+    if (!byYear.has(year)) byYear.set(year, Array(12).fill(0));
+    byYear.get(year)[Number(t.date.slice(5, 7)) - 1] += t.amount;
+    byInstrument.set(t.instrumentId, (byInstrument.get(t.instrumentId) || 0) + t.amount);
+  }
+  const years = [...byYear.keys()].sort().reverse();
+  const year = years.includes(state.dividendYear) ? state.dividendYear : years[0];
+  const sum = values => values.reduce((acc, v) => acc + v, 0);
+  const total = sum(dividends.map(t => t.amount));
+  const yearRows = years.map(y => ({ key: y, label: y, value: sum(byYear.get(y)) }));
+  const instrumentRows = [...byInstrument].map(([id, value]) => ({ key: id, label: instrumentName(id), value })).sort((a, b) => b.value - a.value);
+
+  const yearControls = el('div', { class: 'seg', role: 'group', 'aria-label': 'År' }, years.slice(0, 5).map(y => el('button', {
+    type: 'button',
+    'aria-pressed': String(y === year),
+    onclick: () => { state.dividendYear = y; renderAnalysis(); }
+  }, y)));
+
+  return analysisCard('Utdelningar', el('div', { class: 'split' },
+    el('div', {},
+      el('h3', { class: 'mini-head' }, `Per månad ${year} · ${kr(sum(byYear.get(year)))}`),
+      monthColumns(byYear.get(year))
+    ),
+    el('div', {},
+      el('h3', { class: 'mini-head' }, 'Per år'),
+      barList(yearRows, total, 6),
+      el('h3', { class: 'mini-head' }, 'Per innehav, alla år'),
+      barList(instrumentRows, total, 6)
+    )
+  ), { wide: true, controls: years.length > 1 ? yearControls : null });
+}
+
+function unknownNote(unknown, what) {
+  if (!unknown.length) return null;
+  const value = unknown.reduce((acc, h) => acc + h.value, 0);
+  return el('p', { class: 'note' }, `${kr(value)} saknar ${what}: ${unknown.map(h => h.name).join(', ')}.`);
+}
+
+function analysisCard(title, body, { wide = false, controls = null } = {}) {
+  return el('section', { class: `card${wide ? ' wide' : ''}` },
+    el('div', { class: 'card-head' }, el('h2', {}, title), controls),
+    body
+  );
+}
+
+async function saveInstrumentField(id, field, value) {
+  try {
+    await mutate(data => {
+      const instrument = data.instruments[id];
+      if (!instrument) return;
+      if (value == null) delete instrument[field];
+      else instrument[field] = value;
+    });
+  } catch (err) {
+    showBanner(`Kunde inte spara: ${err.message}`);
+  }
+}
+
+function renderAnalysis() {
+  const container = $('view-analysis');
+  // A refresh while you're typing in the fund table would throw away what you typed
+  if (container.contains(document.activeElement) && document.activeElement.tagName === 'INPUT') return;
+
+  const holdings = analysisHoldings();
+  if (!holdings.length) {
+    container.replaceChildren(el('section', { class: 'card empty-state' }, el('p', {}, 'Lägg in innehav så visas fördelningen här.')));
+    return;
+  }
+  const invested = holdings.reduce((acc, h) => acc + h.value, 0);
+  const cash = cashTotal();
+  const funds = holdings.filter(h => h.isFund).sort((a, b) => b.value - a.value);
+  const fundValue = funds.reduce((acc, h) => acc + h.value, 0);
+
+  // Asset classes, cash included
+  const classes = spread(holdings, h => [{ key: h.assetClass, label: h.assetClass, weight: 1 }]);
+  if (cash > 0) classes.rows.push({ key: 'cash', label: 'Kontanter', value: cash });
+  classes.rows.sort((a, b) => b.value - a.value);
+
+  const countries = spread(holdings, state.countryMode === 'listing' ? listingEntries : countryEntries);
+  const categories = spread(funds, h => [{ key: h.category || '', label: h.category || 'Okategoriserat', weight: 1 }]);
+  const sectors = spread(holdings, h => (h.details?.sectors || []).map(s => ({ key: s.name, label: s.name, weight: s.weight })));
+  const companyRows = companies(holdings);
+  const pairs = overlaps(holdings);
+  const lookthrough = spread(holdings, countryEntries);
+  const sweden = lookthrough.rows.find(r => r.key === 'SE')?.value || 0;
+  const abroadTop = lookthrough.rows.find(r => r.key !== 'SE');
+
+  // Fees: what the funds cost per year at today's value
+  const withFee = funds.filter(h => isNum(h.fee));
+  const feePerYear = withFee.reduce((acc, h) => acc + h.value * h.fee / 100, 0);
+  const feeBase = withFee.reduce((acc, h) => acc + h.value, 0);
+  // Currency: what the shares behind everything trade in; cash counts as kronor
+  const currencies = spread(holdings, currencyEntries);
+  if (cash > 0) {
+    const sek = currencies.rows.find(r => r.key === 'SEK');
+    if (sek) sek.value += cash;
+    else currencies.rows.push({ key: 'SEK', label: currencyLabel('SEK'), value: cash });
+    currencies.known += cash;
+    currencies.rows.sort((a, b) => b.value - a.value);
+  }
+  const foreignCurrency = currencies.known > 0 ? 1 - (currencies.rows.find(r => r.key === 'SEK')?.value || 0) / currencies.known : null;
+
+  // Risk: Avanza's 1–7 for funds and ETFs (shares have none), plus how concentrated it is
+  const rated = holdings.filter(h => h.isFund && isNum(h.details?.risk));
+  const ratedValue = rated.reduce((acc, h) => acc + h.value, 0);
+  const avgRisk = ratedValue > 0 ? rated.reduce((acc, h) => acc + h.value * h.details.risk, 0) / ratedValue : null;
+  const riskLevels = spread(holdings, h => {
+    if (!h.isFund) return [{ key: 'stock', label: 'Aktier (ingen risknivå)', weight: 1 }];
+    const risk = h.details?.risk;
+    return [isNum(risk) ? { key: `r${risk}`, label: `Risk ${risk} · ${RISK_TEXT[risk] || ''}`, weight: 1 } : { key: 'unknown', label: 'Okänd risk', weight: 1 }];
+  });
+  if (cash > 0) riskLevels.rows.push({ key: 'cash', label: 'Kontanter', value: cash });
+  riskLevels.rows.sort((a, b) => a.key.localeCompare(b.key, 'sv', { numeric: true }));
+  const byValue = [...holdings].sort((a, b) => b.value - a.value);
+  const top5 = byValue.slice(0, 5).reduce((acc, h) => acc + h.value, 0);
+
+  // Dividends over the last twelve months, against today's value
+  const yearAgo = shiftMonths(today(), 12);
+  const dividends12m = state.data.transactions
+    .filter(t => t.type === 'dividend' && t.date > yearAgo && isNum(t.amount))
+    .reduce((acc, t) => acc + t.amount, 0);
+
+  const coveredByTop = funds.reduce((acc, h) => acc + h.value * Math.min(100, (h.details?.holdings || []).reduce((s, c) => s + c.weight, 0)) / 100, 0);
+
+  const loading = state.detailsLoading ? el('p', { class: 'hint' }, 'Hämtar fonddata från Avanza…') : null;
+  const top = companyRows[0];
+
+  const kpis = el('section', { class: 'kpis analysis-kpis', 'aria-label': 'Insikter' },
+    kpiTile({
+      label: 'Fondavgifter per år',
+      value: withFee.length ? kr(feePerYear) : '–',
+      sub: withFee.length
+        ? [`${fmt(feeBase > 0 ? (feePerYear / feeBase) * 100 : 0, 2)} % i snitt`, `≈ ${kr(feePerYear * 10)} på 10 år`, withFee.length < funds.length ? `avgift saknas för ${funds.length - withFee.length}` : null].filter(Boolean).join(' · ')
+        : 'Inga fonder med känd avgift'
+    }),
+    kpiTile({
+      label: 'I Sverige, genom fonderna',
+      value: lookthrough.known > 0 ? share(sweden / lookthrough.known) : '–',
+      sub: abroadTop ? `Störst utomlands: ${abroadTop.label} ${share(abroadTop.value / lookthrough.known)}` : null
+    }),
+    kpiTile({
+      label: 'Utdelningar senaste 12 mån',
+      value: kr(dividends12m),
+      sub: invested > 0 ? `${fmt((dividends12m / invested) * 100, 2)} % av dagens värde` : null
+    }),
+    kpiTile({
+      label: 'Största bolaget totalt',
+      value: top ? top.name : '–',
+      sub: top ? `${kr(top.value)} · ${share(top.value / invested)} av värdepapperen` : null
+    })
+  );
+
+  const countryControls = el('div', { class: 'seg', role: 'group', 'aria-label': 'Hur länderna räknas' },
+    [['lookthrough', 'Genom fonderna'], ['listing', 'Noteringsland']].map(([mode, label]) => el('button', {
+      type: 'button',
+      'aria-pressed': String(state.countryMode === mode),
+      onclick: () => { state.countryMode = mode; savePref('countryMode', mode); renderAnalysis(); }
+    }, label))
+  );
+
+  const companyTable = companyRows.length ? el('div', { class: 'table-wrap' }, el('table', {},
+    el('thead', {}, el('tr', {}, el('th', {}, 'Bolag'), el('th', {}, 'Värde'), el('th', {}, 'Andel'))),
+    el('tbody', {}, companyRows.slice(0, 15).map(c => el('tr', {},
+      el('td', {}, el('strong', {}, c.name), el('span', { class: 'sub' },
+        c.via.sort((a, b) => b.value - a.value).map(v => `${v.name} ${kr(v.value)}`).join(' · '))),
+      el('td', { class: 'num' }, kr(c.value)),
+      el('td', { class: 'num' }, share(c.value / invested))
+    )))
+  )) : el('p', { class: 'muted' }, 'Ingen data ännu.');
+
+  const overlapBody = pairs.length ? el('div', { class: 'table-wrap' }, el('table', {},
+    el('thead', {}, el('tr', {}, el('th', {}, 'Fonder'), el('th', {}, 'Överlapp'))),
+    el('tbody', {}, pairs.slice(0, 8).map(p => el('tr', {},
+      el('td', {}, el('strong', {}, `${p.a.name} + ${p.b.name}`), el('span', { class: 'sub' },
+        `${p.common.length} gemensamma bolag, t.ex. ${p.common.slice(0, 3).map(c => c.name).join(', ')}`)),
+      el('td', { class: 'num' }, `${fmt(p.overlap, 1)} %`)
+    )))
+  )) : el('p', { class: 'muted' }, funds.length > 1 ? 'Fonderna har inga gemensamma bolag bland sina största innehav.' : 'Behöver minst två fonder eller ETF:er.');
+
+  const categoryNames = [...new Set(funds.map(h => h.category).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'sv'));
+  const fundTable = funds.length ? el('div', { class: 'table-wrap' }, el('table', {},
+    el('thead', {}, el('tr', {},
+      el('th', {}, 'Fond'), el('th', {}, 'Typ'), el('th', {}, 'Avgift %'), el('th', {}, 'Kr per år'), el('th', { class: 'col-opt' }, 'Risk'), el('th', { class: 'col-opt' }, 'Värde')
+    )),
+    el('tbody', {}, funds.map(h => {
+      const avanzaCategory = h.details?.category || null;
+      const category = el('input', {
+        type: 'text', class: `cell-input${h.instrument.category ? ' overridden' : ''}`, list: 'category-list', value: h.category || '',
+        placeholder: 'Välj typ', 'aria-label': `Typ för ${h.name}`,
+        title: h.instrument.category ? `Ändrad av dig. Töm rutan för Avanzas kategori${avanzaCategory ? ` (${avanzaCategory})` : ''}.` : 'Avanzas kategori',
+        onchange: e => {
+          const value = e.target.value.trim();
+          saveInstrumentField(h.id, 'category', value && value !== avanzaCategory ? value : null);
+        },
+        onkeydown: e => { if (e.key === 'Enter') e.target.blur(); }
+      });
+      const fee = el('input', {
+        type: 'text', inputmode: 'decimal', class: `cell-input fee-input${isNum(h.instrument.fee) ? ' overridden' : ''}`, value: numInput(h.fee),
+        placeholder: '–', 'aria-label': `Avgift i procent för ${h.name}`,
+        title: isNum(h.instrument.fee) ? `Ändrad av dig. Töm rutan för Avanzas avgift${isNum(h.avanzaFee) ? ` (${numInput(h.avanzaFee)} %)` : ''}.` : 'Årlig avgift enligt Avanza',
+        onchange: e => {
+          const text = e.target.value.trim();
+          const value = parseNum(text);
+          if (text && !(value >= 0)) { e.target.classList.add('invalid'); return; }
+          saveInstrumentField(h.id, 'fee', text && value !== h.avanzaFee ? value : null);
+        },
+        onkeydown: e => { if (e.key === 'Enter') e.target.blur(); }
+      });
+      const sub = [
+        h.instrument.track ? `följer ${h.instrument.track.name}` : null,
+        h.details?.fundType && h.details.fundType !== h.category ? h.details.fundType : null,
+        h.instrument.kind === 'etf' && !isNum(h.fee) ? 'ange avgiften själv, Avanza visar den inte' : null
+      ].filter(Boolean).join(' · ');
+      return el('tr', {},
+        el('td', {}, el('strong', {}, h.name), sub ? el('span', { class: 'sub' }, sub) : null),
+        el('td', {}, category),
+        el('td', { class: 'num' }, fee),
+        el('td', { class: 'num' }, isNum(h.fee) ? kr(h.value * h.fee / 100) : '–'),
+        el('td', { class: 'num col-opt' }, isNum(h.details?.risk) ? `${h.details.risk} av 7` : '–'),
+        el('td', { class: 'num col-opt' }, kr(h.value))
+      );
+    }))
+  )) : el('p', { class: 'muted' }, 'Inga fonder eller ETF:er.');
+
+  container.replaceChildren(...[loading].filter(Boolean),
+    kpis,
+    el('div', { class: 'analysis-grid analysis' },
+      analysisCard('Tillgångsslag', [
+        barList(classes.rows, invested + cash),
+        el('p', { class: 'note' }, `Totalt ${kr(invested + cash)}. Ett eget innehav som följer en fond räknas som fond.`)
+      ]),
+      analysisCard('Fondtyper', [
+        barList(categories.rows, fundValue),
+        el('p', { class: 'note' }, 'Enligt Avanzas kategori. Du kan ändra typen i tabellen längst ner.')
+      ]),
+      analysisCard('Länder', [
+        barList(countries.rows, countries.known, 12),
+        unknownNote(countries.unknown, 'landsdata'),
+        el('p', { class: 'note' }, state.countryMode === 'listing'
+          ? 'Aktier räknas på bolagets land, fonder och ETF:er på sin kategori.'
+          : 'Fonder och ETF:er fördelas på länderna de äger aktier i, enligt Avanzas senaste fonddata. Kontanter räknas inte.')
+      ], { controls: countryControls }),
+      analysisCard('Sektorer', [
+        barList(sectors.rows, sectors.known, 12),
+        unknownNote(sectors.unknown, 'sektordata'),
+        el('p', { class: 'note' }, 'Fonder och ETF:er fördelas efter sina sektorvikter, aktier på bolagets sektor.')
+      ]),
+      analysisCard('Valuta', [
+        barList(currencies.rows, currencies.known),
+        unknownNote(currencies.unknown, 'valutadata'),
+        el('p', { class: 'note' }, `${share(foreignCurrency)} är exponerat mot andra valutor än kronor. Räknat på vilka länders aktier du äger, även genom fonder i kronor, eftersom de följer valutan. Valutasäkrade fonder syns inte. Kontanter räknas som kronor.`)
+      ]),
+      analysisCard('Risk', [
+        el('div', { class: 'stats' },
+          el('div', {}, el('span', { class: 'kpi-label' }, 'Fondernas risk, viktad'), el('strong', {}, isNum(avgRisk) ? `${fmt(avgRisk, 1)} av 7` : '–')),
+          el('div', {}, el('span', { class: 'kpi-label' }, 'Största innehavet'), el('strong', {}, byValue[0] ? share(byValue[0].value / invested) : '–')),
+          el('div', {}, el('span', { class: 'kpi-label' }, 'Fem största'), el('strong', {}, share(top5 / invested)))
+        ),
+        barList(riskLevels.rows, invested + cash),
+        el('p', { class: 'note' }, `Avanzas risknivå 1–7 för fonder och ETF:er, viktad på värdet. Aktier har ingen risknivå. Största innehavet är ${byValue[0]?.name || '–'}. Största och fem största räknas på värdepapperen, utan kontanter.`)
+      ]),
+      analysisCard('Underliggande bolag', [
+        companyTable,
+        el('p', { class: 'note' }, fundValue > 0
+          ? `Aktier du äger direkt plus de ca 25 största innehaven i varje fond, som täcker ${share(coveredByTop / fundValue)} av fondernas värde. Resten är spritt på mindre innehav.`
+          : 'Aktier du äger direkt.')
+      ]),
+      analysisCard('Överlapp mellan fonder', [
+        overlapBody,
+        el('p', { class: 'note' }, 'Hur stor del av fonderna som ligger i samma bolag, räknat på de största innehaven. Högt överlapp betyder att fonderna sprider risken mindre än det ser ut.')
+      ]),
+      dividendsCard(),
+      analysisCard('Fonder: typ och avgift', [
+        fundTable,
+        el('datalist', { id: 'category-list' }, [...new Set([...categoryNames, 'Global', 'Sverige', 'Norden', 'Europa', 'Nordamerika', 'Tillväxtmarknader', 'Räntefond', 'Blandfond'])].map(n => el('option', { value: n }))),
+        el('p', { class: 'note' }, 'Typ och avgift kommer från Avanza. Ändra en ruta för att sätta ett eget värde, töm den för att gå tillbaka till Avanzas.')
+      ], { wide: true })
+    )
+  );
+}
+
 // --- Graph ---
 
 function renderRangeControls() {
@@ -989,6 +1476,8 @@ function niceTicks(min, max, count) {
 
 function renderChart() {
   const container = $('chart');
+  // Hidden behind the analysis tab it has no size; setView draws it when it's shown again
+  if (!container.clientWidth) return;
   const series = state.mode === 'actual'
     ? [{ key: 'value', label: 'Värde', color: 'var(--series-1)' }, { key: 'invested', label: 'Anskaffningsvärde', color: 'var(--series-2)' }]
     : [{ key: 'value', label: 'Dagens innehav, värderat bakåt i tiden', color: 'var(--series-1)' }];
@@ -1514,11 +2003,12 @@ async function importJson(file) {
 
 function wireEvents() {
   $('new-tx').addEventListener('click', () => openTxDialog());
-  $('refresh').addEventListener('click', () => { refreshQuotes(); state.history = {}; loadChart(); });
+  $('refresh').addEventListener('click', () => { state.details = {}; refreshQuotes(); state.history = {}; loadChart(); });
   document.querySelectorAll('#mode button').forEach(b => b.addEventListener('click', () => setMode(b.dataset.mode)));
-  document.querySelectorAll('.tabs button').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('#view-tabs button').forEach(b => b.addEventListener('click', () => setView(b.dataset.view)));
+  document.querySelectorAll('#list-tabs button').forEach(b => b.addEventListener('click', () => {
     state.tab = b.dataset.tab;
-    document.querySelectorAll('.tabs button').forEach(t => t.setAttribute('aria-selected', String(t === b)));
+    document.querySelectorAll('#list-tabs button').forEach(t => t.setAttribute('aria-selected', String(t === b)));
     $('holdings').hidden = state.tab !== 'holdings';
     $('transactions').hidden = state.tab !== 'transactions';
     $('closed-toggle').style.visibility = state.tab === 'holdings' ? '' : 'hidden';
@@ -1563,6 +2053,7 @@ function wireEvents() {
 async function init() {
   wireEvents();
   renderRangeControls();
+  setView(state.view);
   try {
     const { data, version, email } = await api('/api/portfolio');
     state.data = normalize(data);

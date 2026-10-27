@@ -27,6 +27,12 @@
   </div>
 
   <main>
+    <div class="tabs view-tabs" id="view-tabs" role="tablist" aria-label="Vy">
+      <button type="button" role="tab" data-view="overview" aria-selected="true" aria-controls="view-overview">Översikt</button>
+      <button type="button" role="tab" data-view="analysis" aria-selected="false" aria-controls="view-analysis">Analys</button>
+    </div>
+
+    <div class="view" id="view-overview" role="tabpanel">
     <section class="kpis" id="kpis" aria-label="Sammanfattning"></section>
 
     <div class="layout">
@@ -58,7 +64,7 @@
 
     <section class="card">
       <div class="card-head">
-        <div class="tabs" role="tablist">
+        <div class="tabs" id="list-tabs" role="tablist">
           <button type="button" role="tab" data-tab="holdings" aria-selected="true">Innehav</button>
           <button type="button" role="tab" data-tab="transactions" aria-selected="false">Affärer</button>
         </div>
@@ -67,6 +73,9 @@
       <div id="holdings"></div>
       <div id="transactions" hidden></div>
     </section>
+    </div>
+
+    <div class="view" id="view-analysis" role="tabpanel" hidden></div>
 
     <footer class="footer">
       <p>Kurser från Avanza. Aktier och ETF:er är fördröjda ca 15 min, fonder har en kurs per dag. Utländska innehav räknas om till kronor med aktuell växelkurs.</p>

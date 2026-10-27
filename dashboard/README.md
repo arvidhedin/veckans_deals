@@ -85,6 +85,12 @@ kod till mejlen, och sedan en tom portfölj. Lägg in ditt första innehav med *
 - **Graf:** *Portföljen* visar vad portföljen var värd varje dag utifrån dina affärer. *Dagens
   innehav* visar hur det du äger nu har gått bakåt i tiden, vilket är användbart så länge allt
   är inlagt som startläge.
+- **Analys:** fliken högst upp visar fördelning per tillgångsslag, fondtyp, land och sektor, dina
+  största bolag genom alla fonder, överlapp mellan fonderna, vad fondavgifterna kostar per år,
+  valutaexponering, fondernas viktade risknivå och utdelningar per år, månad och innehav.
+  Land, sektor, största innehav, kategori och avgift hämtas från Avanzas fonddata
+  (`functions/api/details.js`). Ett eget innehav som följer en fond analyseras som den fonden.
+  Typ och avgift kan ändras i tabellen längst ner, t.ex. för ETF:er där Avanza inte visar avgiften.
 - **Säkerhetskopior:** KV sparar en kopia per dag (`backup:ÅÅÅÅ-MM-DD`, 60 dagar). Du kan också
   exportera/importera allt som JSON längst ner på sidan.
 
