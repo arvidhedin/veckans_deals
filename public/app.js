@@ -145,6 +145,14 @@ async function fetchDealsData() {
 }
 
 // --- Statistics & Store Counts ---
+// ISO week number, the week ICA's offers run (Monday–Sunday)
+function isoWeek(date) {
+  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  return Math.ceil(((d - yearStart) / 86400000 + 1) / 7);
+}
+
 function computeStoreCounts() {
   state.storeCounts = {};
   for (const offer of state.allOffers) {
@@ -165,6 +173,17 @@ function computeStoreCounts() {
     }
     return 0;
   };
+
+  // ICA's offers are uploaded by hand once a week (ica.se blocks the scraper), so say so
+  // when this week's haven't been uploaded instead of showing nine stores with 0 offers
+  const icaMissingNote = document.getElementById('ica-missing-note');
+  if (icaMissingNote) {
+    const icaOffers = Object.entries(state.storeCounts)
+      .filter(([store]) => store.startsWith('ICA '))
+      .reduce((sum, [, count]) => sum + count, 0);
+    icaMissingNote.textContent = `ICA-erbjudandena för v. ${isoWeek(new Date())} är inte hämtade än.`;
+    icaMissingNote.classList.toggle('hidden', icaOffers > 0);
+  }
 
   // ICA
   updateCountElement('count-ica-raby', getCount('ICA Nära Råbyvägen'));

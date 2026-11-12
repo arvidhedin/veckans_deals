@@ -1,39 +1,36 @@
-import requests
-from bs4 import BeautifulSoup
+"""ICA:s veckoerbjudanden.
+
+Sedan 2026-10-28 svarar ica.se 403 (Akamai) på alla anrop från skript, så butikssidorna kan
+inte längre hämtas härifrån. I stället läser ett bokmärke (public/ica-export.js) butikernas
+erbjudandesidor i en vanlig webbläsare och laddar upp dem till uppsaladeals.se
+(functions/api/ica-offers.js). Här hämtas den uppladdningen och tolkas som förut.
+"""
+import datetime
+import os
 import re
-import json
-import time
+
+import requests
 
 from scrapers.origin import country
 from scrapers.pricing import parse_number, parse_price_per_kg, price_per_kg_fields
 
 
-# ICA butiker att hämta erbjudanden för
-STORES = {
-    "ICA Nära Råbyvägen": "https://www.ica.se/erbjudanden/ica-nara-rabyvagen-1003963/",
-    "ICA Supermarket Torgkassen": "https://www.ica.se/erbjudanden/ica-supermarket-torgkassen-1003821/",
-    "ICA Nära Rosendal": "https://www.ica.se/erbjudanden/ica-nara-rosendal-1004328/",
-    "ICA Supermarket Väst": "https://www.ica.se/erbjudanden/ica-supermarket-vast-1003761/",
-    "ICA Vretgränd": "https://www.ica.se/erbjudanden/ica-vretgrand-1003558/",
-    "ICA Supermarket City": "https://www.ica.se/erbjudanden/ica-supermarket-city-uppsala-1003381/",
-    "ICA Supermarket Luthagens Livs": "https://www.ica.se/erbjudanden/ica-supermarket-luthagens-livs-1004458/",
-    "ICA Folkes Livs": "https://www.ica.se/erbjudanden/ica-folkes-livs-1004181/",
-    "ICA Nära Hörnan": "https://www.ica.se/erbjudanden/ica-nara-hornan-1003672/",
-}
+UPLOAD_URL = os.environ.get("ICA_OFFERS_URL", "https://uppsaladeals.se/api/ica-offers")
 
-HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
-                  "AppleWebKit/537.36 (KHTML, like Gecko) "
-                  "Chrome/120.0.0.0 Safari/537.36",
-    "Accept-Language": "sv-SE,sv;q=0.9",
-}
+# ICA-butikerna, i den ordning de visas. Sidorna de läses från står i public/ica-export.js
+STORES = [
+    "ICA Nära Råbyvägen",
+    "ICA Supermarket Torgkassen",
+    "ICA Nära Rosendal",
+    "ICA Supermarket Väst",
+    "ICA Vretgränd",
+    "ICA Supermarket City",
+    "ICA Supermarket Luthagens Livs",
+    "ICA Folkes Livs",
+    "ICA Nära Hörnan",
+]
 
-# ICA:s sida svarar ibland utan erbjudanden eller inte alls, så varje butik får flera försök
-ATTEMPTS = 3
-RETRY_DELAY = 5  # sekunder
-
-# Sidans status för veckans erbjudanden: 0 = NotLoaded, 1 = Loading, 2 = Loaded, 3 = Error
-WEEKLY_OFFERS_LOADED = 2
+STOCKHOLM = datetime.timezone(datetime.timedelta(hours=1))  # Räcker för att avgöra vilket datum det är
 
 # ICA:s varugrupper är breda ("Färskvaror" rymmer både kött, ost och fisk), så de finare
 # grupperna (expandedArticleGroupId) används när de är kända. Kategoriseraren använder
@@ -52,61 +49,13 @@ ARTICLE_GROUPS = {
 }
 
 
-def _parse_initial_data(html: str) -> dict | None:
-    """Extrahera window.__INITIAL_DATA__ från HTML och parsa till dict."""
-    soup = BeautifulSoup(html, "html.parser")
-    script = soup.find("script", string=re.compile(r"window\.__INITIAL_DATA__"))
-    if not script or not script.string:
-        return None
-
-    match = re.search(r"window\.__INITIAL_DATA__\s*=\s*(\{.*\});?", script.string)
-    if not match:
-        return None
-
-    json_str = match.group(1)
-    if json_str.endswith(";"):
-        json_str = json_str[:-1]
-
-    # Fixa JavaScript-specifika värden som inte är giltig JSON
-    json_str = re.sub(r":\s*undefined", ":null", json_str)
-    json_str = re.sub(r"new\s+Map\(\[.*?\]\)", "{}", json_str)
-
-    return json.loads(json_str)
-
-
-def _weekly_offers(html: str) -> list[dict]:
-    """Veckans erbjudanden ur butikssidan. Sidan renderas hos ICA och svarar 200 även när
-    ICA:s server inte fick fram erbjudandena – då är weeklyOffersStatus 3 (Error) och
-    listan tom. Det ger ett fel, så att butiken hämtas igen i stället för att tyst försvinna."""
-    data = _parse_initial_data(html)
-    if not data:
-        raise ValueError("sidan saknar window.__INITIAL_DATA__")
-
-    offers = data.get("offers") or {}
-    weekly_offers = offers.get("weeklyOffers") or []
-    status = offers.get("weeklyOffersStatus")
-    # Tom lista med status Loaded betyder att butiken inte har några erbjudanden
-    if not weekly_offers and status != WEEKLY_OFFERS_LOADED:
-        raise ValueError(f"sidan saknar erbjudanden (weeklyOffersStatus {status})")
-    return weekly_offers
-
-
-def _fetch_weekly_offers(store_name: str, url: str) -> list[dict]:
-    """Hämtar butikens veckoerbjudanden. Försöker igen efter en kort paus om sidan inte
-    svarar eller saknar erbjudanden, och skriver ut ett fel om alla försök misslyckas."""
-    for attempt in range(1, ATTEMPTS + 1):
-        try:
-            response = requests.get(url, headers=HEADERS, timeout=10)
-            response.raise_for_status()
-            return _weekly_offers(response.text)
-        except Exception as e:
-            error = e
-            if attempt < ATTEMPTS:
-                print(f"ICA-erbjudanden ({store_name}): {e} – försöker igen om {RETRY_DELAY} s")
-                time.sleep(RETRY_DELAY)
-
-    print(f"Fel vid hämtning av ICA-erbjudanden ({store_name}), gav upp efter {ATTEMPTS} försök: {error}")
-    return []
+def _still_valid(offer: dict, today: datetime.date) -> bool:
+    """Erbjudandet gäller fortfarande. validTo är sista dagen, t.ex. "2026-11-15T00:00:00".
+    Utan datum behålls det hellre än att försvinna."""
+    try:
+        return datetime.date.fromisoformat(str(offer.get("validTo"))[:10]) >= today
+    except ValueError:
+        return True
 
 
 def _parse_offer(offer: dict, store_name: str) -> dict:
@@ -197,17 +146,24 @@ def _parse_offer(offer: dict, store_name: str) -> dict:
 
 
 def get_offers() -> list[dict]:
-    """Hämtar veckans erbjudanden från alla konfigurerade ICA-butiker."""
+    """Veckans erbjudanden för alla ICA-butiker, ur den senaste uppladdningen från bokmärket.
+    Erbjudanden vars vecka har gått ut tas bort, så en gammal uppladdning ger inga erbjudanden."""
+    response = requests.get(UPLOAD_URL, timeout=30)
+    response.raise_for_status()
+    upload = response.json()
+    print(f"ICA-erbjudanden uppladdade: {upload.get('uploaded_at') or 'aldrig'}")
+
+    today = datetime.datetime.now(STOCKHOLM).date()
+    uploaded = upload.get("stores") or {}
     all_offers = []
-
-    for store_name, url in STORES.items():
-        weekly_offers = _fetch_weekly_offers(store_name, url)
-        try:
-            for offer in weekly_offers:
-                parsed = _parse_offer(offer, store_name)
-                all_offers.append(parsed)
-
-        except Exception as e:
-            print(f"Fel vid hämtning av ICA-erbjudanden ({store_name}): {e}")
+    for store_name in STORES:
+        offers = [o for o in uploaded.get(store_name) or [] if _still_valid(o, today)]
+        if not offers:
+            print(f"Inga giltiga ICA-erbjudanden för {store_name} – kör bokmärket på ica.se")
+        for offer in offers:
+            try:
+                all_offers.append(_parse_offer(offer, store_name))
+            except Exception as e:
+                print(f"Kunde inte tolka ICA-erbjudande ({store_name}): {e}")
 
     return all_offers
