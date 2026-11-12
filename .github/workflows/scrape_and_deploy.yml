@@ -24,6 +24,10 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          # The newest main, not the commit main pointed at when the run was triggered: a run
+          # started by an ICA upload can wait in the queue while an earlier run pushes data
+          ref: main
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -51,7 +55,9 @@ jobs:
             echo "No changes in deals.json to commit."
           else
             git commit -m "Update deals data"
-            # Someone may have pushed while the scrape was running
-            git pull --rebase
+            # Someone may have pushed while the scrape was running. The data files are
+            # generated, so if both changed them this run's newer files win (in a rebase,
+            # "theirs" is the commit being replayed, i.e. this run's)
+            git pull --rebase -X theirs
             git push
           fi
