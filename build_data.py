@@ -116,19 +116,21 @@ def main():
 
     # Dinner recipes from ica.se whose protein is on offer -> public/recipes.json. Their
     # ingredients point at the offers in deals.json by index, so this runs after the offers
-    # are sorted. The recipe pages don't change, so the previous ingredients are reused.
+    # are sorted. The recipe pages don't change, so every recipe fetched is kept in
+    # data/recipe_archive.json and reused (ica.se blocks scripted requests since 2026-10-28).
     print("Fetching recipes from ica.se...")
     recipes_path = os.path.join("public", "recipes.json")
-    previous_recipes = []
+    archive_path = os.path.join("data", "recipe_archive.json")
+    recipe_archive = []
     try:
-        with open(recipes_path, encoding="utf-8") as f:
-            previous_recipes = json.load(f).get("recipes", [])
-    except (OSError, ValueError, AttributeError):
+        with open(archive_path, encoding="utf-8") as f:
+            recipe_archive = json.load(f)
+    except (OSError, ValueError):
         pass
 
     recipe_list = []
     try:
-        recipe_list = recipes.build_recipes(all_offers, previous_recipes)
+        recipe_list, recipe_archive = recipes.build_recipes(all_offers, recipe_archive)
     except Exception as e:
         print(f"   [FAIL] Recipes: Failed with error: {e}")
         traceback.print_exc()
@@ -174,6 +176,12 @@ def main():
                   f, ensure_ascii=False, separators=(",", ":"))
 
     os.makedirs("data", exist_ok=True)
+    # One recipe per line, so a new recipe is one line in the diff
+    if recipe_archive:
+        with open(archive_path, "w", encoding="utf-8") as f:
+            f.write("[\n" + ",\n".join(json.dumps(r, ensure_ascii=False, separators=(",", ":"))
+                                         for r in recipe_archive) + "\n]\n")
+
     with open(prices_path, "w", encoding="utf-8") as f:
         json.dump(ingredient_prices, f, ensure_ascii=False, indent=1)
 

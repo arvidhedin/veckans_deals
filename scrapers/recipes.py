@@ -10,8 +10,9 @@ specific kind ending with it ("Svensk nötfärs" is nötfärs, "Delikatesspotati
 another product starting with it ("Högrevsburgare" is no högrev), from another animal
 ("Lammkotlett") or processed ("Varmrökt lax", "Marinerad kycklingfilé").
 
-The recipe pages don't change, so their ingredients are reused from the previous build and
-only new recipes are fetched.
+The recipe pages don't change, so every recipe ever fetched is kept in data/recipe_archive.json
+and only new recipes are fetched. Since 2026-10-28 ica.se answers scripted requests with 403
+(Akamai); then nothing is fetched and the archived recipes are matched against the offers.
 """
 
 import json
@@ -469,12 +470,18 @@ class _OfferIndex:
         return tuple(offer.index for offer in self.offers if offer.is_(ingredient))
 
 
+class Blocked(Exception):
+    """ica.se refuses scripted requests (403)"""
+
+
 def _get(session: requests.Session, url: str) -> str | None:
     for attempt in range(3):
         try:
             response = session.get(url, headers=HEADERS, timeout=30)
             if response.status_code == 404:
                 return None
+            if response.status_code == 403:
+                raise Blocked(url)
             response.raise_for_status()
             return response.text
         except requests.RequestException as e:
@@ -535,8 +542,57 @@ def _protein_of(ingredients: list[dict], index: _OfferIndex) -> tuple[str, dict,
     return None
 
 
-def build_recipes(offers: list[dict], previous: list[dict] | None = None) -> list[dict]:
-    """Recipes whose protein is on offer, with the offers (indexes in `offers`) per ingredient"""
+# What the archive keeps of a recipe: the list card and the recipe page's ingredients
+ARCHIVE_FIELDS = ("id", "title", "url", "image_url", "cooking_time", "difficulty", "rating", "votes",
+                  "portions")
+
+
+def _from_card(card: dict) -> dict:
+    rating = card.get("rating") or {}
+    return {
+        "id": card.get("id"),
+        "title": card.get("title"),
+        "url": card.get("absoluteUrl"),
+        "image_url": IMAGE_URL + card["imageUrl"] if card.get("imageUrl") else None,
+        "cooking_time": card.get("cookingTime"),
+        "difficulty": card.get("difficulty"),
+        "rating": rating.get("averageRating"),
+        "votes": rating.get("numberOfVotes"),
+    }
+
+
+def _fetch_into_archive(protein_offers: dict, archive: dict) -> None:
+    """Adds the new recipes on the list pages of the proteins on offer to the archive and
+    updates the rating of those already in it. Stops at the first 403 from ica.se."""
+    session = requests.Session()
+    fetched = 0
+    try:
+        for protein, pages, _, _ in PROTEINS:
+            if protein not in protein_offers:
+                continue
+            for page in pages:
+                for card in get_recipe_cards(session, page):
+                    recipe_id = card.get("id")
+                    if not recipe_id or card.get("hasSponsorship"):
+                        continue
+                    if recipe_id in archive:
+                        archive[recipe_id].update(_from_card(card))
+                        continue
+                    time.sleep(REQUEST_DELAY)
+                    result = get_ingredients(session, card.get("absoluteUrl") or BASE_URL + card["url"].lstrip("/"))
+                    fetched += 1
+                    if not result:
+                        continue
+                    portions, ingredients = result
+                    archive[recipe_id] = {**_from_card(card), "portions": portions, "ingredients": ingredients}
+    except Blocked as e:
+        print(f"   [WARN] ica.se refuses scripted requests (403 on {e}); using the archived recipes")
+    print(f"   {fetched} new recipe pages fetched, {len(archive)} recipes in the archive")
+
+
+def build_recipes(offers: list[dict], archive: list[dict] | None = None) -> tuple[list[dict], list[dict]]:
+    """(recipes whose protein is on offer, with the offers (indexes in `offers`) per
+    ingredient; the updated archive of every recipe fetched from ica.se)"""
     # The proteins with a meat or fish offer this week, whose list pages are fetched
     protein_offers: dict[str, list[int]] = {}
     for i, offer in enumerate(offers):
@@ -548,58 +604,30 @@ def build_recipes(offers: list[dict], previous: list[dict] | None = None) -> lis
                 protein_offers.setdefault(protein, []).append(i)
     print(f"   Proteins on offer: {', '.join(f'{p} ({len(ix)})' for p, ix in protein_offers.items()) or 'none'}")
 
-    cached = {r["id"]: r for r in previous or [] if r.get("id") and r.get("ingredients")}
+    by_id = {r["id"]: r for r in archive or [] if r.get("id") and r.get("ingredients")}
+    _fetch_into_archive(protein_offers, by_id)
+
     index = _OfferIndex(offers)
-    session = requests.Session()
-    recipes, seen, fetched = [], set(), 0
-
-    for protein, pages, _, _ in PROTEINS:
-        if protein not in protein_offers:
+    recipes = []
+    for archived in by_id.values():
+        ingredients = [{"text": i["text"], "name": i["name"]} for i in archived["ingredients"]]
+        found = _protein_of(ingredients, index)
+        if not found:
             continue
-        for page in pages:
-            for card in get_recipe_cards(session, page):
-                recipe_id = card.get("id")
-                if not recipe_id or recipe_id in seen or card.get("hasSponsorship"):
-                    continue
-                seen.add(recipe_id)
+        recipe_protein, protein_ingredient, offers_for_protein = found
 
-                if recipe_id in cached:
-                    portions = cached[recipe_id].get("portions")
-                    ingredients = [{"text": i["text"], "name": i["name"]} for i in cached[recipe_id]["ingredients"]]
-                else:
-                    time.sleep(REQUEST_DELAY)
-                    result = get_ingredients(session, card.get("absoluteUrl") or BASE_URL + card["url"].lstrip("/"))
-                    fetched += 1
-                    if not result:
-                        continue
-                    portions, ingredients = result
+        for ingredient in ingredients:
+            if ingredient is protein_ingredient:
+                ingredient["offers"] = offers_for_protein
+            else:
+                ingredient["offers"] = index.matching(ingredient["name"])
+            ingredient["protein"] = ingredient is protein_ingredient
 
-                found = _protein_of(ingredients, index)
-                if not found:
-                    continue
-                recipe_protein, protein_ingredient, offers_for_protein = found
+        recipes.append({**{k: archived.get(k) for k in ARCHIVE_FIELDS},
+                        "protein": recipe_protein, "ingredients": ingredients})
 
-                for ingredient in ingredients:
-                    if ingredient is protein_ingredient:
-                        ingredient["offers"] = offers_for_protein
-                    else:
-                        ingredient["offers"] = index.matching(ingredient["name"])
-                    ingredient["protein"] = ingredient is protein_ingredient
-
-                rating = card.get("rating") or {}
-                recipes.append({
-                    "id": recipe_id,
-                    "title": card.get("title"),
-                    "url": card.get("absoluteUrl"),
-                    "image_url": IMAGE_URL + card["imageUrl"] if card.get("imageUrl") else None,
-                    "cooking_time": card.get("cookingTime"),
-                    "difficulty": card.get("difficulty"),
-                    "rating": rating.get("averageRating"),
-                    "votes": rating.get("numberOfVotes"),
-                    "portions": portions,
-                    "protein": recipe_protein,
-                    "ingredients": ingredients,
-                })
-
-    print(f"   [OK] Recipes: {len(recipes)} ({fetched} recipe pages fetched, the rest from the previous build)")
-    return recipes
+    print(f"   [OK] Recipes: {len(recipes)} with their protein on offer")
+    new_archive = sorted(({**{k: r.get(k) for k in ARCHIVE_FIELDS},
+                           "ingredients": [{"text": i["text"], "name": i["name"]} for i in r["ingredients"]]}
+                          for r in by_id.values()), key=lambda r: str(r["id"]))
+    return recipes, new_archive
