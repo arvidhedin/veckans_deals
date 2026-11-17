@@ -178,7 +178,7 @@ KEYWORDS = {
         wokgrönsaker glass glass* glasspinnar glasspinne glace sorbet gelato gelati
         glasscookies glasstårta ben_&_jerry triumf triumph gelatelli harvest_basket
         fläskschnitzel kycklingschnitzel ostschnitzel ostschnitzlar findus dafgård
-        dafgårds chef_select gooh kebab kebabkött gyros döner shawarma -biffar pannbiff
+        dafgårds chef_select gooh -biffar pannbiff
         järpar frikadeller -burgare vegofärs sojafärs quornfärs formbar_färs umamifärs
         oumph quorn tofu tempeh seitan vegetariska_produkter måltidsdelar nothing_fishy
         pizzasallad potatissallad pastasallad räksallad kycklingsallad coleslaw röra
@@ -248,6 +248,13 @@ WEAK_KEYWORDS = {
     "Dryck": "kolsyrat alkoholfri",
     "Frys & Färdigmat": "fryst frysta djupfryst =vego vego* vegetariskt =sandwich anamma =magnum kartanon",
     "Hushåll & Hygien": "refill listerine",
+}
+
+# Meat dishes that also name what goes with them: "Kebab" is meat, but "Kebab sås",
+# "Kebab bröd" and "Gyros kryddmix" are not. They decide when no ordinary keyword
+# matches, before the store's category (which says "Fryst" for frozen kebab meat).
+DISH_KEYWORDS = {
+    "Kött & Fågel": "kebab kebabkött gyros döner shawarma",
 }
 
 # Words that decide even when another product word comes first: "Ostschnitzel färdigrätt"
@@ -337,16 +344,16 @@ def _compile(keywords: str) -> list[tuple[re.Pattern, int]]:
     return patterns
 
 
-# (category, strength, patterns): strength 2 is ordinary, 1 weak and 3 strong
+# (category, strength, patterns): strength 2 is ordinary, 1 weak, 1.5 a dish and 3 strong
 _RULES = [
     (category, strength, _compile(keywords))
-    for strength, rules in ((2, KEYWORDS), (1, WEAK_KEYWORDS), (3, STRONG_KEYWORDS))
+    for strength, rules in ((2, KEYWORDS), (1, WEAK_KEYWORDS), (1.5, DISH_KEYWORDS), (3, STRONG_KEYWORDS))
     for category, keywords in rules.items()
 ]
 _STORE_CATEGORIES = [(re.compile(pattern, re.IGNORECASE), category) for pattern, category in STORE_CATEGORIES]
 
 
-def _best_keyword_match(text: str, strengths=(1, 2, 3), categories=CATEGORIES) -> str | None:
+def _best_keyword_match(text: str, strengths=(1, 1.5, 2, 3), categories=CATEGORIES) -> str | None:
     """The category of the best keyword match in the text: the strongest, then the first
     word, then a word ending over a word start, then the longest keyword."""
     best, best_score = None, None
@@ -381,6 +388,7 @@ def categorize_offer(offer: dict) -> str:
     # The store's category goes before weak keywords ("Rökt kalkon" is pålägg at Lidl)
     category = (
         _best_keyword_match(name, strengths=(2, 3))
+        or _best_keyword_match(name, strengths=(1.5,))
         or (raw_category and _store_category(raw_category))
         or _best_keyword_match(name, strengths=(1,))
         or _best_keyword_match(_normalize(offer.get("description")))
