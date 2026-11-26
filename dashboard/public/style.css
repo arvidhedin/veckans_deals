@@ -473,3 +473,5 @@ input.invalid { border-color: var(--danger); }
   .analysis input.cell-input { min-width: 100px; }
   .analysis input.fee-input { width: 64px; min-width: 0; }
 }
+
+tfoot tr.total-row td { border-top: 2px solid var(--border); font-weight: 600; }

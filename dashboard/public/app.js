@@ -564,6 +564,7 @@ function render() {
   renderCash();
   renderHoldings(aggregate(valued, p => p.instrumentId), total.value + cash);
   renderTransactions();
+  renderResults(aggregate(valued, p => p.instrumentId));
   renderChart();
   if (state.view === 'analysis') {
     renderAnalysis();
@@ -964,6 +965,59 @@ function renderTransactions() {
 }
 
 // --- Analysis: what the portfolio is made of, looking through funds and ETFs ---
+
+// Everything you have ever owned, sold or not: what each one has earned in total
+function renderResults(groups) {
+  if (!groups.length) {
+    $('results').replaceChildren(el('p', { class: 'muted' }, 'Inga affärer ännu.'));
+    return;
+  }
+  const rows = groups
+    .map(g => ({ g, unrealized: g.qty > 0 ? g.value - g.cost : 0 }))
+    .sort((a, b) => b.g.profit - a.g.profit);
+  const sum = f => rows.reduce((s, r) => s + f(r), 0);
+  const total = {
+    realized: sum(r => r.g.realized),
+    dividends: sum(r => r.g.dividends),
+    unrealized: sum(r => r.unrealized),
+    profit: sum(r => r.g.profit),
+    invested: sum(r => r.g.invested)
+  };
+  const money = v => el('td', { class: `num col-opt ${dirClass(v)}` }, signedKr(v));
+  const dates = id => state.data.transactions.filter(t => t.instrumentId === id && t.type !== 'dividend').map(t => t.date).sort();
+
+  $('results').replaceChildren(el('div', { class: 'table-wrap' }, el('table', {},
+    el('thead', {}, el('tr', {},
+      el('th', {}, 'Innehav'),
+      el('th', { class: 'num col-opt' }, 'Realiserat'),
+      el('th', { class: 'num col-opt' }, 'Utdelning'),
+      el('th', { class: 'num col-opt' }, 'Orealiserat'),
+      el('th', { class: 'num' }, 'Total vinst')
+    )),
+    el('tbody', {}, rows.map(({ g, unrealized }) => {
+      const instrument = state.data.instruments[g.key] || {};
+      const d = dates(g.key);
+      const period = d.length ? `${formatDate(d[0], { month: 'short', year: 'numeric' })}${g.qty > 0 ? ' –' : d.at(-1).slice(0, 7) !== d[0].slice(0, 7) ? ` – ${formatDate(d.at(-1), { month: 'short', year: 'numeric' })}` : ''}` : null;
+      return el('tr', { class: g.qty > 0 ? '' : 'closed-pos' },
+        el('td', {},
+          el('span', { class: 'name' }, instrument.name || g.key),
+          el('span', { class: 'sub' }, [KIND_LABEL[instrument.kind], g.qty > 0 ? 'Äger' : 'Sålt', period].filter(Boolean).join(' · '))
+        ),
+        money(g.realized),
+        money(g.dividends),
+        g.qty > 0 ? money(unrealized) : el('td', { class: 'num col-opt muted' }, '–'),
+        el('td', { class: `num ${dirClass(g.profit)}` }, signedKr(g.profit), el('span', { class: 'cell-sub' }, pct(g.profitPct)))
+      );
+    })),
+    el('tfoot', {}, el('tr', { class: 'total-row' },
+      el('td', {}, el('span', { class: 'name' }, 'Totalt'), el('span', { class: 'sub' }, `${rows.length} innehav · ${rows.filter(r => r.g.qty === 0).length} sålda`)),
+      money(total.realized),
+      money(total.dividends),
+      money(total.unrealized),
+      el('td', { class: `num ${dirClass(total.profit)}` }, signedKr(total.profit), el('span', { class: 'cell-sub' }, pct(total.invested > 0 ? total.profit / total.invested : null)))
+    ))
+  )));
+}
 
 const regionNames = (() => {
   try { return new Intl.DisplayNames(['sv'], { type: 'region' }); } catch { return null; }
@@ -2017,6 +2071,7 @@ function wireEvents() {
     document.querySelectorAll('#list-tabs button').forEach(t => t.setAttribute('aria-selected', String(t === b)));
     $('holdings').hidden = state.tab !== 'holdings';
     $('transactions').hidden = state.tab !== 'transactions';
+    $('results').hidden = state.tab !== 'results';
     $('closed-toggle').style.visibility = state.tab === 'holdings' ? '' : 'hidden';
   }));
   $('show-closed').addEventListener('change', e => { state.showClosed = e.target.checked; render(); });
