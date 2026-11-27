@@ -167,7 +167,9 @@ function normalize(data) {
   return {
     instruments: data && typeof data.instruments === 'object' && !Array.isArray(data.instruments) ? data.instruments : {},
     transactions: Array.isArray(data?.transactions) ? data.transactions : [],
-    cash: Array.isArray(data?.cash) ? data.cash : [] // [{ id, name, platform, amount, updatedAt }]
+    cash: Array.isArray(data?.cash) ? data.cash : [], // [{ id, name, platform, amount, updatedAt }]
+    // Cash per platform at the end of each day it changed: { platform: [[date, amount], ...] }
+    cashHistory: data && typeof data.cashHistory === 'object' && !Array.isArray(data.cashHistory) ? data.cashHistory : {}
   };
 }
 
@@ -519,6 +521,7 @@ function buildChartSeries() {
   const currentQty = {};
   computePositions().forEach(p => { currentQty[p.instrumentId] = (currentQty[p.instrumentId] || 0) + p.qty; });
 
+  const cashAt = state.mode === 'actual' ? cashLookup() : () => 0;
   const book = new Map();
   const qtyById = {};
   let next = 0;
@@ -543,10 +546,13 @@ function buildChartSeries() {
       const rate = L.currency === 'SEK' ? 1 : (L.fx(date) ?? L.firstFx);
       if (qty > 1e-9 && isNum(close) && isNum(rate)) value += qty * close * rate;
     }
-    const invested = state.mode === 'actual' ? [...book.values()].reduce((sum, p) => sum + p.cost, 0) : null;
-    series.push({ date, value, invested });
+    const cash = cashAt(date);
+    const invested = state.mode === 'actual' ? [...book.values()].reduce((sum, p) => sum + p.cost, 0) + cash : null;
+    series.push({ date, value: value + cash, invested });
   }
-  series.push({ date: todayStr, value: state.total.value, invested: state.mode === 'actual' ? state.total.cost : null });
+  // Today's point matches "Totalt värde": holdings plus cash
+  const cash = state.mode === 'actual' ? cashTotal() : 0;
+  series.push({ date: todayStr, value: state.total.value + cash, invested: state.mode === 'actual' ? state.total.cost + cash : null });
   return series;
 }
 
@@ -665,9 +671,32 @@ function cashTotal() {
   return state.data.cash.reduce((sum, c) => sum + (isNum(c.amount) ? c.amount : 0), 0);
 }
 
+// Remembers each platform's cash today, so the graph can show cash back in time
+function recordCashHistory(data) {
+  const date = today();
+  const totals = {};
+  for (const c of data.cash) totals[c.platform] = (totals[c.platform] || 0) + (isNum(c.amount) ? c.amount : 0);
+  for (const platform of new Set([...Object.keys(totals), ...Object.keys(data.cashHistory)])) {
+    const points = (data.cashHistory[platform] ||= []).filter(([d]) => d < date);
+    const amount = round(totals[platform] || 0, 2);
+    if (points.at(-1)?.[1] !== amount) points.push([date, amount]);
+    data.cashHistory[platform] = points;
+  }
+}
+
+// Cash on a date, for dates in increasing order. A platform with history counts what it had
+// then (nothing before its first point); one without counts today's amount all along.
+function cashLookup() {
+  const history = state.data.cashHistory;
+  const withHistory = Object.keys(history).filter(p => history[p]?.length);
+  const steppers = withHistory.map(p => stepper([...history[p]].sort(byDate)));
+  const constant = state.data.cash.filter(c => !withHistory.includes(c.platform)).reduce((sum, c) => sum + (isNum(c.amount) ? c.amount : 0), 0);
+  return date => constant + steppers.reduce((sum, at) => sum + (at(date) || 0), 0);
+}
+
 async function saveCash(change) {
   try {
-    await mutate(data => { change(data.cash); });
+    await mutate(data => { change(data.cash); recordCashHistory(data); });
   } catch (err) {
     showBanner(`Kunde inte spara: ${err.message}`);
   }
@@ -1539,7 +1568,7 @@ function renderChart() {
   // Hidden behind the analysis tab it has no size; setView draws it when it's shown again
   if (!container.clientWidth) return;
   const series = state.mode === 'actual'
-    ? [{ key: 'value', label: 'Värde', color: 'var(--series-1)' }, { key: 'invested', label: 'Anskaffningsvärde', color: 'var(--series-2)' }]
+    ? [{ key: 'value', label: 'Värde', color: 'var(--series-1)' }, { key: 'invested', label: 'Anskaffningsvärde + kontanter', color: 'var(--series-2)' }]
     : [{ key: 'value', label: 'Dagens innehav, värderat bakåt i tiden', color: 'var(--series-1)' }];
   $('legend').replaceChildren(...series.map(s => el('span', {}, el('i', { style: `background:${s.color}` }), s.label)));
 
